@@ -1,0 +1,273 @@
+{% load django_bootstrap5 static %}
+
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Iniciar Sessió - Borsa de Treball{% endblock %}</title>
+    
+    {% bootstrap_css %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+<div class="row justify-content-center align-items-center min-vh-100 mt-4">
+    <div class="col-lg-5 col-md-7 col-sm-9">
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-5">
+                <!-- Logo Section -->
+                <div class="text-center mb-4">
+                    <div class="logo-container mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100" height="40" viewBox="115 105 310 90">
+                            <style>
+                              circle {
+                                opacity: 0;
+                                animation: fadeInOut 4s infinite;
+                              }
+                          
+                              .circle1 { animation-delay: 0s; }
+                              .circle2 { animation-delay: 0.5s; }
+                              .circle3 { animation-delay: 1s; }
+                          
+                              @keyframes fadeInOut {
+                                0% { opacity: 0; }
+                                20% { opacity: 1; }
+                                80% { opacity: 1; }
+                                100% { opacity: 0; }
+                              }
+                            </style>
+                          
+                            <circle class="circle1" cx="160" cy="150" r="45" fill="#4B49AC"/>
+                            <circle class="circle2" cx="270" cy="150" r="45" fill="#7DA0FA"/>
+                            <circle class="circle3" cx="380" cy="150" r="45" fill="#98BDFF"/>
+                          </svg>
+                    </div>
+                    <h2 class="h4 text-dark mb-2">Benvingut/da de nou</h2>
+                    <p class="text-muted">Inicia sessió per accedir al teu compte</p>
+                </div>
+
+                <!-- Login Form -->
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>Error!</strong> {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Email Field (canviat de username a email) -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            <i class="bi bi-envelope me-2"></i>Correu electrònic
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="bi bi-envelope text-muted"></i>
+                            </span>
+                            <input type="email" 
+                                   class="form-control border-start-0 ps-0" 
+                                   id="email"
+                                   name="email"
+                                   value="{{ request.POST.email|default:'' }}"
+                                   placeholder="Introdueix el teu correu electrònic"
+                                   required>
+                        </div>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="mb-4">
+                        <label for="password" class="form-label">
+                            <i class="bi bi-lock me-2"></i>Contrasenya
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="bi bi-lock text-muted"></i>
+                            </span>
+                            <input type="password" 
+                                   class="form-control border-start-0 ps-0" 
+                                   id="password"
+                                   name="password"
+                                   placeholder="Introdueix la teva contrasenya"
+                                   required>
+                            <button class="btn btn-outline-secondary border-start-0" type="button" id="togglePassword">
+                                <i class="bi bi-eye" id="toggleIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Remember Me & Forgot Password -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="form-check">
+                            
+                        </div>
+                        <a href="#" class="text-decoration-none small">Has oblidat la contrasenya?</a>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid mb-4">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Iniciar sessió
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Divider -->
+                <div class="text-center mb-4">
+                    <div class="position-relative">
+                        <hr class="my-4">
+                        <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted small">
+                            o
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Google Login Button -->
+                <div class="d-grid mb-4">
+                    <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn btn-outline-danger btn-lg">
+                        <i class="bi bi-google me-2"></i>
+                        Iniciar sessió amb Google
+                    </a>
+                </div>
+
+                <!-- Registration Links -->
+                <div class="text-center">
+                    <p class="text-muted mb-3">No tens compte encara?</p>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <a href="{% url 'registre_estudiant' %}" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-mortarboard me-2"></i>
+                                <span class="d-none d-sm-inline">Sóc </span>Estudiant
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'registre_empresa' %}" class="btn btn-outline-success w-100">
+                                <i class="bi bi-building me-2"></i>
+                                <span class="d-none d-sm-inline">Sóc </span>Empresa
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Info -->
+        <div class="text-center mt-4">
+            <small class="text-muted">
+                <i class="bi bi-shield-check me-1"></i>
+                Les teves dades estan protegides i segures
+            </small>
+        </div>
+    </div>
+</div>
+
+<style>
+    .min-vh-100 {
+        min-height: calc(100vh - 140px) !important;
+    }
+    
+    .logo-svg {
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+        transition: transform 0.3s ease;
+    }
+    
+    .logo-svg:hover {
+        transform: scale(1.05);
+    }
+    
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .input-group-text {
+        border: 1px solid #ced4da;
+    }
+    
+    .form-control.border-start-0 {
+        border-left: none !important;
+    }
+    
+    .input-group-text.border-end-0 {
+        border-right: none !important;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        border: none;
+        padding: 12px;
+        font-weight: 500;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+    
+    .btn-outline-primary:hover,
+    .btn-outline-success:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    @media (max-width: 576px) {
+        .card-body {
+            padding: 2rem !important;
+        }
+        
+        .logo-svg {
+            width: 60px;
+            height: 60px;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle password visibility
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('toggleIcon');
+    
+    if (togglePassword && passwordInput && toggleIcon) {
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            if (type === 'password') {
+                toggleIcon.className = 'bi bi-eye';
+            } else {
+                toggleIcon.className = 'bi bi-eye-slash';
+            }
+        });
+    }
+    
+    // Form validation
+    const form = document.querySelector('.needs-validation');
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    }
+});
+</script>
+</body>
+</html>
