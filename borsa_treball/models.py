@@ -1,9 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
-from django.forms import ValidationError
+from django.core.exceptions import ValidationError 
 from django.utils import timezone
-from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
 from datetime import datetime
 
 class UsuariManager(BaseUserManager):
@@ -75,7 +73,7 @@ class Empresa(models.Model):
     descripcio = models.TextField(blank=True, null=True)
     num_treballadors = models.IntegerField(blank=True, null=True)
     web = models.URLField(blank=True, null=True)
-    logo = models.ImageField(upload_to='empreses/logos/', blank=True, null=True)
+    telefon = models.CharField(max_length=15, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "empreses"
@@ -166,7 +164,7 @@ class EstudiEstudiant(models.Model):
     
     data_creacio = models.DateTimeField(auto_now_add=True)
     data_modificacio = models.DateTimeField(auto_now=True)
-    
+
     
     class Meta:
         verbose_name = "Estudi estudiant"
@@ -221,6 +219,19 @@ class Funcio(models.Model):
         return f"Funció {self.ordre} - {self.descripcio[:50]}..."
 
 
+class NivellIdioma(models.Model):
+    oferta = models.ForeignKey('Oferta', on_delete=models.CASCADE, related_name='idiomes')
+    idioma = models.CharField(max_length=100, blank=True, help_text="Ex: anglès, català...")
+    nivell = models.CharField(max_length=100, blank=True, help_text="Ex: alt, mitjà, nadiu...")
+
+    class Meta:
+        verbose_name = "Nivell d'idioma"
+        verbose_name_plural = "Nivells d'idioma"
+
+    def __str__(self):
+        return f"{self.idioma or '-'} ({self.nivell or '-'})"
+    
+
 
 class Oferta(models.Model):
     TIPUS_CONTRACTE = [
@@ -237,32 +248,61 @@ class Oferta(models.Model):
         ('FL', 'Flexible'),
     ]
 
+    PUBLIC_DESTINATARI = [
+        ('EST', 'Estudiant'),
+        ('TIT', 'Titulat/da'),
+        ('AMB', 'Estudiant i Titulat/da'),
+    ]
+
+    EXPERIENCIA  = [
+        ('SE', 'Sense experiència'),
+        ('2A', '> 2 anys'),
+        ('5A', '> 5 anys'),
+    ]
+
+
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='ofertes')
+    
+    # informació bàsica
+    # camp obligatoris
     titol = models.CharField(max_length=100)
     descripcio = models.TextField()
-    cicles = models.ManyToManyField(Cicle, related_name='ofertes')
-    data_publicacio = models.DateField(auto_now_add=True)
+    numero_vacants = models.PositiveSmallIntegerField(default=1, verbose_name="Número vacants")
     data_limit = models.DateField()
+    lloc_treball = models.CharField(max_length=100)
+
+
     tipus_contracte = models.CharField(max_length=2, choices=TIPUS_CONTRACTE)
     jornada = models.CharField(max_length=2, choices=JORNADA)
-    horari = models.CharField(max_length=100)
-    salari = models.CharField(max_length=50, blank=True)
-    requisits = models.TextField(blank=True)
-    lloc_treball = models.CharField(max_length=100)
-    contacte_nom = models.CharField(max_length=100)
-    contacte_email = models.EmailField()
-    contacte_telefon = models.CharField(max_length=15)
+    hores_setmanals = models.PositiveSmallIntegerField(blank=True,null=True,verbose_name="Hores setmanals", help_text="Només s'utilitza si la jornada és parcial")
+    horari = models.CharField(max_length=100,blank=True,null=True)
+    public_destinatari = models.CharField(max_length=3,blank=True,null=True, choices=PUBLIC_DESTINATARI,default='AMB', verbose_name="A qui va dirigida")
+    experiencia = models.CharField(max_length=2,choices=EXPERIENCIA,blank=True,null=True,verbose_name="Experiència requerida")
+    salari = models.CharField(max_length=50, blank=True, null=True)
 
+    cicles = models.ManyToManyField(Cicle, related_name='ofertes')
+    capacitats_clau = models.ManyToManyField(CapacitatClau, blank=True, related_name='ofertes')
+
+    data_publicacio = models.DateField(auto_now_add=True)
+        
+    
+    # altres requesits que es vulguin posar
+    requisits = models.TextField(blank=True, null=True)    
+    # Camps optatius, de moment no es fan servir
+    contacte_nom = models.CharField(max_length=100, blank=True,null=True)
+    contacte_email = models.EmailField(blank=True,null=True)
+    contacte_telefon = models.CharField(max_length=15, blank=True,null=True)
+
+   
     # Visible per l'empresa
     visible = models.BooleanField(default=True, help_text="Controlat per l'empresa")
-
     # Activació per part del responsable de borsa
     activa = models.BooleanField(default=False, help_text="Activat pel responsable de la borsa de treball")
 
-    capacitats_clau = models.ManyToManyField(CapacitatClau, blank=True, related_name='ofertes')
+   
 
     def __str__(self):
-        return f"{self.titol} - {self.empresa.nom_comercial}"
+        return f"{self.titol}"
 
     class Meta:
         verbose_name = "Oferta"

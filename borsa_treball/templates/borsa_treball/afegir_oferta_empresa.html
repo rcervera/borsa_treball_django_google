@@ -1,0 +1,922 @@
+{% extends 'base.html' %}
+
+{% block title %}Nova Oferta - Borsa de Treball{% endblock %}
+
+{% block page_title %}Nova Oferta de Treball{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10 col-md-11">
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-5">
+                <!-- Header Section -->
+                <div class="text-center mb-4">
+                    <div class="mb-3">
+                        <i class="bi bi-megaphone text-primary" style="font-size: 2rem;"></i>
+                    </div>
+                    <h2 class="h4 text-dark mb-2">Nova Oferta de Treball</h2>
+                    <p class="text-muted">Publica una nova oferta per trobar el millor talent</p>
+                </div>
+
+                <!-- Messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Alertes API -->
+                <div id="api-missatges"></div>
+
+                <!-- Form -->
+                <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate id="ofertaForm">
+                    {% csrf_token %}
+                    
+                    <!-- Secció 1: Informació bàsica -->
+                    <div class="mb-5">
+                        <h5 class="text-primary mb-4">
+                            <i class="bi bi-info-circle me-2"></i>Informació Bàsica
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                               
+                                 <label for="titol" class="form-label">
+                                    <i class="bi bi-card-heading text-muted me-2"></i>Títol de l'oferta *
+                                </label>
+                                <div class="input-group">                                    
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="titol" 
+                                           name="titol" 
+                                           placeholder="Ex: Desenvolupador/a Web Junior"
+                                           required>
+                                     
+                                </div>
+                                <div  id="error-titol" class="error-validacio form-text text-danger"></div>
+                               
+                               
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">                               
+                                <label for="data_limit" class="form-label">
+                                    <i class="bi  bi-calendar-event text-muted me-2"></i>Data límit *
+                                </label>
+                                <div class="input-group">                                    
+                                    <input type="date" 
+                                           class="form-control" 
+                                           id="data_limit" 
+                                           name="data_limit" 
+                                           required>
+                                </div>
+                                <div  id="error-data_limit" class="error-validacio form-text text-danger"></div>
+                            </div>
+
+                            
+                        </div>
+                        <div class="row">
+                            <div class="mb-3">                           
+                                <label for="descripcio" class="form-label">
+                                        <i class="bi bi-file-text text-muted me-2"></i>Descripció de l'oferta *
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 align-items-start pt-3">                                   
+                                    </span>
+                                    <textarea class="form-control" 
+                                            id="descripcio" 
+                                            name="descripcio" 
+                                            rows="4" 
+                                            placeholder="Descriu les responsabilitats i objectius del lloc de treball..."
+                                            required></textarea>
+                                </div>
+                                <div  id="error-descripcio" class="error-validacio form-text text-danger"></div>
+                            </div> 
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                     <label for="lloc_treball" class="form-label">
+                                        <i class="bi bi-geo-alt text-muted me-2"></i>Lloc de treball *
+                                    </label>                                   
+                                    <div class="input-group">                                       
+                                        <input type="text" 
+                                            class="form-control" 
+                                            id="lloc_treball" 
+                                            name="lloc_treball"
+                                            placeholder="Exemple: Tarragona"
+                                            required>
+                                    </div>
+                                    <div  id="error-lloc_treball" class="error-validacio form-text text-danger"></div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">                               
+                                    <label for="numero_vacants" class="form-label">
+                                        <i class="bi  bi-people-fill text-muted me-2"></i>Vacants *
+                                    </label>
+                                    <div class="input-group">                                    
+                                        <input type="number" 
+                                            class="form-control" 
+                                            id="numero_vacants" 
+                                            name="numero_vacants" 
+                                            value="1"
+                                            min = "1"
+                                            max = "100"
+                                            required>
+                                    </div>
+                                    <div  id="error-numero_vacants" class="error-validacio form-text text-danger"></div>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <!-- Secció 2: Condicions laborals -->
+                    <div class="mb-5">
+                        <h5 class="text-primary mb-4">
+                            <i class="bi bi-briefcase me-2"></i>Condicions Laborals
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">                                
+                                 <label for="tipus_contracte" class="form-label">
+                                    <i class="bi  bi-file-earmark-text text-muted me-2"></i>Tipus de contracte *
+                                </label>
+                                <div class="input-group">                                    
+                                    <select class="form-select" id="tipus_contracte" name="tipus_contracte" required>
+                                        <option value="">Selecciona tipus</option>
+                                        {% for code, name in TIPUS_CONTRACTE %}
+                                        <option value="{{ code }}">{{ name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div  id="error-tipus_contracte" class="error-validacio form-text text-danger"></div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">                               
+                                 <label for="destinatari" class="form-label">
+                                    <i class="bi  bi-send text-muted me-2"></i>A qui va dirigida l'oferta 
+                                </label>
+                                <select name="destinatari" id="destinatari" class="form-select" required>
+                                    <option value="">Selecciona destinatari</option>
+                                     {% for code, name in PUBLIC_DESTINATARI %}
+                                     <option value="{{ code }}">{{ name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div  id="error-destinatari" class="error-validacio form-text text-danger"></div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">                               
+                                 <label for="experiencia" class="form-label">
+                                    <i class="bi  bi-calendar4-range text-muted me-2"></i>Experiència requerida
+                                </label>
+                                <select name="experiencia" id="experiencia" class="form-select">
+                                    <option value="">Selecciona experiència</option>
+                                        {% for code, name in EXPERIENCIA %}
+                                        <option value="{{ code }}">{{ name }}</option>
+                                        {% endfor %}
+                                </select>
+                                <div  id="error-experiencia" class="error-validacio form-text text-danger"></div>
+                            </div>
+                                                 
+                          
+                            <div class="col-md-6 mb-3">                             
+                                <label for="horari" class="form-label">
+                                    <i class="bi bi-alarm text-muted me-2"></i>Horari
+                                </label>
+                                <div class="input-group">                                    
+                                    <input type="text" 
+                                           class="form-control border-start-0 ps-0" 
+                                           id="horari" 
+                                           name="horari"
+                                           placeholder="Ex: 9:00 - 17:00">
+                                </div>
+                                <div  id="error-horari" class="error-validacio form-text text-danger"></div>
+                            </div>
+
+                            <div class="col-md-3 mb-3">                               
+                                <label for="jornada" class="form-label">
+                                    <i class="bi  bi-clock text-muted me-2"></i>Jornada *
+                                </label>                                 
+                                <div class="input-group">                                   
+                                    <select class="form-select" id="jornada" name="jornada" required>
+                                        <option value="">Selecciona jornada</option>
+                                        {% for code, name in JORNADA %}
+                                        <option value="{{ code }}">{{ name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div  id="error-jornada" class="error-validacio form-text text-danger"></div>
+                            </div>
+
+                             <div class="col-md-3 mb-3" id="div_hores" style="display: none;">                              
+                                <label for="hores" class="form-label">
+                                    <i class="bi  bi-clock text-muted me-2"></i> Nombre d'hores
+                                </label> 
+                                <input type="number" name="hores" id="hores" class="form-control" min="1" placeholder="Ex: 20">
+                                <div  id="error-hores" class="error-validacio form-text text-danger"></div>
+                            </div>
+                            
+                            
+                        </div>
+                        
+                        <div class="row">                          
+
+                            <div class="col-md-12 mb-3">                             
+                                 <label for="salari" class="form-label">
+                                    <i class="bi  bi-currency-euro text-muted me-2"></i>Salari
+                                </label>
+                                <div class="input-group">                                   
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="salari" 
+                                           name="salari"
+                                           placeholder="Ex: 18.000-22.000€">
+                                </div>
+                                <div  id="error-salari" class="error-validacio form-text text-danger"></div>
+                            </div>  
+                            
+                            
+                        </div>
+                    </div>
+
+                    <!-- Secció 3: Requeriments         -->
+                    <div class="mb-5">
+                        <h5 class="text-primary mb-4">
+                            <i class="bi bi-mortarboard me-2"></i>Estudis
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                               
+                                <div id="cicles-container" class="mb-3">
+                                </div>
+                                <div class="card border-dashed">
+                                    <div class="card-body">
+                                        <div class="input-group">
+                                            
+                                            <select id="select-cicle" class="form-select">
+                                                <option value="">Selecciona un cicle</option>
+                                                {# ARA ITEREM SOBRE LA LLISTA DE DICT, NO DE TUPLES #}
+                                                {% for familia_data in cicles_agrupats_per_familia %}
+                                                    <optgroup label="{{ familia_data.familia_nom }}"> {# Accedim a la clau 'familia_nom' del diccionari #}
+                                                        {% for cicle in familia_data.cicles %} {# Accedim a la clau 'cicles' del diccionari #}
+                                                            <option value="{{ cicle.id }}" 
+                                                                    data-nom="{{ cicle.nom }}" 
+                                                                    data-grau="{{ cicle.grau }}"
+                                                                    data-familia="{{ cicle.familia_nom }}"> {# Utilitzem cicle.familia_nom ja que està dins del diccionari del cicle #}
+                                                                {{ cicle.nom }} ({{ cicle.grau }})
+                                                            </option>
+                                                        {% endfor %}
+                                                    </optgroup>
+                                                {% endfor %}
+                                            </select>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="afegirCicle()">
+                                                <i class="bi bi-plus-lg"></i> Afegir
+                                            </button>
+                                        </div>
+                                        <small class="text-muted mt-2 d-block">Selecciona un cicle per afegir-lo.</small>
+                                        <div  id="error-cicles" class="error-validacio form-text text-danger"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                            
+                    <div class="mb-5">
+                        <h5 class="text-primary mb-4">
+                            <i class="bi bi-gear me-2"></i>Capacitats
+                        </h5>      
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                
+                                <div id="capacitats-container" class="mb-3">
+                                </div>
+                                <div class="card border-dashed">
+                                    <div class="card-body">
+                                        <div class="input-group">
+                                            
+                                            <select id="select-capacitat" class="form-select">
+                                                <option value="">Selecciona una capacitat</option>
+                                                {% for capacitat in capacitats %}
+                                                <option value="{{ capacitat.id }}" data-nom="{{ capacitat.nom }}" data-categoria="{{ capacitat.categoria }}">{{ capacitat.nom }} ({{ capacitat.categoria }})</option>
+                                                {% endfor %}
+                                            </select>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="afegirCapacitat()">
+                                                <i class="bi bi-plus-lg"></i> Afegir
+                                            </button>
+                                        </div>
+                                        <small class="text-muted mt-2 d-block">Selecciona una capacitat per afegir-la.</small>
+                                        <div  id="error-capacitats" class="error-validacio form-text text-danger"></div>
+                                    </div>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+
+                    <!-- Secció 4: Funcions del càrrec -->
+                    <div class="mb-5">
+                        <h5 class="text-primary mb-4">
+                            <i class="bi bi-list-task me-2"></i>Funcions del Càrrec
+                        </h5>
+                        
+                        <div id="funcions-container" class="mb-3">
+                            <!-- Funcions s'afegiran aquí dinàmicament -->
+                        </div>
+                        
+                        <div class="card border-dashed">
+                            <div class="card-body">
+                                <div class="input-group">
+                                    
+                                    <input type="text" 
+                                           id="nova-funcio" 
+                                           class="form-control" 
+                                           placeholder="Descripció de la funció (Ex: Desenvolupar aplicacions web amb React)">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="afegirFuncio()">
+                                        <i class="bi bi-plus-lg"></i> Afegir
+                                    </button>
+                                </div>
+                                <small class="text-muted mt-2 d-block">Prem Enter o fes clic a "Afegir" per afegir una funció</small>
+                                <div  id="error-funcions" class="error-validacio form-text text-danger"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secció 7: Idiomes requerits -->
+                    <div class="mb-5">
+                        <h5 class="text-primary mb-4">
+                            <i class="bi bi-translate me-2"></i>Idiomes Requerits
+                        </h5>
+
+                        <div id="idiomes-container" class="mb-3"></div>
+
+                        <div class="card border-dashed">
+                            <div class="card-body">
+                                <div class="row g-2 align-items-end">
+                                    <div class="col-md-5">
+                                        <label for="idioma_nom" class="form-label">Idioma</label>
+                                        <input type="text" id="idioma_nom" list="llista_idiomes" class="form-control" placeholder="Ex: Català">
+                                        <datalist id="llista_idiomes">
+                                            <option value="Català">
+                                            <option value="Castellà">
+                                            <option value="Anglès">
+                                            <option value="Francès">
+                                            <option value="Alemany">
+                                        </datalist>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label for="idioma_nivell" class="form-label">Nivell</label>
+                                        <input type="text" id="idioma_nivell" list="llista_nivells" class="form-control" placeholder="Ex: Alt, Parlat, Escrit">
+                                        <datalist id="llista_nivells">
+                                            <option value="Alt">
+                                            <option value="Mitjà">
+                                            <option value="Baix">
+                                            <option value="Parlat">
+                                            <option value="Escrit">
+                                            <option value="Nadiu">
+                                        </datalist>
+                                    </div>
+                                    <div class="col-md-2 text-end">
+                                        <button type="button" class="btn btn-outline-secondary w-100" onclick="afegirIdioma()">
+                                            <i class="bi bi-plus-lg me-1"></i> Afegir
+                                        </button>
+                                    </div>
+                                </div>
+                                <small class="text-muted d-block mt-2">Pots escriure un idioma i nivell nous o triar dels suggerits.</small>
+                                <div  id="error-idiomes" class="error-validacio form-text text-danger"></div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="mb-5">
+                        <h5 class="text-primary mb-4">
+                            <i class="bi bi-info-square me-2"></i>Altres
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="mb-3">                           
+                                <label for="requisits" class="form-label">
+                                        <i class="bi bi-info-square text-muted me-2"></i>altres requisits
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 align-items-start pt-3">                                   
+                                    </span>
+                                    <textarea class="form-control" 
+                                            id="requisits" 
+                                            name="requisits" 
+                                            rows="4" 
+                                            placeholder="Escriu altres requisits necessaris per al lloc de treball..."
+                                            required></textarea>
+                                </div>
+                                <div  id="error-requisits" class="error-validacio form-text text-danger"></div>
+                            </div> 
+                        </div>
+                    </div>
+
+
+
+                    
+
+                    <!-- Secció 6: Configuració -->
+                    <div class="mb-5">
+                        <h5 class="text-primary mb-4">
+                            <i class="bi bi-gear me-2"></i>Configuració
+                        </h5>
+                        
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" 
+                                   type="checkbox" 
+                                   id="visible" 
+                                   name="visible"
+                                   {% if oferta.visible %}checked{% endif %}>
+                            <label class="form-check-label" for="visible">
+                                <strong>Oferta visible</strong>
+                                <br>
+                                <small class="text-muted">Si està activat, l'oferta serà visible per als estudiants</small>
+                            </label>
+                        </div>
+                    </div>
+
+
+                    <!-- Botons d'acció -->
+                    <div class="d-flex justify-content-between align-items-center pt-4 border-top">
+                        <a href="{% url 'llista_ofertes_empresa' %}" class="btn btn-outline-secondary rounded-pill">
+                            <i class="bi bi-arrow-left me-2"></i>Tornar enrere
+                        </a>
+                        <div>
+                           
+                            <button type="submit" class="btn btn-primary rounded-pill">
+                                <i class="bi bi-check-circle me-2"></i>Desar Oferta
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Array per emmagatzemar funcions
+let funcions = [];
+
+function afegirFuncio() {
+    const input = document.getElementById('nova-funcio');
+    const descripcio = input.value.trim();
+    
+    if (descripcio) {
+        funcions.push(descripcio);
+        renderitzarFuncions();
+        input.value = '';
+        input.focus();
+    }
+}
+
+function eliminarFuncio(index) {
+    funcions.splice(index, 1);
+    renderitzarFuncions();
+}
+
+function renderitzarFuncions() {
+    const container = document.getElementById('funcions-container');
+    container.innerHTML = '';
+    
+    if (funcions.length === 0) {
+        container.innerHTML = `
+            <div class="text-center text-muted py-3">
+                <i class="bi bi-list-task" style="font-size: 2rem;"></i>
+                <p class="mt-2 mb-0">Encara no has afegit cap funció</p>
+                <small>Afegeix les funcions principals del càrrec</small>
+            </div>
+        `;
+        return;
+    }
+    
+    funcions.forEach((funcio, index) => {
+        const div = document.createElement('div');
+        div.className = 'funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start';
+        
+        div.innerHTML = `
+            <div class="flex-grow-1">
+                <strong class="text-primary">${index + 1}.</strong> ${funcio}
+                <input type="hidden" name="funcions" value="${funcio}">
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="eliminarFuncio(${index})" title="Eliminar funció">
+                <i class="bi bi-trash"></i>
+            </button>
+        `;
+        
+        container.appendChild(div);
+    });
+}
+
+
+// IDIOMES  
+// Idiomes
+let idiomes = [];
+
+function afegirIdioma() {
+    const nom = document.getElementById('idioma_nom').value.trim();
+    const nivell = document.getElementById('idioma_nivell').value.trim();
+
+    if (nom && nivell) {
+        idiomes.push({ nom, nivell });
+        renderitzarIdiomes();
+        document.getElementById('idioma_nom').value = '';
+        document.getElementById('idioma_nivell').value = '';
+    }
+}
+
+function eliminarIdioma(index) {
+    idiomes.splice(index, 1);
+    renderitzarIdiomes();
+}
+
+function renderitzarIdiomes() {
+    const container = document.getElementById('idiomes-container');
+    container.innerHTML = '';
+
+    if (idiomes.length === 0) {
+        container.innerHTML = `
+            <div class="text-center text-muted py-3">
+                <i class="bi bi-translate" style="font-size: 2rem;"></i>
+                <p class="mt-2 mb-0">No has afegit cap idioma</p>
+                <small>Afegeix idiomes i nivells requerits</small>
+            </div>
+        `;
+        return;
+    }
+
+    idiomes.forEach((idioma, index) => {
+        const div = document.createElement('div');
+        div.className = 'funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start';
+        div.innerHTML = `
+            <div class="flex-grow-1">
+                <strong class="text-primary">${index + 1}.</strong> ${idioma.nom} — <em>${idioma.nivell}</em>
+                <input type="hidden" name="idiomes_nom" value="${idioma.nom}">
+                <input type="hidden" name="idiomes_nivell" value="${idioma.nivell}">
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="eliminarIdioma(${index})" title="Eliminar idioma">
+                <i class="bi bi-trash"></i>
+            </button>
+        `;
+        container.appendChild(div);
+    });
+}
+
+
+// CAPACITATS CLAU
+// Capacitats clau
+let capacitats_clau_seleccionades = [];
+let totes_les_capacitats = []; // Per emmagatzemar les capacitats originals
+
+function inicialitzarCapacitats() {
+    const select = document.getElementById('select-capacitat');
+    // Buidar per evitar duplicats si es crida més d'una vegada
+    totes_les_capacitats = []; 
+    for (let i = 0; i < select.options.length; i++) {
+        const option = select.options[i];
+        if (option.value) { // Ignorar l'opció "Selecciona una capacitat"
+            totes_les_capacitats.push({
+                id: option.value,
+                nom: option.dataset.nom,
+                categoria: option.dataset.categoria
+            });
+        }
+    }
+    renderitzarCapacitatsDisponibles();
+    renderitzarCapacitatsSeleccionades(); // Assegurar que el contenidor de seleccionades es renderitza buit a l'inici
+}
+
+function afegirCapacitat() {
+    const select = document.getElementById('select-capacitat');
+    const selectedOption = select.options[select.selectedIndex];
+
+    if (selectedOption && selectedOption.value) {
+        const id = selectedOption.value;
+        const nom = selectedOption.dataset.nom;
+        const categoria = selectedOption.dataset.categoria;
+
+        capacitats_clau_seleccionades.push({ id, nom, categoria });
+        
+        // Eliminar la capacitat seleccionada de la llista de disponibles
+        totes_les_capacitats = totes_les_capacitats.filter(c => c.id !== id);
+
+        renderitzarCapacitatsDisponibles();
+        renderitzarCapacitatsSeleccionades();
+    }
+}
+
+function eliminarCapacitat(index) {
+    const capacitatEliminada = capacitats_clau_seleccionades.splice(index, 1)[0];
+    
+    // Tornar la capacitat eliminada a la llista de disponibles (ordenant per nom)
+    totes_les_capacitats.push(capacitatEliminada);
+    totes_les_capacitats.sort((a, b) => a.nom.localeCompare(b.nom));
+
+    renderitzarCapacitatsDisponibles();
+    renderitzarCapacitatsSeleccionades();
+}
+
+function renderitzarCapacitatsDisponibles() {
+    const select = document.getElementById('select-capacitat');
+    select.innerHTML = '<option value="">Selecciona una capacitat</option>'; // Restablir el select
+
+    totes_les_capacitats.forEach(capacitat => {
+        const option = document.createElement('option');
+        option.value = capacitat.id;
+        option.dataset.nom = capacitat.nom;
+        option.dataset.categoria = capacitat.categoria;
+        option.textContent = `${capacitat.nom} (${capacitat.categoria})`;
+        select.appendChild(option);
+    });
+}
+
+function renderitzarCapacitatsSeleccionades() {
+    const container = document.getElementById('capacitats-container');
+    container.innerHTML = '';
+
+    if (capacitats_clau_seleccionades.length === 0) {
+        container.innerHTML = `
+            <div class="text-center text-muted py-3">
+                <i class="bi bi-gear" style="font-size: 2rem;"></i>
+                <p class="mt-2 mb-0">No has afegit cap capacitat clau</p>
+                <small>Selecciona les capacitats necessàries per a l'oferta</small>
+            </div>
+        `;
+        return;
+    }
+
+    capacitats_clau_seleccionades.forEach((capacitat, index) => {
+        const div = document.createElement('div');
+        div.className = 'funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start';
+        div.innerHTML = `
+            <div class="flex-grow-1">
+                <strong class="text-primary">${index + 1}.</strong> ${capacitat.nom} — <em>${capacitat.categoria}</em>
+                <input type="hidden" name="capacitats_clau" value="${capacitat.id}">
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="eliminarCapacitat(${index})" title="Eliminar capacitat">
+                <i class="bi bi-trash"></i>
+            </button>
+        `;
+        container.appendChild(div);
+    });
+}
+
+
+// CICLES FORMATIUS
+let cicles_seleccionats = [];
+// Aquesta variable global emmagatzemarà tots els cicles originals per referència
+// La inicialitzarem des del DOM en `inicialitzarCicles()`
+let tots_els_cicles_disponibles = {}; // Objecte per emmagatzemar cicles agrupats per família
+
+function inicialitzarCicles() {
+    const select = document.getElementById('select-cicle');
+    tots_els_cicles_disponibles = {}; // Netejar per evitar duplicats
+
+    // Iterar sobre els optgroups i les opcions per reconstruir la estructura
+    Array.from(select.children).forEach(node => {
+        if (node.tagName === 'OPTGROUP') {
+            const familiaNom = node.label;
+            tots_els_cicles_disponibles[familiaNom] = tots_els_cicles_disponibles[familiaNom] || [];
+            Array.from(node.children).forEach(option => {
+                if (option.value) {
+                    tots_els_cicles_disponibles[familiaNom].push({
+                        id: option.value,
+                        nom: option.dataset.nom,
+                        grau: option.dataset.grau,
+                        familia: option.dataset.familia // Es podria treure si ja està a la clau de l'objecte
+                    });
+                }
+            });
+        } else if (node.tagName === 'OPTION' && node.value) { // Per si hi ha opcions fora d'optgroup
+            const familiaNom = node.dataset.familia || 'Altres'; // Assignar una família per defecte
+            tots_els_cicles_disponibles[familiaNom] = tots_els_cicles_disponibles[familiaNom] || [];
+            tots_els_cicles_disponibles[familiaNom].push({
+                id: node.value,
+                nom: node.dataset.nom,
+                grau: node.dataset.grau,
+                familia: node.dataset.familia
+            });
+        }
+    });
+
+    renderitzarCiclesDisponibles();
+    renderitzarCiclesSeleccionats(); // Assegurar que el contenidor de seleccionades es renderitza buit a l'inici
+}
+
+function afegirCicle() {
+    const select = document.getElementById('select-cicle');
+    const selectedOption = select.options[select.selectedIndex];
+
+    if (selectedOption && selectedOption.value) {
+        const id = selectedOption.value;
+        const nom = selectedOption.dataset.nom;
+        const grau = selectedOption.dataset.grau;
+        const familia = selectedOption.dataset.familia;
+
+        cicles_seleccionats.push({ id, nom, grau, familia });
+        
+        // Eliminar el cicle seleccionat de la llista de disponibles
+        for (const familiaNom in tots_els_cicles_disponibles) {
+            tots_els_cicles_disponibles[familiaNom] = tots_els_cicles_disponibles[familiaNom].filter(c => c.id !== id);
+        }
+
+        renderitzarCiclesDisponibles();
+        renderitzarCiclesSeleccionats();
+    }
+}
+
+function eliminarCicle(index) {
+    const cicleEliminat = cicles_seleccionats.splice(index, 1)[0];
+    
+    // Tornar el cicle eliminat a la llista de disponibles
+    const familiaDelCicle = cicleEliminat.familia || 'Altres';
+    tots_els_cicles_disponibles[familiaDelCicle] = tots_els_cicles_disponibles[familiaDelCicle] || [];
+    tots_els_cicles_disponibles[familiaDelCicle].push(cicleEliminat);
+    
+    // Ordenar els cicles dins de la seva família per mantenir l'ordre alfabètic
+    tots_els_cicles_disponibles[familiaDelCicle].sort((a, b) => a.nom.localeCompare(b.nom));
+
+    renderitzarCiclesDisponibles();
+    renderitzarCiclesSeleccionats();
+}
+
+function renderitzarCiclesDisponibles() {
+    const select = document.getElementById('select-cicle');
+    select.innerHTML = '<option value="">Selecciona un cicle</option>'; // Restablir el select
+
+    // Ordenar famílies per nom per una visualització consistent
+    const familiesOrdenades = Object.keys(tots_els_cicles_disponibles).sort();
+
+    familiesOrdenades.forEach(familiaNom => {
+        const ciclesFamilia = tots_els_cicles_disponibles[familiaNom];
+        if (ciclesFamilia.length > 0) { // Només crear optgroup si hi ha cicles
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = familiaNom;
+
+            ciclesFamilia.forEach(cicle => {
+                const option = document.createElement('option');
+                option.value = cicle.id;
+                option.dataset.nom = cicle.nom;
+                option.dataset.grau = cicle.grau;
+                option.dataset.familia = cicle.familia;
+                option.textContent = `${cicle.nom} (${cicle.grau})`;
+                optgroup.appendChild(option);
+            });
+            select.appendChild(optgroup);
+        }
+    });
+}
+
+function renderitzarCiclesSeleccionats() {
+    const container = document.getElementById('cicles-container');
+    container.innerHTML = '';
+
+    if (cicles_seleccionats.length === 0) {
+        container.innerHTML = `
+            <div class="text-center text-muted py-3">
+                <i class="bi bi-mortarboard" style="font-size: 2rem;"></i>
+                <p class="mt-2 mb-0">No has afegit cap estudi</p>
+                <small>Selecciona els cicles als quals va dirigida l'oferta</small>
+            </div>
+        `;
+        return;
+    }
+
+    cicles_seleccionats.forEach((cicle, index) => {
+        const div = document.createElement('div');
+        div.className = 'funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start';
+        div.innerHTML = `
+            <div class="flex-grow-1">
+                <strong class="text-primary">${index + 1}.</strong> ${cicle.nom} — <em>${cicle.grau} (${cicle.familia})</em>
+                <input type="hidden" name="cicles" value="${cicle.id}">
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="eliminarCicle(${index})" title="Eliminar cicle">
+                <i class="bi bi-trash"></i>
+            </button>
+        `;
+        container.appendChild(div);
+    });
+}
+
+
+
+
+function guardarEsborrany() {
+    // Implementar funcionalitat d'esborrany
+    alert('Funcionalitat d\'esborrany per implementar');
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+
+    // Inicialitzar les capacitats clau
+    inicialitzarCapacitats();
+    inicialitzarCicles(); //
+    renderitzarIdiomes();
+    renderitzarFuncions();
+
+    // Afegir funció amb Enter
+    document.getElementById('nova-funcio').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            afegirFuncio();
+        }
+    });
+    
+    document.getElementById("jornada").addEventListener("change", function () {
+  const divHores = document.getElementById("div_hores");
+  if (this.value === "PA") {
+    divHores.style.display = "block";
+  } else {
+    divHores.style.display = "none";
+    document.getElementById("hores").value = '';
+  }
+});
+
+document.getElementById("ofertaForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    // Construir objecte de dades per a l'API
+    const data = {
+        titol: formData.get("titol"),
+        data_limit: formData.get("data_limit"),
+        numero_vacants: formData.get("numero_vacants"),
+        descripcio: formData.get("descripcio"),
+        tipus_contracte: formData.get("tipus_contracte"),
+        jornada: formData.get("jornada"),
+        hores: formData.get("hores"),
+        horari: formData.get("horari"),
+        salari: formData.get("salari"),
+        lloc_treball: formData.get("lloc_treball"),
+        destinatari: formData.get("destinatari"),
+        experiencia: formData.get("experiencia"),
+        visible: formData.get("visible") === "on",
+        cicles: cicles_seleccionats.map(c => c.id), 
+        capacitats_clau: capacitats_clau_seleccionades.map(c => c.id), 
+        funcions: funcions, 
+        idiomes: idiomes    
+    };
+
+    try {
+        const resposta = await fetch("/api/empresa/oferta/nova", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
+
+        const resultat = await resposta.json();
+
+        const cont = document.getElementById("api-missatges");
+        cont.innerHTML = "";
+
+        // Esborra errors anteriors
+        form.querySelectorAll('.error-validacio').forEach(div => div.innerText = '');
+        form.querySelectorAll('.invalid-feedback').forEach(div => div.innerText = '');
+        form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+        if (resultat.success) {
+            
+            cont.innerHTML = `<div class="alert alert-success">${resultat.message}</div>`;
+            form.reset();
+
+
+        } else {
+            const errors = resultat.errors;
+            for (const camp in errors) {
+                const missatge = errors[camp];
+                const input = form.querySelector(`[name="${camp}"]`);
+                const errorDiv = document.getElementById(`error-${camp}`);
+
+                console.log(errorDiv)
+
+                if (input) input.classList.add('is-invalid');
+                if (errorDiv) errorDiv.innerText = missatge;
+            }
+
+            cont.innerHTML = `<div class="alert alert-danger">Hi ha errors en el formulari.</div>`;
+        }
+
+    } catch (error) {
+        document.getElementById("api-missatges").innerHTML = `<div class="alert alert-danger">Error de connexió amb el servidor.</div>`;
+    }
+});
+
+   
+    
+    // Establir data mínima com avui
+    const dataLimit = document.getElementById('data_limit');
+            if (dataLimit) {
+                const avui = new Date().toISOString().split('T')[0];
+                dataLimit.min = avui;
+            }
+    });
+</script>
+{% endblock %}

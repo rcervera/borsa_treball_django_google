@@ -1,0 +1,521 @@
+{% extends 'base.html' %}
+
+{% block title %}Registre Empresa - Borsa de Treball{% endblock %}
+
+{% block page_title %}Registre Empresa{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center min-vh-100">
+    <div class="col-lg-7 col-md-9 col-sm-11">
+        <div class="card shadow-lg border-0 mt-4">
+            <div class="card-body p-5">
+                <!-- Logo Section -->
+                <div class="text-center mb-4">
+                    <div class="logo-container mb-3">
+                         <a href="{% url 'index' %}">
+                    <div class="logo-container mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100" height="40" viewBox="115 105 310 90">
+                            <style>
+                              circle {
+                                opacity: 0;
+                                animation: fadeInOut 4s infinite;
+                              }
+                          
+                              .circle1 { animation-delay: 0s; }
+                              .circle2 { animation-delay: 0.5s; }
+                              .circle3 { animation-delay: 1s; }
+                          
+                              @keyframes fadeInOut {
+                                0% { opacity: 0; }
+                                20% { opacity: 1; }
+                                80% { opacity: 1; }
+                                100% { opacity: 0; }
+                              }
+                            </style>
+                          
+                            <circle class="circle1" cx="160" cy="150" r="45" fill="#4B49AC"/>
+                            <circle class="circle2" cx="270" cy="150" r="45" fill="#7DA0FA"/>
+                            <circle class="circle3" cx="380" cy="150" r="45" fill="#98BDFF"/>
+                          </svg>
+                    </div>
+                    </a>
+                    </div>
+                    <h2 class="h4 text-dark mb-2">Registre d'Empresa</h2>
+                    <p class="text-muted">Registra la teva empresa per publicar ofertes i trobar talent</p>
+                </div>
+
+                <!-- Messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Registration Form -->
+                <form method="post" class="needs-validation" novalidate id="registrationForm">
+                    {% csrf_token %}
+                    
+                    <!-- General Errors -->
+                    {% if errors.general %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>Error!</strong>
+                            {% for error in errors.general %}
+                                {{ error }}
+                            {% endfor %}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endif %}
+
+                    <!-- Account Information Section -->
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-person-circle me-2"></i>Informació del Compte
+                        </h6>
+                        
+                        <div class="row">                      
+
+                            <!-- Email -->
+                            <div class="col-md-6 mb-3">
+                               
+                                <label for="password" class="form-label">
+                                    <i class="bi bi-envelope text-muted me-2"></i>Correu electrònic *
+                                </label>
+                                <div class="input-group">                                   
+                                    <input type="email" 
+                                           class="form-control  {% if errors.email %}is-invalid{% endif %}" 
+                                           id="email"
+                                           name="email"
+                                           value="{{ form_data.email|default:'' }}"
+                                           placeholder="contacte@empresa.com"
+                                           required>
+                                </div>
+                                {% if errors.email %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in errors.email %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!-- Password -->
+                            <div class="col-md-6 mb-3">
+                             
+                                <label for="password" class="form-label">
+                                    <i class="bi bi-lock text-muted me-2"></i>Contrasenya *
+                                </label>
+                                <div class="input-group">                                 
+                                    <input type="password" 
+                                           class="form-control {% if errors.password1 %}is-invalid{% endif %}" 
+                                           id="password1"
+                                           name="password1"
+                                           placeholder="Crea una contrasenya segura"
+                                           required
+                                           minlength="8">                                    
+                                </div>
+                                {% if errors.password1 %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in errors.password1 %}{{ error }}<br>{% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="text-muted">Mínim 8 caràcters</small>
+                            </div>
+
+                            <!-- Confirm Password -->
+                            <div class="col-md-6 mb-3">                               
+                                <label for="password" class="form-label">
+                                    <i class="bi bi-lock text-muted me-2"></i>Confirma la contrasenya *
+                                </label>
+                                <div class="input-group">                                    
+                                    <input type="password" 
+                                           class="form-control  {% if errors.password2 %}is-invalid{% endif %}" 
+                                           id="password2"
+                                           name="password2"
+                                           placeholder="Repeteix la contrasenya"
+                                           required
+                                           minlength="8">                                    
+                                </div>
+                                {% if errors.password2 %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in errors.password2 %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!-- Nom  -->
+                            <div class="col-md-6 mb-3">                              
+                                <label for="nom" class="form-label">
+                                    <i class="bi bi-person-badge text-muted me-2"></i>Nom *
+                                </label>
+                                <div class="input-group">
+                                  
+                                    <input type="text" 
+                                           class="form-control  {% if errors.nom %}is-invalid{% endif %}" 
+                                           id="nom"
+                                           name="nom"
+                                           value="{{ form_data.nom|default:'' }}"
+                                           placeholder="El teu nom"
+                                           required
+                                    >
+                                </div>
+                                {% if errors.nom %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in errors.nom %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                                
+                            </div>
+
+                            <!-- cognoms  -->
+                            <div class="col-md-6 mb-3">                              
+                                <label for="cognoma" class="form-label">
+                                    <i class="bi bi-person-badge text-muted me-2"></i>Cognoms *
+                                </label>
+                                <div class="input-group">
+                                  
+                                    <input type="text" 
+                                           class="form-control  {% if errors.cognoma %}is-invalid{% endif %}" 
+                                           id="cognoms"
+                                           name="cognoms"
+                                           value="{{ form_data.cognoms|default:'' }}"
+                                           placeholder="Els teus cognoms"
+                                           required
+                                    >
+                                </div>
+                                {% if errors.nom %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in errors.cognoms %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                                
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Company Information Section -->
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-building me-2"></i>Informació de l'Empresa
+                        </h6>
+                        
+                        <div class="row">
+                            <!-- CIF -->
+                            <div class="col-md-6 mb-3">                              
+                                <label for="password" class="form-label">
+                                    <i class="bi bi-card-text text-muted me-2"></i>CIF/NIF *
+                                </label>
+                                <div class="input-group">
+                                  
+                                    <input type="text" 
+                                           class="form-control  {% if errors.cif %}is-invalid{% endif %}" 
+                                           id="cif"
+                                           name="cif"
+                                           value="{{ form_data.cif|default:'' }}"
+                                           placeholder="A12345678"
+                                           required
+                                           pattern="[A-Z][0-9]{8}|[0-9]{8}[A-Z]"
+                                           title="Format: A12345678 o 12345678A">
+                                </div>
+                                {% if errors.cif %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in errors.cif %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="text-muted">Format: A12345678 o 12345678A</small>
+                            </div>
+
+                            <!-- Sector -->
+                            <div class="col-md-6 mb-3">                           
+                                <label for="password" class="form-label">
+                                    <i class="bi bi-diagram-3 text-muted me-2"></i>Sector *
+                                </label>
+                                <div class="input-group">                                   
+                                    <select class="form-select {% if errors.sector %}is-invalid{% endif %}" 
+                                            id="sector" name="sector" required>
+                                        <option value="">Selecciona el sector</option>
+                                        {% for sector in sectors %}
+                                            <option value="{{ sector.id }}" 
+                                                    {% if form_data.sector == sector.id|stringformat:"s" %}selected{% endif %}>
+                                                {{ sector.nom }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                {% if errors.sector %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in errors.sector %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Nom Comercial -->
+                            <div class="col-md-6 mb-3">                              
+                                <label for="password" class="form-label">
+                                    <i class="bi bi-shop text-muted me-2"></i>Nom comercial *
+                                </label>
+                                <div class="input-group">                                    
+                                    <input type="text" 
+                                           class="form-control  {% if errors.nom_comercial %}is-invalid{% endif %}" 
+                                           id="nom_comercial"
+                                           name="nom_comercial"
+                                           value="{{ form_data.nom_comercial|default:'' }}"
+                                           placeholder="Nom de l'empresa"
+                                           required>
+                                </div>
+                                {% if errors.nom_comercial %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in errors.nom_comercial %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Raó Social -->
+                            <div class="col-md-6 mb-3">
+                               
+                                <label for="password" class="form-label">
+                                    <i class="bi bi-building-check text-muted me-2"></i>Raó social *
+                                </label>
+                                <div class="input-group">                                   
+                                    <input type="text" 
+                                           class="form-control {% if errors.rao_social %}is-invalid{% endif %}" 
+                                           id="rao_social"
+                                           name="rao_social"
+                                           value="{{ form_data.rao_social|default:'' }}"
+                                           placeholder="Raó social oficial"
+                                           required>
+                                </div>
+                                {% if errors.rao_social %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in errors.rao_social %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!-- Telefon -->
+                            <div class="col-md-6 mb-3">
+                            
+                                <label for="password" class="form-label">
+                                    <i class="bi bi-phone text-muted me-2"></i>Telèfon *
+                                </label>
+                                <div class="input-group">                                   
+                                    <input type="text" 
+                                           class="form-control  {% if errors.telefon %}is-invalid{% endif %}" 
+                                           id="telefon"
+                                           name="telefon"
+                                           value="{{ form_data.telefon|default:'' }}"
+                                           placeholder="Telèfon de l'empresa"
+                                           required>
+                                </div>
+                                {% if errors.nom_comercial %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in errors.telefon %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                   
+
+                    <!-- Terms and Conditions -->
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                Accepto els <a href="#footer-info" class="text-decoration-none">termes i condicions i la política de privacitat</a> *
+                            </label>
+                            <div class="invalid-feedback">
+                                Has d'acceptar els termes i condicions.
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid mb-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-building-add me-2"></i>
+                            Registrar empresa
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Login Link -->
+                <div class="text-center">
+                    <p class="text-muted">
+                        Ja tens compte? 
+                        <a href="{% url 'login' %}" class="text-decoration-none">Inicia sessió aquí</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Info -->
+        <div id="footer-info" class="text-center mt-4 text-muted" style="font-size: 0.8rem;">
+            <i class="bi bi-shield-check me-1"></i>
+            <span>Les teves dades estan protegides i segures.</span>
+            <ul class="list-unstyled mt-2 mb-0">
+                <li><strong>Responsable:</strong> Institut Francesc Vidal i Barraquer</li>
+                <li><strong>Finalitat:</strong> Publicació de l’oferta al web de la Borsa de Treball. (No es publicarà cap nom d’empresa ni dada/correu personal)</li>
+                <li><strong>Legitimació:</strong> Consentiment de la persona interessada.</li>
+                <li><strong>Destinataris:</strong> Institut F. Vidal i Barraquer, el seu portal de transparència, estudiants i titulats/des.</li>
+                <li><strong>Drets:</strong> Accedir, rectificar, suprimir, oposar-se, limitar o sol·licitar la portabilitat de les dades.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+    .min-vh-100 {
+        min-height: calc(100vh - 140px) !important;
+    }
+    
+    .logo-svg {
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+        transition: transform 0.3s ease;
+    }
+    
+    .logo-svg:hover {
+        transform: scale(1.05);
+    }
+    
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .input-group-text {
+        border: 1px solid #ced4da;
+    }
+    
+    .form-control.border-start-0,
+    .form-select.border-start-0 {
+        border-left: none !important;
+    }
+    
+    .input-group-text.border-end-0 {
+        border-right: none !important;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        border: none;
+        padding: 12px;
+        font-weight: 500;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+    
+    .text-primary {
+        color: #0d6efd !important;
+    }
+    
+    .password-match {
+        border-color: #0d6efd !important;
+    }
+    
+    .password-no-match {
+        border-color: #dc3545 !important;
+    }
+    
+    @media (max-width: 576px) {
+        .card-body {
+            padding: 2rem !important;
+        }
+        
+        .logo-svg {
+            width: 60px;
+            height: 60px;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle password visibility
+    function setupPasswordToggle(passwordId, toggleId, iconId) {
+        const togglePassword = document.getElementById(toggleId);
+        const passwordInput = document.getElementById(passwordId);
+        const toggleIcon = document.getElementById(iconId);
+        
+        if (togglePassword && passwordInput && toggleIcon) {
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                if (type === 'password') {
+                    toggleIcon.className = 'bi bi-eye';
+                } else {
+                    toggleIcon.className = 'bi bi-eye-slash';
+                }
+            });
+        }
+    }
+    
+    setupPasswordToggle('password1', 'togglePassword1', 'toggleIcon1');
+    setupPasswordToggle('password2', 'togglePassword2', 'toggleIcon2');
+    
+    // Password confirmation validation
+    const password1 = document.getElementById('password1');
+    const password2 = document.getElementById('password2');
+    
+    function validatePasswordMatch() {
+        if (password2.value && password1.value !== password2.value) {
+            password2.classList.add('password-no-match');
+            password2.classList.remove('password-match');
+            password2.setCustomValidity('Les contrasenyes no coincideixen');
+        } else if (password2.value && password1.value === password2.value) {
+            password2.classList.add('password-match');
+            password2.classList.remove('password-no-match');
+            password2.setCustomValidity('');
+        } else {
+            password2.classList.remove('password-match', 'password-no-match');
+            password2.setCustomValidity('');
+        }
+    }
+    
+    if (password1 && password2) {
+        password1.addEventListener('input', validatePasswordMatch);
+        password2.addEventListener('input', validatePasswordMatch);
+    }
+    
+    // CIF validation
+    const cifInput = document.getElementById('cif');
+    if (cifInput) {
+        cifInput.addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+    }
+    
+    // Form validation
+    const form = document.getElementById('registrationForm');
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    }
+});
+</script>
+{% endblock %}

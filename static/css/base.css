@@ -132,8 +132,8 @@ body {
 .sidebar-brand {
             padding: 1.5rem 1rem;
             border-bottom: 1px solid var(--sidebar-border);
-            margin-bottom: 1rem;
-            background-color: #f8f9fa;
+            margin-bottom: 1rem;           
+            background-color: white;
 }
     
 .sidebar-brand h4 {
@@ -150,13 +150,13 @@ body {
             padding: 1rem;
             border-top: 1px solid var(--sidebar-border);
             margin-top: auto;
-            background-color: #f8f9fa;
+            background-color: white;
 }
     
 .user-info .user-avatar {
             width: 40px;
             height: 40px;
-            background: #e9ecef;
+            background: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -222,3 +222,17 @@ body {
 .stat-card {
             border-left: 4px solid var(--primary-color);
 }
+
+.icon-size-3rem {
+    font-size: 3rem;
+}
+
+
+ .funcio-item {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-left: 4px solid #0d6efd;
+    }
+    
+.funcio-item:hover {
+        background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+    }

@@ -249,6 +249,7 @@ class Command(BaseCommand):
                         'descripcio': fake.text(max_nb_chars=300),
                         'num_treballadors': random.randint(10, 500),
                         'web': f'https://www.{fake.domain_name()}',
+                        'telefon': fake.phone_number()[:15],
                     }
                 )
             else:

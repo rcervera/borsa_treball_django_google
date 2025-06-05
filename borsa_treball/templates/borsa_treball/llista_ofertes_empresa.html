@@ -1,0 +1,649 @@
+{% extends 'base.html' %}
+
+{% block title %}Les Meves Ofertes - Borsa de Treball{% endblock %}
+
+{% block page_title %}Les Meves Ofertes{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-11 col-md-12">
+        <!-- Header Section amb estadístiques -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h3 class="mb-2 text-dark">
+                            <i class="bi bi-briefcase-fill text-primary me-2"></i>
+                            Les Meves Ofertes
+                        </h3>
+                        <p class="text-muted mb-0">Gestiona les teves ofertes de treball publicades</p>
+                    </div>
+                    <div>
+                        <a href="{% url 'afegir_oferta' %}" class="btn btn-primary rounded-pill">
+                            <i class="bi bi-plus-circle me-2"></i>Nova Oferta
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Estadístiques ràpides -->
+                <div class="row text-center">
+                    <div class="col-3">
+                        <div class="border-end">
+                            <h4 class="text-primary mb-0">{{ stats.total }}</h4>
+                            <small class="text-muted">Total</small>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="border-end">
+                            <h4 class="text-success mb-0">{{ stats.actives }}</h4>
+                            <small class="text-muted">Actives</small>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="border-end">
+                            <h4 class="text-warning mb-0">{{ stats.caducades }}</h4>
+                            <small class="text-muted">Caducades</small>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <h4 class="text-secondary mb-0">{{ stats.ocultes }}</h4>
+                        <small class="text-muted">Ocultes</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtres Section -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body p-3">
+                <form method="get" id="filterForm">
+                    <div class="row align-items-end">
+                        <!-- Cerca -->
+                        <div class="col-md-3 mb-2">
+                            <label class="form-label small">Cerca</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="bi bi-search text-muted"></i>
+                                </span>
+                                <input type="text" 
+                                       class="form-control border-start-0" 
+                                       name="search" 
+                                       value="{{ search_query }}"
+                                       placeholder="Títol, descripció...">
+                            </div>
+                        </div>
+                        
+                        <!-- Estat -->
+                        <div class="col-md-2 mb-2">
+                            <label class="form-label small">Estat</label>
+                            <select class="form-select" name="status">
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Tipus contracte -->
+                        <div class="col-md-2 mb-2">
+                            <label class="form-label small">Contracte</label>
+                            <select class="form-select" name="type">
+                                <option value="">Tots</option>
+                                {% for value, label in tipus_contracte_choices %}
+                                <option value="{{ value }}" {% if type_filter == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Jornada -->
+                        <div class="col-md-2 mb-2">
+                            <label class="form-label small">Jornada</label>
+                            <select class="form-select" name="jornada">
+                                <option value="">Totes</option>
+                                {% for value, label in jornada_choices %}
+                                <option value="{{ value }}" {% if jornada_filter == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Ordenació -->
+                        <div class="col-md-2 mb-2">
+                            <label class="form-label small">Ordenar per</label>
+                            <select class="form-select" name="order_by">
+                                {% for value, label in order_choices %}
+                                <option value="{{ value }}" {% if order_by == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Botons -->
+                        <div class="col-md-1 mb-2">
+                            <button type="submit" class="btn btn-primary w-100 rounded-pill" title="Aplicar filtres">
+                                <i class="bi bi-funnel"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Resultats i controls -->
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                        <div class="text-muted">
+                            <small>
+                                Mostrant {{ ofertes.start_index }}-{{ ofertes.end_index }} de {{ total_results }} resultats
+                            </small>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <label class="form-label small me-2 mb-0">Per pàgina:</label>
+                            <select class="form-select form-select-sm" name="per_page" style="width: auto;" onchange="this.form.submit()">
+                                <option value="6" {% if items_per_page == 6 %}selected{% endif %}>6</option>
+                                <option value="12" {% if items_per_page == 12 %}selected{% endif %}>12</option>
+                                <option value="24" {% if items_per_page == 24 %}selected{% endif %}>24</option>
+                            </select>
+                            <a href="?" class="btn btn-outline-secondary btn-sm ms-2" title="Netejar filtres">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Ofertes List -->
+        {% if ofertes %}
+            <div class="row" id="ofertesContainer">
+                {% for oferta in ofertes %}
+                <div class="col-lg-6 col-12 mb-4">
+                    <div class="card shadow-sm border-0 h-100 oferta-card">
+                        <div class="card-body p-4">
+                            <!-- Header de l'oferta -->
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="flex-grow-1">
+                                    <h5 class="card-title mb-2 text-dark">
+                                        <i class="bi bi-briefcase me-2 text-primary"></i>
+                                        <a href="{% url 'detall_oferta' oferta.id %}" class="text-decoration-none text-dark">
+                                            {{ oferta.titol }}
+                                        </a>
+                                    </h5>
+                                    <div class="d-flex align-items-center text-muted mb-2">
+                                        <i class="bi bi-calendar-event me-2"></i>
+                                        <small>{{ oferta.data_publicacio|date:"d/m/Y" }}</small>
+                                        <span class="mx-2">•</span>
+                                        <i class="bi bi-clock me-2"></i>
+                                        <small>Límit: {{ oferta.data_limit|date:"d/m/Y" }}</small>
+                                    </div>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{% url 'detall_oferta' oferta.id %}"><i class="bi bi-eye me-2"></i>Veure detalls</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'editar_oferta' oferta.id %}"><i class="bi bi-pencil me-2"></i>Editar</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="duplicarOfertaRapid('{{ oferta.id }}', '{{ oferta.titol|escapejs }}')">
+                                            <i class="bi bi-copy me-2"></i>Duplicar
+                                        </a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        {% if oferta.visible %}
+                                        <li><a class="dropdown-item" href="#" onclick="toggleVisibilitat('{{ oferta.id }}')"><i class="bi bi-eye-slash me-2"></i>Ocultar</a></li>
+                                        {% else %}
+                                        <li><a class="dropdown-item" href="#" onclick="toggleVisibilitat('{{ oferta.id }}')"><i class="bi bi-eye me-2"></i>Mostrar</a></li>
+                                        {% endif %}
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="confirmarEliminacio('{{ oferta.id }}')"><i class="bi bi-trash me-2"></i>Eliminar</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Descripció -->
+                            <p class="card-text text-muted mb-3">
+                                {{ oferta.descripcio|truncatewords:20 }}
+                            </p>
+
+                            
+
+                            <!-- Estadístiques -->
+                            <div class="row text-center mb-3">
+                                <div class="col-6">
+                                    <div class="border-end">
+                                        <h6 class="text-primary mb-0">{{oferta.candidatures.count}}</h6>
+                                        <small class="text-muted">Candidatures</small>
+                                    </div>
+                                </div>
+                               
+                                <div class="col-6">
+                                    <h6 class="text-info mb-0">
+                                        {% now "Y-m-d" as today %}
+                                        {% if oferta.data_limit|date:"Y-m-d" >= today %}
+                                            {{ oferta.data_limit|timeuntil }}
+                                        {% else %}
+                                            Caducada
+                                        {% endif %}
+                                    </h6>
+                                    <small class="text-muted">Temps restant</small>
+                                </div>
+                            </div>
+
+                            <!-- Accions -->
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                                <div>
+                                    {% now "Y-m-d" as today %}
+                                    {% if not oferta.activa %}
+                                        <span class="badge bg-secondary-subtle text-danger">
+                                            <i class="bi bi bi-lightbulb-off me-1"></i>Pendent aprovar
+                                        </span>
+                                     {% endif %}
+                                    {% if not oferta.visible %}
+                                        <span class="badge bg-secondary-subtle text-secondary">
+                                            <i class="bi bi-eye-slash me-1"></i>Oculta
+                                        </span>
+                                    {% elif oferta.data_limit|date:"Y-m-d" >= today %}
+                                        <span class="badge bg-success-subtle text-success">
+                                            <i class="bi bi-check-circle me-1"></i>Activa
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-danger-subtle text-danger">
+                                            <i class="bi bi-x-circle me-1"></i>Caducada
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {% if oferta.candidatures.count > 0 %}
+                                    <a href="" class="btn btn-outline-primary btn-sm me-2 rounded-pill">
+                                        <i class="bi bi-people"></i>
+                                        <span class="d-none d-lg-inline ms-1">Candidatures</span>                                        
+                                    </a>
+                                    {% endif %}
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Paginació -->
+            {% if ofertes.has_other_pages %}
+            <div class="d-flex justify-content-center mt-4">
+                <nav aria-label="Paginació ofertes">
+                    <ul class="pagination">
+                        {% if ofertes.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ ofertes.previous_page_number }}">
+                                    <i class="bi bi-chevron-left"></i> Anterior
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in ofertes.paginator.page_range %}
+                            {% if ofertes.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > ofertes.number|add:'-3' and num < ofertes.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if ofertes.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ ofertes.next_page_number }}">
+                                    Següent <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+
+        {% else %}
+            <!-- Empty State -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        {% if search_query or status_filter or type_filter or jornada_filter %}
+                            <i class="bi bi-search" style="font-size: 4rem; color: #dee2e6;"></i>
+                            <h4 class="text-muted mb-3 mt-3">No s'han trobat ofertes</h4>
+                            <p class="text-muted mb-4">Prova a modificar els filtres de cerca per trobar més resultats.</p>
+                            <a href="?" class="btn btn-outline-primary">
+                                <i class="bi bi-arrow-clockwise me-2"></i>Netejar filtres
+                            </a>
+                        {% else %}
+                            <i class="bi bi-briefcase" style="font-size: 4rem; color: #dee2e6;"></i>
+                            <h4 class="text-muted mb-3 mt-3">Encara no has publicat cap oferta</h4>
+                            
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal de confirmació d'eliminació -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                    Confirmar eliminació
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Estàs segur que vols eliminar aquesta oferta? Aquesta acció no es pot desfer.</p>
+                <div class="alert alert-warning">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Atenció:</strong> També s'eliminaran totes les candidatures associades.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">
+                    <i class="bi bi-trash me-2"></i>Eliminar Oferta
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .oferta-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.5em 0.75em;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        border: none;
+        font-weight: 500;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+    
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .input-group-text {
+        border: 1px solid #ced4da;
+    }
+    
+    .form-control.border-start-0 {
+        border-left: none !important;
+    }
+    
+    .input-group-text.border-end-0 {
+        border-right: none !important;
+    }
+    
+    .text-primary {
+        color: #0d6efd !important;
+    }
+    
+    .bg-success-subtle {
+        background-color: rgba(25, 135, 84, 0.1) !important;
+    }
+    
+    .bg-danger-subtle {
+        background-color: rgba(220, 53, 69, 0.1) !important;
+    }
+    
+    .bg-secondary-subtle {
+        background-color: rgba(108, 117, 125, 0.1) !important;
+    }
+    
+    .pagination .page-link {
+        border-radius: 8px;
+        margin: 0 2px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        border-color: #0d6efd;
+    }
+    
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem !important;
+        }
+        
+        .row.text-center .col-4 {
+            margin-bottom: 1rem;
+        }
+        
+        .row.text-center .border-end {
+            border-right: none !important;
+        }
+    }
+</style>
+
+<script>
+    let ofertaToDelete = null;
+
+    function duplicarOfertaRapid(ofertaId, titolOferta) {
+        if (confirm(`Vols duplicar l'oferta "${titolOferta}"?\n\nEs crearà una còpia que podràs editar immediatament.`)) {
+            // Mostrar indicador de càrrega
+            const button = event.target.closest('a');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Duplicant...';
+            
+            // Redirigir a la URL de duplicació
+            window.location.href = `/ofertes/${ofertaId}/duplicar/`;
+        }
+    }
+    
+    function confirmarEliminacio(ofertaId) {
+        ofertaToDelete = ofertaId;
+        const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        modal.show();
+    }
+    
+    function toggleVisibilitat(ofertaId) {
+        // Mostrar loading
+        const button = event.target.closest('a');
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Processant...';
+        button.classList.add('disabled');
+        
+        fetch(`/empresa/oferta/${ofertaId}/toggle-visibilitat/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Mostrar missatge d'èxit
+                showToast(data.message, 'success');
+                
+                // Recarregar la pàgina per actualitzar l'estat
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            } else {
+                showToast(data.error || 'Error en canviar la visibilitat', 'error');
+                button.innerHTML = originalText;
+                button.classList.remove('disabled');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Error de connexió', 'error');
+            button.innerHTML = originalText;
+            button.classList.remove('disabled');
+        });
+    }
+    
+    function showToast(message, type = 'info') {
+        // Crear toast notification
+        const toastContainer = document.getElementById('toastContainer') || createToastContainer();
+        
+        const toastId = 'toast-' + Date.now();
+        const bgClass = type === 'success' ? 'bg-success' : type === 'error' ? 'bg-danger' : 'bg-info';
+        
+        const toastHTML = `
+            <div id="${toastId}" class="toast align-items-center text-white ${bgClass} border-0" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        `;
+        
+        toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+        
+        const toastElement = document.getElementById(toastId);
+        const toast = new bootstrap.Toast(toastElement, { delay: 4000 });
+        toast.show();
+        
+        // Eliminar el toast del DOM després que es tanqui
+        toastElement.addEventListener('hidden.bs.toast', () => {
+            toastElement.remove();
+        });
+    }
+    
+    function createToastContainer() {
+        const container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'toast-container position-fixed top-0 end-0 p-3';
+        container.style.zIndex = '1055';
+        document.body.appendChild(container);
+        return container;
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-submit form quan canvien els filtres
+        const filterForm = document.getElementById('filterForm');
+        const filterInputs = filterForm.querySelectorAll('select[name="status"], select[name="type"], select[name="jornada"], select[name="order_by"]');
+        
+        filterInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                filterForm.submit();
+            });
+        });
+        
+        // Submit form amb Enter en el camp de cerca
+        const searchInput = filterForm.querySelector('input[name="search"]');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    filterForm.submit();
+                }
+            });
+        }
+        
+        // Confirmació d'eliminació
+        document.getElementById('confirmDelete').addEventListener('click', function() {
+            if (ofertaToDelete) {
+                // Mostrar loading
+                const button = this;
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Eliminant...';
+                button.disabled = true;
+                
+                // Fer la crida AJAX per eliminar
+                fetch(`/empresa/oferta/${ofertaToDelete}/esborrar/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Mostrar missatge d'èxit
+                        showToast(data.message, 'success');
+                        
+                        // Tancar modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+                        modal.hide();
+                        
+                        // Eliminar la card de l'oferta del DOM
+                        const ofertaCard = document.querySelector(`[onclick="confirmarEliminacio('${data.oferta_id}')"]`)
+                                                  ?.closest('.col-lg-6');
+                        if (ofertaCard) {
+                            ofertaCard.style.transition = 'all 0.3s ease';
+                            ofertaCard.style.opacity = '0';
+                            ofertaCard.style.transform = 'scale(0.8)';
+                            
+                            setTimeout(() => {
+                                ofertaCard.remove();
+                                
+                                // Si no queden ofertes, recarregar la pàgina per mostrar l'empty state
+                                const remainingCards = document.querySelectorAll('#ofertesContainer .col-lg-6');
+                                if (remainingCards.length === 0) {
+                                    location.reload();
+                                }
+                            }, 300);
+                        }
+                    } else {
+                        showToast(data.error || 'Error en eliminar l\'oferta', 'error');
+                    }
+                    
+                    // Restaurar botó
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                    ofertaToDelete = null;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Error de connexió', 'error');
+                    
+                    // Restaurar botó
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

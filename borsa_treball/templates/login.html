@@ -20,6 +20,7 @@
             <div class="card-body p-5">
                 <!-- Logo Section -->
                 <div class="text-center mb-4">
+                    <a href="{% url 'index' %}">
                     <div class="logo-container mb-3">
                         <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100" height="40" viewBox="115 105 310 90">
                             <style>
@@ -45,6 +46,7 @@
                             <circle class="circle3" cx="380" cy="150" r="45" fill="#98BDFF"/>
                           </svg>
                     </div>
+                    </a>
                     <h2 class="h4 text-dark mb-2">Benvingut/da de nou</h2>
                     <p class="text-muted">Inicia sessió per accedir al teu compte</p>
                 </div>
@@ -68,12 +70,9 @@
                         <label for="email" class="form-label">
                             <i class="bi bi-envelope me-2"></i>Correu electrònic
                         </label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0">
-                                <i class="bi bi-envelope text-muted"></i>
-                            </span>
+                        <div class="input-group">                           
                             <input type="email" 
-                                   class="form-control border-start-0 ps-0" 
+                                   class="form-control " 
                                    id="email"
                                    name="email"
                                    value="{{ request.POST.email|default:'' }}"
@@ -87,19 +86,13 @@
                         <label for="password" class="form-label">
                             <i class="bi bi-lock me-2"></i>Contrasenya
                         </label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0">
-                                <i class="bi bi-lock text-muted"></i>
-                            </span>
+                        <div class="input-group">                          
                             <input type="password" 
-                                   class="form-control border-start-0 ps-0" 
+                                   class="form-control " 
                                    id="password"
                                    name="password"
                                    placeholder="Introdueix la teva contrasenya"
-                                   required>
-                            <button class="btn btn-outline-secondary border-start-0" type="button" id="togglePassword">
-                                <i class="bi bi-eye" id="toggleIcon"></i>
-                            </button>
+                                   required>                            
                         </div>
                     </div>
 
@@ -132,7 +125,7 @@
 
                 <!-- Google Login Button -->
                 <div class="d-grid mb-4">
-                    <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn btn-outline-danger btn-lg">
+                    <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn btn-light btn-lg rounded-pill">
                         <i class="bi bi-google me-2"></i>
                         Iniciar sessió amb Google
                     </a>
@@ -143,15 +136,13 @@
                     <p class="text-muted mb-3">No tens compte encara?</p>
                     <div class="row g-2">
                         <div class="col-6">
-                            <a href="{% url 'registre_estudiant' %}" class="btn btn-outline-primary w-100">
-                                <i class="bi bi-mortarboard me-2"></i>
-                                <span class="d-none d-sm-inline">Sóc </span>Estudiant
+                            <a href="{% url 'registre_estudiant' %}" class="btn btn-outline-secondary btn-lg rounded-pill">
+                                <i class="bi bi-mortarboard me-2"></i>Registre Estudiant
                             </a>
                         </div>
                         <div class="col-6">
-                            <a href="{% url 'registre_empresa' %}" class="btn btn-outline-success w-100">
-                                <i class="bi bi-building me-2"></i>
-                                <span class="d-none d-sm-inline">Sóc </span>Empresa
+                            <a href="{% url 'registre_empresa' %}" class="btn btn-outline-secondary btn-lg rounded-pill">
+                                 <i class="bi bi-building-add me-2"></i>Registre empresa
                             </a>
                         </div>
                     </div>

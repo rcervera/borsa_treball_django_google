@@ -11,10 +11,6 @@
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     
     {% block extra_css %}{% endblock %}
-
-    <style>
-        
-    </style>
     
 </head>
 <body>
@@ -22,6 +18,33 @@
     <!-- Sidebar -->
     <div class="sidebar d-flex flex-column" id="sidebar">
         <div class="sidebar-brand">
+             <a href="{% url 'index' %}">
+                    <div class="logo-container mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="50" height="20" viewBox="115 105 310 90">
+                            <style>
+                              circle {
+                                opacity: 0;
+                                animation: fadeInOut 4s infinite;
+                              }
+                          
+                              .circle1 { animation-delay: 0s; }
+                              .circle2 { animation-delay: 0.5s; }
+                              .circle3 { animation-delay: 1s; }
+                          
+                              @keyframes fadeInOut {
+                                0% { opacity: 0; }
+                                20% { opacity: 1; }
+                                80% { opacity: 1; }
+                                100% { opacity: 0; }
+                              }
+                            </style>
+                          
+                            <circle class="circle1" cx="160" cy="150" r="45" fill="#4B49AC"/>
+                            <circle class="circle2" cx="270" cy="150" r="45" fill="#7DA0FA"/>
+                            <circle class="circle3" cx="380" cy="150" r="45" fill="#98BDFF"/>
+                          </svg>
+                    </div>
+                    </a>
             <h4>Borsa de Treball</h4>
             <small>Vidal i Barraquer</small>
         </div>
@@ -45,7 +68,7 @@
             
             {% elif user.tipus == 'EMP' %}
               
-                <a class="nav-link" href="/empresa/ofertes/">
+                <a class="nav-link" href="{% url 'llista_ofertes_empresa' %}">
                     <i class="bi bi-list-ul"></i>Les meves ofertes
                 </a>
                
@@ -82,10 +105,10 @@
                     <i class="bi bi-person"></i>
                 </div>
                 <div class="flex-grow-1">
-                    <div class="username">{{ user.first_name }} {{ user.last_name }}</div>
-                    <div class="text-white-50 small">
-                        {% if user.tipus == 'EST' %}Estudiant
-                        {% elif user.tipus == 'EMP' %}Empresa
+                    <div class="username">{{ user.nom }} {{ user.cognoms }}</div>
+                    <div class="text-gray small">
+                        {% if user.tipus == 'EST' %}Estudiant 
+                        {% elif user.tipus == 'EMP' %}Empresa {{ user.empresa.nom_comercial }}
                         {% elif user.tipus == 'ADM' %}Administrador
                         {% endif %}
                     </div>

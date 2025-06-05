@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from .models import (
     Usuari, Sector, Empresa, FamiliaProfessional, Estudiant, Cicle,
     EstudiEstudiant, CapacitatClau, Funcio, Oferta, Candidatura,
-    Noticia, RegistreAuditoria
+    Noticia, RegistreAuditoria, NivellIdioma
 )
 
 class UsuariAdmin(UserAdmin):
@@ -87,21 +87,47 @@ class CicleAdmin(admin.ModelAdmin):
     list_filter = ('familia', 'grau')
     ordering = ('familia', 'codi')
 
+
+class NivellIdiomaInline(admin.TabularInline):
+    model = NivellIdioma
+    extra = 1
+
 class OfertaAdmin(admin.ModelAdmin):
     list_display = ('titol', 'empresa', 'tipus_contracte', 'jornada', 'data_publicacio', 'data_limit', 'activa', 'visible')
     search_fields = ('titol', 'empresa__nom_comercial', 'descripcio')
     list_filter = ('tipus_contracte', 'jornada', 'activa', 'visible', 'data_publicacio')
     filter_horizontal = ('cicles', 'capacitats_clau')
-    inlines = [FuncioInline]
+    inlines = [FuncioInline, NivellIdiomaInline]
     date_hierarchy = 'data_publicacio'
     autocomplete_fields = ['empresa']
 
+from django.contrib import admin
+from .models import Candidatura
+
 class CandidaturaAdmin(admin.ModelAdmin):
-    list_display = ('oferta', 'estudiant', 'estat', 'data_candidatura', 'puntuacio')
-    search_fields = ('oferta__titol', 'estudiant__usuari__email')
-    list_filter = ('estat', 'oferta__empresa')
-    raw_id_fields = ('oferta', 'estudiant')
+    list_display = ('empresa_nom', 'estudiant_nom', 'data_candidatura', 'estat')
+    list_filter = ('estat', 'oferta__empresa__nom_comercial')
+    search_fields = (
+        'estudiant__usuari__nom',
+        'estudiant__usuari__cognoms',
+        'oferta__empresa__nom_comercial',
+        'oferta__titol'
+    )
     date_hierarchy = 'data_candidatura'
+    autocomplete_fields = ['estudiant', 'oferta']
+    list_per_page = 20  
+    list_max_show_all = 200
+
+    def empresa_nom(self, obj):
+        return obj.oferta.empresa.nom_comercial
+    empresa_nom.short_description = "Empresa"
+    empresa_nom.admin_order_field = 'oferta__empresa__nom_comercial'
+
+    def estudiant_nom(self, obj):
+        return obj.estudiant.usuari.get_full_name()
+    estudiant_nom.short_description = "Estudiant"
+    estudiant_nom.admin_order_field = 'estudiant__usuari__nom'
+
 
 class NoticiaAdmin(admin.ModelAdmin):
     list_display = ('titol', 'destinatari', 'data_publicacio', 'visible')
