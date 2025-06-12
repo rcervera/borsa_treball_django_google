@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, date
 from borsa_treball.models import (
     Usuari, FamiliaProfessional, Cicle, Sector, CapacitatClau, 
     Estudiant, EstudiEstudiant, Empresa, Oferta, 
-    Funcio, Candidatura, Noticia, RegistreAuditoria
+    Funcio, Candidatura, Noticia, RegistreAuditoria,NivellIdioma
 )
 
 fake = Faker('es_ES')
@@ -217,7 +217,7 @@ class Command(BaseCommand):
         ]
 
         for i in range(5):
-            email = f'empresa{i+1}@{fake.domain_name()}'
+            email = f'empresa{i+1}@empresa.com'
             
             # Crear usuari empresa
             usuari, created = Usuari.objects.get_or_create(
@@ -273,11 +273,16 @@ class Command(BaseCommand):
 
         for i in range(10):
             email = f'estudiant{i+1}@{fake.domain_name()}'
+
+            # Generar DNI únic
+            dni_base = f'{fake.random_number(digits=8)}B'
+            while Estudiant.objects.filter(dni=dni_base).exists():
+                dni_base = f'{fake.random_number(digits=8)}B'
             
             # Crear usuari estudiant
             usuari, created = Usuari.objects.get_or_create(
                 email=email,
-                defaults={
+                defaults={                    
                     'nom': fake.first_name(),
                     'cognoms': fake.last_name(),
                     'tipus': 'EST',
@@ -291,7 +296,8 @@ class Command(BaseCommand):
             # Crear estudiant si no existeix
             if created or not hasattr(usuari, 'estudiant'):
                 estudiant, est_created = Estudiant.objects.get_or_create(
-                    usuari=usuari
+                    usuari=usuari,
+                    dni = dni_base,
                 )
             else:
                 estudiant = usuari.estudiant
@@ -399,6 +405,11 @@ class Command(BaseCommand):
                         descripcio=random.choice(funcions_text),
                         ordre=j + 1
                     )
+
+                # Afegir idiomes amb nivell
+                NivellIdioma.objects.create(oferta=oferta, idioma="Català", nivell="nadiu")
+                NivellIdioma.objects.create(oferta=oferta, idioma="Castellà", nivell="nadiu")
+                NivellIdioma.objects.create(oferta=oferta, idioma="Anglès", nivell="parlat")
 
                 ofertes.append(oferta)
 
@@ -521,6 +532,6 @@ class Command(BaseCommand):
         self.stdout.write(f"Notícies: {Noticia.objects.count()}")
         self.stdout.write("\nCredencials:")
         self.stdout.write("Admin: admin@vidalbarraquer.cat / admin123")
-        self.stdout.write("Empreses: empresa1@exemple.com / empresa123")
+        self.stdout.write("Empreses: empresa1@empresa.com / empresa123")
         self.stdout.write("Estudiants: estudiant1@exemple.com / estudiant123")
         self.stdout.write("="*50)

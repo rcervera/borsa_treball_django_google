@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ofertes Disponibles</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        /* Estils personalitzats per a un look més modern */
+        body {
+            background-color: #f8f9fa; /* Fons lleugerament gris */
+        }
+        .header-section {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .container {
+            padding-top: 30px;
+            padding-bottom: 30px;
+        }
+        h2 {
+            color: #343a40; /* Negre més suau */
+            font-weight: 600; /* Negreta subtil */
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .table-ofertes {
+            border-radius: 0.75rem; /* Cantonades arrodonides per la taula */
+            overflow: hidden; /* Per aplicar el border-radius al contingut */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08); /* Ombra més pronunciada */
+        }
+        .table-ofertes thead th {
+            background-color: #007bff; /* Blau primari de Bootstrap */
+            color: white;
+            font-weight: 600;
+            vertical-align: middle;
+            padding: 1rem 0.75rem;
+            border-bottom: none; /* Elimina la vora inferior de la capçalera */
+        }
+        .table-ofertes tbody tr {
+            background-color: #ffffff;
+            transition: background-color 0.2s ease; /* Transició suau al passar el ratolí */
+        }
+        .table-ofertes tbody tr:hover {
+            background-color: #f1f7fe; /* Fons clar en hover */
+        }
+        .table-ofertes tbody td {
+            padding: 1rem 0.75rem;
+            border-top: 1px solid #dee2e6; /* Vores entre files */
+            border-bottom: none;
+        }
+        .table-ofertes tbody tr:last-child td {
+            border-bottom: none; /* Elimina la vora inferior de la darrera fila */
+        }
+        .badge {
+            font-size: 0.8rem; /* Una mica més grans */
+            padding: 0.6em 0.9em;
+            border-radius: 0.5rem; /* Més arrodonits */
+            font-weight: 500;
+        }
+        .badge.bg-info-subtle {
+            background-color: #e0f2f7 !important; /* Més suau */
+            color: #008cba !important; /* Més fosc */
+        }
+        .badge.bg-secondary {
+            background-color: #e9ecef !important;
+            color: #6c757d !important;
+        }
+        .btn-sm {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.85rem;
+            border-radius: 0.5rem;
+        }
+        .btn-outline-primary {
+            color: #007bff;
+            border-color: #007bff;
+            transition: all 0.2s ease;
+        }
+        .btn-outline-primary:hover {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            transition: all 0.2s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .alert-warning {
+            border-radius: 0.75rem;
+        }
+        .pagination .page-link {
+            border-radius: 0.5rem !important;
+            margin: 0 3px;
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        /* Estils per la columna de Data Límit i dies restants */
+        .data-limit-cell {
+            white-space: nowrap; /* Evita que el text es trenqui */
+        }
+        .dias-restantes {
+            font-size: 0.9em;
+            font-weight: 600;
+            display: block; /* Per posar-lo sota la data */
+            margin-top: 0.2em;
+        }
+        .dias-restantes.text-danger {
+            color: #dc3545 !important;
+        }
+        .dias-restantes.text-warning {
+            color: #ffc107 !important;
+        }
+        .dias-restantes.text-success {
+            color: #28a745 !important;
+        }
+    </style>
+</head>
+<body>
+<header class="header-section py-3 mb-4">
+    <div class="container d-flex align-items-center">
+        <a href="{% url 'index' %}" class="d-flex align-items-center text-decoration-none">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100" height="40" viewBox="115 105 310 90">
+                            <style>
+                              circle {
+                                opacity: 0;
+                                animation: fadeInOut 4s infinite;
+                              }
+                          
+                              .circle1 { animation-delay: 0s; }
+                              .circle2 { animation-delay: 0.5s; }
+                              .circle3 { animation-delay: 1s; }
+                          
+                              @keyframes fadeInOut {
+                                0% { opacity: 0; }
+                                20% { opacity: 1; }
+                                80% { opacity: 1; }
+                                100% { opacity: 0; }
+                              }
+                            </style>
+                          
+                            <circle class="circle1" cx="160" cy="150" r="45" fill="#4B49AC"/>
+                            <circle class="circle2" cx="270" cy="150" r="45" fill="#7DA0FA"/>
+                            <circle class="circle3" cx="380" cy="150" r="45" fill="#98BDFF"/>
+                          </svg>
+            <span class="fs-4 text-dark fw-bold p-2">Borsa de Treball</span>
+        </a>
+    </div>
+</header>
+<div class="row justify-content-center">
+     <h2 class="mb-5">Detall de l'oferta</h2>
+    <div class="col-lg-10 col-md-11">
+        <div class="card shadow-lg border-0 mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3">
+                                <i class="bi bi-briefcase-fill text-primary" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <div>
+                                <h2 class="h3 text-dark mb-1">{{ oferta.titol }}</h2>
+                                <div class="d-flex align-items-center text-muted">
+                                   
+                                    
+                                    <i class="bi bi-geo-alt me-2"></i>
+                                    <span>{{ oferta.lloc_treball }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex flex-wrap align-items-center mb-3">
+                           
+                            <span class="badge bg-primary me-2 mb-2">
+                                {{ oferta.get_tipus_contracte_display }}
+                            </span>
+                            <span class="badge bg-secondary me-2 mb-2">
+                                {{ oferta.get_jornada_display }}
+                            </span>
+                            {% if oferta.salari %}
+                            <span class="badge bg-success me-2 mb-2">
+                                <i class="bi bi-currency-euro me-1"></i>
+                                {{ oferta.salari }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+                
+                <div class="row text-center mt-4 pt-3 border-top">                    
+                    
+                    <div class="col-4">
+                        <div class="border-end">
+                            <h4 class="text-warning mb-0">{{ dies_restants }}</h4>
+                            <small class="text-muted">Dies restants</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <h4 class="text-success mb-0">{{ oferta.data_publicacio|timesince }}</h4>
+                        <small class="text-muted">Publicada fa</small>
+                    </div>
+                    <div class="col-4">
+                        <h4 class="text-info mb-0">{{ oferta.numero_vacants }}</h4>
+                        <small class="text-muted">Vacants</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="text-primary mb-3">
+                            <i class="bi bi-file-text me-2"></i>Descripció de l'Oferta
+                        </h5>
+                        <div class="text-muted" style="line-height: 1.6;">
+                            {{ oferta.descripcio|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+
+                {% if oferta.funcions.exists %}
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="text-primary mb-3">
+                            <i class="bi bi-list-task me-2"></i>Funcions del Càrrec
+                        </h5>
+                        <div class="row">
+                            {% for funcio in oferta.funcions.all %}
+                            <div class="col-12 mb-3">
+                                <div class="d-flex align-items-start">
+                                    <div class="me-3">
+                                        <span class="badge bg-primary rounded-circle" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                            {{ funcio.ordre }}
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <p class="mb-0 text-dark">{{ funcio.descripcio }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if oferta.idiomes.exists %}
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="text-primary mb-3">
+                            <i class="bi bi-translate me-2"></i>Idiomes Requerits
+                        </h5>
+                        <div class="row">
+                            {% for idioma in oferta.idiomes.all %}
+                            <div class="col-md-6 mb-2">
+                                <div class="d-flex align-items-center p-2 bg-light rounded">
+                                    <i class="bi bi-chat-dots text-info me-2"></i>
+                                    <div>
+                                        <strong>{{ idioma.idioma|default:"No especificat" }}</strong>
+                                        {% if idioma.nivell %}<br><small class="text-muted">{{ idioma.nivell }}</small>{% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if oferta.requisits %}
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="text-primary mb-3">
+                            <i class="bi bi-list-check me-2"></i>Requisits Addicionals
+                        </h5>
+                        <div class="text-muted" style="line-height: 1.6;">
+                            {{ oferta.requisits|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="text-primary mb-3">
+                            <i class="bi bi-people me-2"></i>Destinataris
+                        </h5>
+                        
+                        {% if oferta.cicles.exists %}
+                        <div class="mb-4">
+                            <h6 class="text-dark mb-3">
+                                <i class="bi bi-mortarboard me-2"></i>Cicles Formatius
+                            </h6>
+                            <div class="row">
+                                {% for cicle in oferta.cicles.all %}
+                                <div class="col-md-6 mb-2">
+                                    <div class="d-flex align-items-center p-2 bg-light rounded">
+                                        <i class="bi bi-check-circle text-success me-2"></i>
+                                        <div>
+                                            <strong>{{ cicle.nom }}</strong>
+                                            {% if cicle.grau %}<br><small class="text-muted">{{ cicle.get_grau_display }}</small>{% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if oferta.capacitats_clau.exists %}
+                        <div>
+                            <h6 class="text-dark mb-3">
+                                <i class="bi bi-stars me-2"></i>Capacitats Clau Requerides
+                            </h6>
+                            <div class="d-flex flex-wrap">
+                                {% for capacitat in oferta.capacitats_clau.all %}
+                                <span class="badge bg-info-subtle text-info me-2 mb-2">
+                                    {{ capacitat.nom }}
+                                </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="text-primary mb-3">
+                            <i class="bi bi-info-circle me-2"></i>Informació Ràpida
+                        </h5>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">
+                                    <i class="bi bi-calendar-event me-2"></i>Data publicació
+                                </span>
+                                <strong>{{ oferta.data_publicacio|date:"d/m/Y" }}</strong>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">
+                                    <i class="bi bi-clock me-2"></i>Data límit
+                                </span>
+                                <strong class="{% if dies_restants <= 7 %}text-danger{% elif dies_restants <= 14 %}text-warning{% else %}text-success{% endif %}">
+                                    {{ oferta.data_limit|date:"d/m/Y" }}
+                                </strong>
+                            </div>
+                             <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">
+                                    <i class="bi bi-briefcase-fill me-2"></i>Tipus de Contracte
+                                </span>
+                                <strong>{{ oferta.get_tipus_contracte_display }}</strong>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">
+                                    <i class="bi bi-hourglass-split me-2"></i>Jornada
+                                </span>
+                                <strong>{{ oferta.get_jornada_display }}</strong>
+                            </div>
+                            {% if oferta.hores_setmanals %}
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">
+                                    <i class="bi bi-hourglass-top me-2"></i>Hores Setmanals
+                                </span>
+                                <strong>{{ oferta.hores_setmanals }}</strong>
+                            </div>
+                            {% endif %}
+                            {% if oferta.horari %}
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">
+                                    <i class="bi bi-alarm me-2"></i>Horari
+                                </span>
+                                <strong>{{ oferta.horari }}</strong>
+                            </div>
+                            {% endif %}
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">
+                                    <i class="bi bi-person-fill me-2"></i>Públic Destinatari
+                                </span>
+                                <strong>{{ oferta.get_public_destinatari_display }}</strong>
+                            </div>
+                            {% if oferta.experiencia %}
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">
+                                    <i class="bi bi-briefcase me-2"></i>Experiència
+                                </span>
+                                <strong>{{ oferta.get_experiencia_display }}</strong>
+                            </div>
+                            {% endif %}
+                            {% if oferta.salari %}
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">
+                                    <i class="bi bi-currency-euro me-2"></i>Salari
+                                </span>
+                                <strong>{{ oferta.salari }}</strong>
+                            </div>
+                            {% endif %}
+                            
+                        </div>
+                    </div>
+                </div>
+
+                
+
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4 text-center">
+                        <h5 class="text-dark mb-3">
+                            <i class="bi bi-person-plus me-2"></i>Candidatura
+                        </h5>
+                        <p class="text-muted">
+                            Si vols presentar una candidatura a aquesta oferta has d'iniciar sessió o registrar-te com estudiant si encara no tens usuari.
+                        </p>
+                        <div class="d-grid gap-2 d-md-block mt-3">
+                            <a href="{% url 'login' %}" class="btn btn-primary rounded-pill me-md-2 mb-2 mb-md-0">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sessió
+                            </a>
+                            <a href="{% url 'registre_estudiant' %}" class="btn btn-primary rounded-pill">
+                                <i class="bi bi-person-add me-2"></i>Registrar-se com Estudiant
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <a href="{% url 'tauler_ofertes' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Tornar a la llista
+            </a>
+            
+        </div>
+    </div>
+</div>
+
+
+
+<style>
+    .card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        border: none;
+        font-weight: 500;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+    
+    .text-primary {
+        color: #0d6efd !important;
+    }
+    
+    .bg-success-subtle {
+        background-color: rgba(25, 135, 84, 0.1) !important;
+    }
+    
+    .bg-danger-subtle {
+        background-color: rgba(220, 53, 69, 0.1) !important;
+    }
+    
+    .bg-secondary-subtle {
+        background-color: rgba(108, 117, 125, 0.1) !important;
+    }
+    
+    .bg-info-subtle {
+        background-color: rgba(13, 202, 240, 0.1) !important;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.5em 0.75em;
+    }
+    
+    @media (max-width: 768px) {
+        .row.text-center .col-3 {
+            margin-bottom: 1rem;
+        }
+        
+        .row.text-center .border-end {
+            border-right: none !important;
+        }
+        
+        .card-body {
+            padding: 1.5rem !important;
+        }
+    }
+</style>
+
+<script>
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Confirmació d'eliminació
+    document.getElementById('confirmDelete').addEventListener('click', function() {
+        if (ofertaToDelete) {
+            // Mostrar loading
+            const button = this;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Eliminant...';
+            button.disabled = true;
+            
+            // Fer la crida AJAX per eliminar
+            fetch(`/ofertes/${ofertaToDelete}/esborrar/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Redirigir a la llista d'ofertes
+                    window.location.href = "{% url 'llista_ofertes_empresa' %}";
+                } else {
+                    alert(data.error || 'Error en eliminar l\'oferta');
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }
+                ofertaToDelete = null;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error de connexió');
+                button.innerHTML = originalText;
+                button.disabled = false;
+            });
+        }
+    });
+});
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

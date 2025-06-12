@@ -49,8 +49,8 @@
                     </div>
                     </a>
                     </div>
-                    <h2 class="h4 text-dark mb-2">Registre d'Empresa</h2>
-                    <p class="text-muted">Registra la teva empresa per publicar ofertes i trobar talent</p>
+                    <h2 class="h4 text-dark mb-2">Registre d'Estudiant</h2>
+                    <p class="text-muted">Registra't per poder presentar candidatures a les ofertes de treball</p>
                 </div>
 
                  <div id="api-messages" class="mb-3"></div>
@@ -124,6 +124,16 @@
                                 <span id="password-match-feedback" class=""></span>
                             </div>
                         </div>
+                        
+
+                    </div>
+
+                    <!-- Estudent Information Section -->
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-person-circle me-2"></i>Informació de l'estudiant
+                        </h6>
+                        
                         <div class="row">
                             <!-- Nom  -->
                             <div class="col-md-6 mb-3">                              
@@ -147,13 +157,13 @@
 
                             <!-- cognoms  -->
                             <div class="col-md-6 mb-3">                              
-                                <label for="cognoma" class="form-label">
+                                <label for="cognoms" class="form-label">
                                     <i class="bi bi-person-badge text-muted me-2"></i>Cognoms *
                                 </label>
                                 <div class="input-group">
                                   
                                     <input type="text" 
-                                           class="form-control  {% if errors.cognoma %}is-invalid{% endif %}" 
+                                           class="form-control  {% if errors.cognoms %}is-invalid{% endif %}" 
                                            id="cognoms"
                                            name="cognoms"
                                            value="{{ form_data.cognoms|default:'' }}"
@@ -161,115 +171,120 @@
                                            required
                                     >
                                 </div>
-                                 <div class="error-validacio" id="error-cognoms"></div>
+                                <div class="error-validacio" id="error-cognoms"></div>
+                                
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- DNI  -->
+                            <div class="col-md-6 mb-3">                              
+                                <label for="dni" class="form-label">
+                                    <i class="bi bi-person-badge text-muted me-2"></i>DNI *
+                                </label>
+                                <div class="input-group">
+                                  
+                                    <input type="text" 
+                                           class="form-control  {% if errors.dni %}is-invalid{% endif %}" 
+                                           id="dni"
+                                           name="dni"
+                                           value="{{ form_data.dni|default:'' }}"
+                                           placeholder="El teu dni"
+                                           required
+                                    >
+                                </div>
+                                 <div class="error-validacio" id="error-dni"></div>
+                                
+                            </div>
+
+                            <!-- telèfon  -->
+                            <div class="col-md-6 mb-3">                              
+                                <label for="telefon" class="form-label">
+                                    <i class="bi bi-person-badge text-muted me-2"></i>Telefon *
+                                </label>
+                                <div class="input-group">
+                                  
+                                    <input type="text" 
+                                           class="form-control  {% if errors.cognoma %}is-invalid{% endif %}" 
+                                           id="telefon"
+                                           name="telefon"
+                                           value="{{ form_data.telefon|default:'' }}"
+                                           placeholder="Els teus telefon"
+                                           required
+                                    >
+                                </div>
+                                <div class="error-validacio" id="error-telefon"></div>
                                 
                             </div>
                         </div>
 
                     </div>
 
-                    <!-- Company Information Section -->
+                    <!-- Academic Information Section -->
                     <div class="mb-4">
                         <h6 class="text-primary mb-3">
-                            <i class="bi bi-building me-2"></i>Informació de l'Empresa
+                            <i class="bi bi-mortarboard me-2"></i>Informació Acadèmica
                         </h6>
                         
+                        <!-- Cicle -->
+                        <div class="mb-3">                           
+                            <label for="cicle" class="form-label">
+                                    <i class="bi bi-book text-muted me-2"></i>Cicle Formatiu actual o darrer estudiat *
+                            </label>
+                            <div class="input-group">
+                                
+                                <select class="form-select {% if errors.cicle %}is-invalid{% endif %}" 
+                                        id="cicle" name="cicle" required>
+                                    <option value="">Selecciona el teu cicle</option>
+                                    {% for cicle in cicles %}
+                                        <option value="{{ cicle.id }}" 
+                                                {% if form_data.cicle == cicle.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ cicle.nom }} ({{ cicle.grau }})
+                                        </option>
+                                    {% endfor %}                                 
+                                </select>
+                            </div>
+                             <div class="error-validacio" id="error-cicle"></div>
+                        </div>
+
                         <div class="row">
-                            <!-- CIF -->
-                            <div class="col-md-6 mb-3">                              
-                                <label for="password" class="form-label">
-                                    <i class="bi bi-card-text text-muted me-2"></i>CIF/NIF *
+                            <!-- Any Inici -->
+                            <div class="col-md-6 mb-3">                             
+                                <label for="cicle" class="form-label">
+                                    <i class="bi bi-calendar-event text-muted me-2"></i>Any d'inici *
+                                </label>
+                                <div class="input-group">                                   
+                                    <input type="number" 
+                                           class="form-control  {% if errors.any_inici %}is-invalid{% endif %}" 
+                                           id="any_inici"
+                                           name="any_inici"
+                                           value="{{ form_data.any_inici|default:'' }}"
+                                           placeholder="per exemple, 2024"
+                                           min="2020"
+                                           max="2030"
+                                           required>
+                                </div>
+                                 <div class="error-validacio" id="error-any_inici"></div>
+                            </div>
+
+                            <!-- Any Fi (Optional) -->
+                            <div class="col-md-6 mb-3">
+                                <label for="cicle" class="form-label">
+                                    <i class="bi bi-calendar-event text-muted me-2"></i>Any de finalització
                                 </label>
                                 <div class="input-group">
-                                  
-                                    <input type="text" 
-                                           class="form-control  {% if errors.cif %}is-invalid{% endif %}" 
-                                           id="cif"
-                                           name="cif"
-                                           value="{{ form_data.cif|default:'' }}"
-                                           placeholder="A12345678"
-                                           required
-                                           pattern="[A-Z][0-9]{8}|[0-9]{8}[A-Z]"
-                                           title="Format: A12345678 o 12345678A">
+                                                                    
+                                    <input type="number" 
+                                           class="form-control  {% if errors.any_fi %}is-invalid{% endif %}" 
+                                           id="any_fi"
+                                           name="any_fi"
+                                           value="{{ form_data.any_fi|default:'' }}"
+                                           placeholder="2026"
+                                           min="2020"
+                                           max="2035">
                                 </div>
-                                <div class="error-validacio" id="error-cif"></div>
-                                <small class="text-muted">Format: A12345678 o 12345678A</small>
-                            </div>
-
-                            <!-- Sector -->
-                            <div class="col-md-6 mb-3">                           
-                                <label for="password" class="form-label">
-                                    <i class="bi bi-diagram-3 text-muted me-2"></i>Sector *
-                                </label>
-                                <div class="input-group">                                   
-                                    <select class="form-select {% if errors.sector %}is-invalid{% endif %}" 
-                                            id="sector" name="sector" required>
-                                        <option value="">Selecciona el sector</option>
-                                        {% for sector in sectors %}
-                                            <option value="{{ sector.id }}" 
-                                                    {% if form_data.sector == sector.id|stringformat:"s" %}selected{% endif %}>
-                                                {{ sector.nom }}
-                                            </option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                 <div class="error-validacio" id="error-sector"></div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <!-- Nom Comercial -->
-                            <div class="col-md-6 mb-3">                              
-                                <label for="password" class="form-label">
-                                    <i class="bi bi-shop text-muted me-2"></i>Nom comercial *
-                                </label>
-                                <div class="input-group">                                    
-                                    <input type="text" 
-                                           class="form-control  {% if errors.nom_comercial %}is-invalid{% endif %}" 
-                                           id="nom_comercial"
-                                           name="nom_comercial"
-                                           value="{{ form_data.nom_comercial|default:'' }}"
-                                           placeholder="Nom de l'empresa"
-                                           required>
-                                </div>
-                                <div class="error-validacio" id="error-nom_comercial"></div>
-                            </div>
-
-                            <!-- Raó Social -->
-                            <div class="col-md-6 mb-3">
-                               
-                                <label for="password" class="form-label">
-                                    <i class="bi bi-building-check text-muted me-2"></i>Raó social *
-                                </label>
-                                <div class="input-group">                                   
-                                    <input type="text" 
-                                           class="form-control {% if errors.rao_social %}is-invalid{% endif %}" 
-                                           id="rao_social"
-                                           name="rao_social"
-                                           value="{{ form_data.rao_social|default:'' }}"
-                                           placeholder="Raó social oficial"
-                                           required>
-                                </div>
-                                <div class="error-validacio" id="error-rao_social"></div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <!-- Telefon -->
-                            <div class="col-md-6 mb-3">
-                            
-                                <label for="password" class="form-label">
-                                    <i class="bi bi-phone text-muted me-2"></i>Telèfon *
-                                </label>
-                                <div class="input-group">                                   
-                                    <input type="text" 
-                                           class="form-control  {% if errors.telefon %}is-invalid{% endif %}" 
-                                           id="telefon"
-                                           name="telefon"
-                                           value="{{ form_data.telefon|default:'' }}"
-                                           placeholder="Telèfon de l'empresa"
-                                           required>
-                                </div>
-                                 <div class="error-validacio" id="error-telefon"></div>
+                                <div class="error-validacio" id="error-any_fi"></div>
+                                <small class="text-muted">Deixa en blanc si encara estàs estudiant</small>
                             </div>
                         </div>
                     </div>
@@ -294,7 +309,7 @@
                     <div class="d-grid mb-4">
                         <button type="submit" class="btn btn-primary btn-lg" id="registerButton">
                             <i class="bi bi-building-add me-2"></i>
-                            Registrar empresa
+                            Registrar estudiant
                         </button>
                     </div>
                 </form>
@@ -315,7 +330,7 @@
             <span>Les teves dades estan protegides i segures.</span>
             <ul class="list-unstyled mt-2 mb-0">
                 <li><strong>Responsable:</strong> Institut Francesc Vidal i Barraquer</li>
-                <li><strong>Finalitat:</strong> Publicació de l’oferta al web de la Borsa de Treball. (No es publicarà cap nom d’empresa ni dada/correu personal)</li>
+                <li><strong>Finalitat:</strong> Publicació de l’oferta al web de la Borsa de Treball. (No es publicarà cap nom d’estudiant ni dada/correu personal)</li>
                 <li><strong>Legitimació:</strong> Consentiment de la persona interessada.</li>
                 <li><strong>Destinataris:</strong> Institut F. Vidal i Barraquer, el seu portal de transparència, estudiants i titulats/des.</li>
                 <li><strong>Drets:</strong> Accedir, rectificar, suprimir, oposar-se, limitar o sol·licitar la portabilitat de les dades.</li>
@@ -436,8 +451,8 @@
             const data = Object.fromEntries(formData.entries());
 
             try {
-                // Aquesta URL hauràs de definir-la al teu urls.py (p.ex., path('api/registre-empresa/', views.registre_empresa, name='registre_empresa_api'))
-                const response = await fetch('{% url "registre_empresa_api" %}', {
+                // 
+                const response = await fetch('{% url "registre_estudiant_api" %}', {
                     method: 'POST',
                      headers: {
                             'X-CSRFToken': getCookie('csrftoken'),
@@ -479,7 +494,7 @@
             } finally {
                 // Habilita el botó de nou
                 registerButton.disabled = false;
-                registerButton.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>Registrar Empresa';
+                registerButton.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>Registrar Estudiant';
             }
         });
 

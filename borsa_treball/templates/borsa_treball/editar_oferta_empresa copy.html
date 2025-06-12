@@ -1,0 +1,576 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Oferta - Borsa de Treball{% endblock %}
+
+{% block page_title %}Editar Oferta de Treball{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10 col-md-11">
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-5">
+                <!-- Header Section -->
+                <div class="text-center mb-4">
+                    <div class="mb-3">
+                        <i class="bi bi-pencil-square text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h2 class="h4 text-dark mb-2">Editar Oferta de Treball</h2>
+                    <p class="text-muted">Modifica els detalls de l'oferta "{{ oferta.titol }}"</p>
+                </div>
+
+                <!-- Messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Form -->
+                <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate id="ofertaForm">
+                    {% csrf_token %}
+                    
+                    <!-- Secció 1: Informació bàsica -->
+                    <div class="mb-5">
+                        <h5 class="text-primary mb-4">
+                            <i class="bi bi-info-circle me-2"></i>Informació Bàsica
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="titol" class="form-label">Títol de l'oferta *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-card-heading text-muted"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control border-start-0 ps-0" 
+                                           id="titol" 
+                                           name="titol" 
+                                           value="{{ oferta.titol }}"
+                                           placeholder="Ex: Desenvolupador/a Web Junior"
+                                           required>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Si us plau, introdueix el títol de l'oferta.
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="data_limit" class="form-label">Data límit *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-calendar-event text-muted"></i>
+                                    </span>
+                                    <input type="date" 
+                                           class="form-control border-start-0 ps-0" 
+                                           id="data_limit" 
+                                           name="data_limit" 
+                                           value="{{ data_limit_formatted }}"
+                                           required>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Si us plau, selecciona una data límit.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="descripcio" class="form-label">Descripció de l'oferta *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 align-items-start pt-3">
+                                    <i class="bi bi-file-text text-muted"></i>
+                                </span>
+                                <textarea class="form-control border-start-0 ps-0" 
+                                          id="descripcio" 
+                                          name="descripcio" 
+                                          rows="4" 
+                                          placeholder="Descriu les responsabilitats i objectius del lloc de treball..."
+                                          required>{{ oferta.descripcio }}</textarea>
+                            </div>
+                            <div class="invalid-feedback">
+                                Si us plau, proporciona una descripció de l'oferta.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="requisits" class="form-label">Requisits <small class="text-muted">(opcional)</small></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 align-items-start pt-3">
+                                    <i class="bi bi-list-check text-muted"></i>
+                                </span>
+                                <textarea class="form-control border-start-0 ps-0" 
+                                          id="requisits" 
+                                          name="requisits" 
+                                          rows="3"
+                                          placeholder="Especifica els requisits necessaris per al lloc...">{{ oferta.requisits }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secció 2: Condicions laborals -->
+                    <div class="mb-5">
+                        <h5 class="text-primary mb-4">
+                            <i class="bi bi-briefcase me-2"></i>Condicions Laborals
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="tipus_contracte" class="form-label">Tipus de contracte *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-file-earmark-text text-muted"></i>
+                                    </span>
+                                    <select class="form-select border-start-0 ps-0" id="tipus_contracte" name="tipus_contracte" required>
+                                        <option value="">Selecciona tipus</option>
+                                        {% for code, name in TIPUS_CONTRACTE %}
+                                        <option value="{{ code }}" {% if oferta.tipus_contracte == code %}selected{% endif %}>{{ name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Si us plau, selecciona el tipus de contracte.
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="jornada" class="form-label">Jornada *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-clock text-muted"></i>
+                                    </span>
+                                    <select class="form-select border-start-0 ps-0" id="jornada" name="jornada" required>
+                                        <option value="">Selecciona jornada</option>
+                                        {% for code, name in JORNADA %}
+                                        <option value="{{ code }}" {% if oferta.jornada == code %}selected{% endif %}>{{ name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Si us plau, selecciona el tipus de jornada.
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="salari" class="form-label">Salari <small class="text-muted">(opcional)</small></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-currency-euro text-muted"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control border-start-0 ps-0" 
+                                           id="salari" 
+                                           name="salari"
+                                           value="{{ oferta.salari }}"
+                                           placeholder="Ex: 18.000-22.000€">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="horari" class="form-label">Horari <small class="text-muted">(opcional)</small></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-alarm text-muted"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control border-start-0 ps-0" 
+                                           id="horari" 
+                                           name="horari"
+                                           value="{{ oferta.horari }}"
+                                           placeholder="Ex: 9:00 - 17:00">
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="lloc_treball" class="form-label">Lloc de treball *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-geo-alt text-muted"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control border-start-0 ps-0" 
+                                           id="lloc_treball" 
+                                           name="lloc_treball"
+                                           value="{{ oferta.lloc_treball }}"
+                                           placeholder="Ex: Tarragona, Catalunya"
+                                           required>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Si us plau, especifica el lloc de treball.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secció 3: Destinataris i requeriments -->
+                    <div class="mb-5">
+                        <h5 class="text-primary mb-4">
+                            <i class="bi bi-people me-2"></i>Destinataris i Requeriments
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Cicles destinataris *</label>
+                                <div class="card border">
+                                    <div class="card-header bg-light py-2">
+                                        <small class="text-muted">
+                                            <i class="bi bi-mortarboard me-1"></i>
+                                            Selecciona els cicles formatius
+                                        </small>
+                                    </div>
+                                    <div class="card-body p-3" style="max-height: 200px; overflow-y: auto;">
+                                        {% for cicle in cicles %}
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" 
+                                                   type="checkbox" 
+                                                   id="cicle-{{ cicle.id }}" 
+                                                   name="cicles" 
+                                                   value="{{ cicle.id }}"
+                                                   {% if cicle in oferta.cicles.all %}checked{% endif %}>
+                                            <label class="form-check-label" for="cicle-{{ cicle.id }}">
+                                                <strong>{{ cicle.nom }}</strong>
+                                                {% if cicle.grau %}<br><small class="text-muted">{{ cicle.grau }}</small>{% endif %}
+                                            </label>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <small class="text-muted">Selecciona almenys un cicle formatiu</small>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Capacitats clau requerides <small class="text-muted">(opcional)</small></label>
+                                <div class="card border">
+                                    <div class="card-header bg-light py-2">
+                                        <small class="text-muted">
+                                            <i class="bi bi-gear me-1"></i>
+                                            Selecciona les capacitats necessàries
+                                        </small>
+                                    </div>
+                                    <div class="card-body p-3" style="max-height: 200px; overflow-y: auto;">
+                                        {% for capacitat in capacitats %}
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" 
+                                                   type="checkbox" 
+                                                   id="capacitat-{{ capacitat.id }}" 
+                                                   name="capacitats_clau" 
+                                                   value="{{ capacitat.id }}"
+                                                   {% if capacitat in oferta.capacitats_clau.all %}checked{% endif %}>
+                                            <label class="form-check-label" for="capacitat-{{ capacitat.id }}">
+                                                <strong>{{ capacitat.nom }}</strong>
+                                                {% if capacitat.categoria %}<br><small class="text-muted">{{ capacitat.categoria }}</small>{% endif %}
+                                            </label>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secció 4: Funcions del càrrec -->
+                    <div class="mb-5">
+                        <h5 class="text-primary mb-4">
+                            <i class="bi bi-list-task me-2"></i>Funcions del Càrrec
+                        </h5>
+                        
+                        <div id="funcions-container" class="mb-3">
+                            <!-- Funcions s'afegiran aquí dinàmicament -->
+                        </div>
+                        
+                        <div class="card border-dashed">
+                            <div class="card-body">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="bi bi-plus-circle text-muted"></i>
+                                    </span>
+                                    <input type="text" 
+                                           id="nova-funcio" 
+                                           class="form-control" 
+                                           placeholder="Descripció de la funció (Ex: Desenvolupar aplicacions web amb React)">
+                                    <button class="btn btn-primary" type="button" onclick="afegirFuncio()">
+                                        <i class="bi bi-plus-lg"></i> Afegir
+                                    </button>
+                                </div>
+                                <small class="text-muted mt-2 d-block">Prem Enter o fes clic a "Afegir" per afegir una funció</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secció 5: Informació de contacte -->
+                    <div class="mb-5">
+                        <h5 class="text-primary mb-4">
+                            <i class="bi bi-person-lines-fill me-2"></i>Informació de Contacte
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="contacte_nom" class="form-label">Persona de contacte *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-person text-muted"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control border-start-0 ps-0" 
+                                           id="contacte_nom" 
+                                           name="contacte_nom"
+                                           value="{{ oferta.contacte_nom }}"
+                                           placeholder="Nom i cognoms"
+                                           required>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Si us plau, introdueix el nom de contacte.
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="contacte_email" class="form-label">Email de contacte *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-envelope text-muted"></i>
+                                    </span>
+                                    <input type="email" 
+                                           class="form-control border-start-0 ps-0" 
+                                           id="contacte_email" 
+                                           name="contacte_email"
+                                           value="{{ oferta.contacte_email }}"
+                                           placeholder="contacte@empresa.com"
+                                           required>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Si us plau, introdueix un email vàlid.
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="contacte_telefon" class="form-label">Telèfon de contacte *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-telephone text-muted"></i>
+                                    </span>
+                                    <input type="tel" 
+                                           class="form-control border-start-0 ps-0" 
+                                           id="contacte_telefon" 
+                                           name="contacte_telefon"
+                                           value="{{ oferta.contacte_telefon }}"
+                                           placeholder="977 123 456"
+                                           required>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Si us plau, introdueix un telèfon de contacte.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secció 6: Configuració -->
+                    <div class="mb-5">
+                        <h5 class="text-primary mb-4">
+                            <i class="bi bi-gear me-2"></i>Configuració
+                        </h5>
+                        
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" 
+                                   type="checkbox" 
+                                   id="visible" 
+                                   name="visible"
+                                   {% if oferta.visible %}checked{% endif %}>
+                            <label class="form-check-label" for="visible">
+                                <strong>Oferta visible</strong>
+                                <br>
+                                <small class="text-muted">Si està activat, l'oferta serà visible per als estudiants</small>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Botons d'acció -->
+                    <div class="d-flex justify-content-between align-items-center pt-4 border-top">
+                        <a href="{% url 'llista_ofertes_empresa' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Tornar enrere
+                        </a>
+                        <div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>Actualitzar Oferta
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .input-group-text {
+        border: 1px solid #ced4da;
+    }
+    
+    .form-control.border-start-0,
+    .form-select.border-start-0 {
+        border-left: none !important;
+    }
+    
+    .input-group-text.border-end-0 {
+        border-right: none !important;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        border: none;
+        font-weight: 500;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+    
+    .text-primary {
+        color: #0d6efd !important;
+    }
+    
+    .border-dashed {
+        border: 2px dashed #dee2e6 !important;
+    }
+    
+    .funcio-item {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-left: 4px solid #0d6efd;
+    }
+    
+    .funcio-item:hover {
+        background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+    }
+    
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 2rem !important;
+        }
+    }
+</style>
+
+<script>
+// Array per emmagatzemar funcions - inicialitzar amb funcions existents
+let funcions = [
+    {% for funcio in funcions_existents %}
+    "{{ funcio|escapejs }}"{% if not forloop.last %},{% endif %}
+    {% endfor %}
+];
+
+function afegirFuncio() {
+    const input = document.getElementById('nova-funcio');
+    const descripcio = input.value.trim();
+    
+    if (descripcio) {
+        funcions.push(descripcio);
+        renderitzarFuncions();
+        input.value = '';
+        input.focus();
+    }
+}
+
+function eliminarFuncio(index) {
+    funcions.splice(index, 1);
+    renderitzarFuncions();
+}
+
+function renderitzarFuncions() {
+    const container = document.getElementById('funcions-container');
+    container.innerHTML = '';
+    
+    if (funcions.length === 0) {
+        container.innerHTML = `
+            <div class="text-center text-muted py-3">
+                <i class="bi bi-list-task" style="font-size: 2rem;"></i>
+                <p class="mt-2 mb-0">Encara no has afegit cap funció</p>
+                <small>Afegeix les funcions principals del càrrec</small>
+            </div>
+        `;
+        return;
+    }
+    
+    funcions.forEach((funcio, index) => {
+        const div = document.createElement('div');
+        div.className = 'funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start';
+        
+        div.innerHTML = `
+            <div class="flex-grow-1">
+                <strong class="text-primary">${index + 1}.</strong> ${funcio}
+                <input type="hidden" name="funcions" value="${funcio}">
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="eliminarFuncio(${index})" title="Eliminar funció">
+                <i class="bi bi-trash"></i>
+            </button>
+        `;
+        
+        container.appendChild(div);
+    });
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Renderitzar funcions existents al carregar la pàgina
+    renderitzarFuncions();
+    
+    // Afegir funció amb Enter
+    document.getElementById('nova-funcio').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            afegirFuncio();
+        }
+    });
+    
+    // Validació del formulari
+    const form = document.getElementById('ofertaForm');
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            // Validar que almenys un cicle estigui seleccionat
+            const ciclesSeleccionats = document.querySelectorAll('input[name="cicles"]:checked');
+            if (ciclesSeleccionats.length === 0) {
+                event.preventDefault();
+                event.stopPropagation();
+                alert('Si us plau, selecciona almenys un cicle formatiu destinatari.');
+                return;
+            }
+            
+            // Validar que hi hagi almenys una funció
+            if (funcions.length === 0) {
+                event.preventDefault();
+                event.stopPropagation();
+                alert('Si us plau, afegeix almenys una funció a l\'oferta.');
+                return;
+            }
+            
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    }
+    
+    // Establir data mínima com avui
+    const dataLimit = document.getElementById('data_limit');
+    if (dataLimit) {
+        const avui = new Date().toISOString().split('T')[0];
+        dataLimit.min = avui;
+    }
+});
+</script>
+{% endblock %}

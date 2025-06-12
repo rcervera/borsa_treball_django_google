@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ofertes Disponibles</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        /* Estils personalitzats per a un look més modern */
+        body {
+            background-color: #f8f9fa; /* Fons lleugerament gris */
+        }
+        .header-section {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .container {
+            padding-top: 30px;
+            padding-bottom: 30px;
+        }
+        h2 {
+            color: #343a40; /* Negre més suau */
+            font-weight: 600; /* Negreta subtil */
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .table-ofertes {
+            border-radius: 0.75rem; /* Cantonades arrodonides per la taula */
+            overflow: hidden; /* Per aplicar el border-radius al contingut */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08); /* Ombra més pronunciada */
+        }
+        .table-ofertes thead th {
+            background-color: #007bff; /* Blau primari de Bootstrap */
+            color: white;
+            font-weight: 600;
+            vertical-align: middle;
+            padding: 1rem 0.75rem;
+            border-bottom: none; /* Elimina la vora inferior de la capçalera */
+        }
+        .table-ofertes tbody tr {
+            background-color: #ffffff;
+            transition: background-color 0.2s ease; /* Transició suau al passar el ratolí */
+        }
+        .table-ofertes tbody tr:hover {
+            background-color: #f1f7fe; /* Fons clar en hover */
+        }
+        .table-ofertes tbody td {
+            padding: 1rem 0.75rem;
+            border-top: 1px solid #dee2e6; /* Vores entre files */
+            border-bottom: none;
+        }
+        .table-ofertes tbody tr:last-child td {
+            border-bottom: none; /* Elimina la vora inferior de la darrera fila */
+        }
+        .badge {
+            font-size: 0.8rem; /* Una mica més grans */
+            padding: 0.6em 0.9em;
+            border-radius: 0.5rem; /* Més arrodonits */
+            font-weight: 500;
+        }
+        .badge.bg-info-subtle {
+            background-color: #e0f2f7 !important; /* Més suau */
+            color: #008cba !important; /* Més fosc */
+        }
+        .badge.bg-secondary {
+            background-color: #e9ecef !important;
+            color: #6c757d !important;
+        }
+        .btn-sm {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.85rem;
+            border-radius: 0.5rem;
+        }
+        .btn-outline-primary {
+            color: #007bff;
+            border-color: #007bff;
+            transition: all 0.2s ease;
+        }
+        .btn-outline-primary:hover {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            transition: all 0.2s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .alert-warning {
+            border-radius: 0.75rem;
+        }
+        .pagination .page-link {
+            border-radius: 0.5rem !important;
+            margin: 0 3px;
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        /* Estils per la columna de Data Límit i dies restants */
+        .data-limit-cell {
+            white-space: nowrap; /* Evita que el text es trenqui */
+        }
+        .dias-restantes {
+            font-size: 0.9em;
+            font-weight: 600;
+            display: block; /* Per posar-lo sota la data */
+            margin-top: 0.2em;
+        }
+        .dias-restantes.text-danger {
+            color: #dc3545 !important;
+        }
+        .dias-restantes.text-warning {
+            color: #ffc107 !important;
+        }
+        .dias-restantes.text-success {
+            color: #28a745 !important;
+        }
+    </style>
+</head>
+<body>
+<header class="header-section py-3 mb-4">
+    <div class="container d-flex align-items-center">
+        <a href="{% url 'index' %}" class="d-flex align-items-center text-decoration-none">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100" height="40" viewBox="115 105 310 90">
+                            <style>
+                              circle {
+                                opacity: 0;
+                                animation: fadeInOut 4s infinite;
+                              }
+                          
+                              .circle1 { animation-delay: 0s; }
+                              .circle2 { animation-delay: 0.5s; }
+                              .circle3 { animation-delay: 1s; }
+                          
+                              @keyframes fadeInOut {
+                                0% { opacity: 0; }
+                                20% { opacity: 1; }
+                                80% { opacity: 1; }
+                                100% { opacity: 0; }
+                              }
+                            </style>
+                          
+                            <circle class="circle1" cx="160" cy="150" r="45" fill="#4B49AC"/>
+                            <circle class="circle2" cx="270" cy="150" r="45" fill="#7DA0FA"/>
+                            <circle class="circle3" cx="380" cy="150" r="45" fill="#98BDFF"/>
+                          </svg>
+            <span class="fs-4 text-dark fw-bold p-2">Borsa de Treball</span>
+        </a>
+    </div>
+</header>
+
+<div class="container">
+    <h2 class="mb-5">Descobreix les nostres oportunitats de feina</h2>
+
+    <div class="mb-4 p-4 bg-light rounded shadow-sm">
+        <form method="GET" action="{% url 'tauler_ofertes' %}">
+            <div class="row align-items-end">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <label for="cicle_id" class="form-label fw-semibold">Filtrar per Estudis:</label>
+                    <select class="form-select" id="cicle_id" name="cicle_id">
+                        <option value="">Tots els estudis</option>
+                        {% for cicle in cicles %}
+                            <option value="{{ cicle.id }}" {% if selected_cicle == cicle.id %}selected{% endif %}>
+                                {{ cicle.nom }} ({{ cicle.get_grau_display }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill">
+                        <i class="bi bi-funnel me-2 "></i>Aplicar Filtre
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% if ofertes %}
+    <div class="table-responsive">
+        <table class="table table-striped align-middle table-ofertes">
+            <thead class="table-light">
+                <tr>
+                    <th>Títol de l'Oferta</th>
+                    <th>Estudis Requerits</th>                  
+                    <th> <i class="bi bi-geo-alt me-2"></i>Lloc de Treball</th>
+                    <th>Tipus Contracte</th>
+                    <th>Jornada</th>
+                    <th>Data Límit</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for oferta in ofertes %}
+                <tr>
+                    <td>
+                        <a href="{% url 'detall_oferta_tauler'  oferta.id %}" class="text-decoration-none fw-semibold text-primary">
+                            {{ oferta.titol }}
+                        </a>
+                        <br>
+                        <small class="text-muted d-block mt-1">{{ oferta.descripcio|truncatewords:20 }}</small>
+                    </td>
+                    <td>
+                        {% for cicle in oferta.cicles.all %}
+                           
+                             
+                                    <div class="d-flex align-items-center p-1 bg-light rounded">
+                                        <i class="bi bi-check-circle text-success me-2"></i>
+                                        <div>
+                                            <strong>{{ cicle.nom }}</strong>
+                                            {% if cicle.grau %}<br><small class="text-muted">{{ cicle.get_grau_display }}</small>{% endif %}
+                                        </div>
+                                    </div>
+                               
+                        {% empty %}
+                            <span class="text-muted small">No especificat</span>
+                        {% endfor %}
+                    </td>
+                   
+                    <td>{{ oferta.lloc_treball }}</td>
+                    <td>{{ oferta.get_tipus_contracte_display }}</td>
+                    <td>{{ oferta.get_jornada_display }}</td>
+                   
+                    <td class="data-limit-cell">
+                        <span class="text-muted d-block">{{ oferta.data_limit|date:"d/m/Y" }}</span>
+                        {% if oferta.days_remaining is not None %}
+                            {% if oferta.days_remaining == -1 %}
+                                <span class="dias-restantes text-danger">Caducada</span>
+                            {% elif oferta.days_remaining == 0 %}
+                                <span class="dias-restantes text-danger">Avui és l'últim dia!</span>
+                            {% elif oferta.days_remaining == 1 %}
+                                <span class="dias-restantes text-danger">Queda 1 dia</span>
+                            {% elif oferta.days_remaining <= 7 %}
+                                <span class="dias-restantes text-danger">Queden {{ oferta.days_remaining }} dies</span>
+                            {% elif oferta.days_remaining <= 30 %}
+                                <span class="dias-restantes text-warning">Queden {{ oferta.days_remaining }} dies</span>
+                            {% else %}
+                                <span class="dias-restantes text-success">Queden {{ oferta.days_remaining }} dies</span>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {# Paginació #}
+    {% if ofertes.has_other_pages %}
+    <nav aria-label="Paginació" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if ofertes.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% if selected_cicle %}&cicle_id={{ selected_cicle }}{% endif %}" aria-label="Primera">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ ofertes.previous_page_number }}{% if selected_cicle %}&cicle_id={{ selected_cicle }}{% endif %}" aria-label="Anterior">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in ofertes.paginator.page_range %}
+                {% if ofertes.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > ofertes.number|add:'-3' and num < ofertes.number|add:'3' %}
+                <li class="page-item"><a class="page-link" href="?page={{ num }}{% if selected_cicle %}&cicle_id={{ selected_cicle }}{% endif %}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if ofertes.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ ofertes.next_page_number }}{% if selected_cicle %}&cicle_id={{ selected_cicle }}{% endif %}" aria-label="Següent">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ ofertes.paginator.num_pages }}{% if selected_cicle %}&cicle_id={{ selected_cicle }}{% endif %}" aria-label="Última">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+        <div class="text-center text-muted mt-2">
+            <small>Mostrant {{ ofertes.start_index }} - {{ ofertes.end_index }} de {{ ofertes.paginator.count }} ofertes</small>
+        </div>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="alert alert-warning text-center p-4 rounded-3 shadow-sm">
+        <i class="bi bi-search fs-4 me-2"></i> No s'han trobat ofertes disponibles en aquest moment.
+    </div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

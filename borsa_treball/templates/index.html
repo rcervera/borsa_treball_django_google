@@ -199,7 +199,7 @@
                 <div class="card stat-card mb-4">
                     <div class="card-body text-center">
                         <i class="bi bi-people text-primary" style="font-size: 2rem;"></i>
-                        <h3 class="mt-2 mb-0">0</h3>
+                        <h3 class="mt-2 mb-0">{{total_usuaris}}</h3>
                         <p class="text-muted mb-0">Usuaris totals</p>
                     </div>
                 </div>
@@ -208,7 +208,7 @@
                 <div class="card stat-card mb-4">
                     <div class="card-body text-center">
                         <i class="bi bi-building text-success" style="font-size: 2rem;"></i>
-                        <h3 class="mt-2 mb-0">0</h3>
+                        <h3 class="mt-2 mb-0">{{total_empreses}}</h3>
                         <p class="text-muted mb-0">Empreses</p>
                     </div>
                 </div>
@@ -217,7 +217,7 @@
                 <div class="card stat-card mb-4">
                     <div class="card-body text-center">
                         <i class="bi bi-briefcase text-warning" style="font-size: 2rem;"></i>
-                        <h3 class="mt-2 mb-0">0</h3>
+                        <h3 class="mt-2 mb-0">{{total_ofertes_actives}}</h3>
                         <p class="text-muted mb-0">Ofertes actives</p>
                     </div>
                 </div>
@@ -226,7 +226,7 @@
                 <div class="card stat-card mb-4">
                     <div class="card-body text-center">
                         <i class="bi bi-graph-up text-info" style="font-size: 2rem;"></i>
-                        <h3 class="mt-2 mb-0">0</h3>
+                        <h3 class="mt-2 mb-0">{{total_candidatures_actives}}</h3>
                         <p class="text-muted mb-0">Candidatures</p>
                     </div>
                 </div>
@@ -240,32 +240,87 @@
                         <h5 class="mb-0"><i class="bi bi-activity me-2"></i>Activitat recent del sistema</h5>
                     </div>
                     <div class="card-body">
-                        <div class="text-muted text-center py-3">
-                            <i class="bi bi-clock-history" style="font-size: 2rem;"></i>
-                            <p class="mt-2 mb-0">No hi ha activitat recent registrada</p>
-                        </div>
+                        <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-clipboard-check me-2"></i>Notificacions Pendents de Revisió</h5>
+                    <span class="badge bg-light text-primary rounded-pill">{{ registres_auditoria.paginator.count }} registres nous</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Data</th>
+                                    <th scope="col">Acció</th>
+                                    <th scope="col">Usuari</th>
+                                    <th scope="col">Model Afectat</th>
+                                    <th scope="col">Descripció</th>
+                                    <th scope="col">Estat</th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for registre in registres_auditoria %}
+                                <tr>
+                                    <td>{{ registre.data|date:"d/m/Y H:i" }}</td>
+                                    <td><strong>{{ registre.accio }}</strong></td>
+                                    <td>{{ registre.usuari.email|default:"N/A" }}</td>
+                                    <td>{{ registre.model_afectat }}</td>
+                                    <td>{{ registre.descripcio|truncatechars:70 }}</td>
+                                    <td>
+                                        {% if not registre.revisat %}
+                                            <span class="badge bg-warning text-dark">Pendent</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Revisat</span>
+                                        {% endif %}
+                                    </td>
+                                   
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                 <div class="card-footer d-flex justify-content-center">
+                    <nav aria-label="Paginació de registres d'auditoria">
+                        <ul class="pagination pagination-sm mb-0">
+                            {% if registres_auditoria.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ registres_auditoria.previous_page_number }}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in registres_auditoria.paginator.page_range %}
+                                {% if registres_auditoria.number == num %}
+                                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                {% elif num > registres_auditoria.number|add:'-3' and num < registres_auditoria.number|add:'3' %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if registres_auditoria.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ registres_auditoria.next_page_number }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+                        
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-tools me-2"></i>Accions ràpides</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-grid gap-2">
-                            <a href="/admin" class="btn btn-danger">
-                                <i class="bi bi-gear me-2"></i>Administració Django
-                            </a>
-                            <a href="#" class="btn btn-warning">
-                                <i class="bi bi-people me-2"></i>Gestionar usuaris
-                            </a>
-                            <a href="#" class="btn btn-info">
-                                <i class="bi bi-bar-chart me-2"></i>Veure estadístiques
-                            </a>
-                        </div>
-                    </div>
-                </div>
+               
             </div>
         </div>
     {% endif %}
@@ -358,7 +413,7 @@
                     </div>
                     <div class="col-md-4 text-center">
                        
-                            <a href="{% url 'registre_empresa' %}" class="btn btn-primary btn-lg rounded-pill">
+                            <a href="{% url 'tauler_ofertes' %}" class="btn btn-primary btn-lg rounded-pill">
                                         <i class="bi bi-list-ul me-2"></i>Tauler d'ofertes
                             </a>
                            

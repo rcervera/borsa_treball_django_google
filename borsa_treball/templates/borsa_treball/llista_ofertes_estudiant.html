@@ -1,0 +1,455 @@
+{% extends 'base.html' %}
+
+{% block title %}Ofertes Disponibles{% endblock %}
+
+{% block page_title %}Ofertes de Feina{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Sidebar de filtres -->
+        <div class="col-lg-3 col-md-4 mb-4">
+            <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+                <div class="card-body p-4">
+                    <h5 class="text-primary mb-3">
+                        <i class="bi bi-funnel me-2"></i>Filtres
+                    </h5>
+                    
+                    <form method="get" id="filtresForm">
+                        <!-- Cerca general -->
+                        <div class="mb-3">
+                            <label for="cerca" class="form-label">
+                                <i class="bi bi-search me-1"></i>Cerca
+                            </label>
+                            <input type="text" class="form-control" id="cerca" name="cerca" 
+                                   value="{{ cerca }}" placeholder="Títol, descripció, empresa...">
+                        </div>
+                        
+                        
+                        
+                        <!-- Cicle formatiu -->
+                        <div class="mb-3">
+                            <label for="cicle" class="form-label">
+                                <i class="bi bi-mortarboard me-1"></i>Cicle Formatiu
+                            </label>
+                            <select class="form-select" id="cicle" name="cicle">
+                                <option value="">Tots els cicles</option>
+                                {% for cicle in cicles %}
+                                <option value="{{ cicle.id }}" {% if cicle.id|stringformat:"s" == cicle_seleccionat %}selected{% endif %}>
+                                    {{ cicle.nom }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Tipus de contracte -->
+                        <div class="mb-3">
+                            <label for="tipus_contracte" class="form-label">
+                                <i class="bi bi-file-text me-1"></i>Tipus Contracte
+                            </label>
+                            <select class="form-select" id="tipus_contracte" name="tipus_contracte">
+                                <option value="">Tots els tipus</option>
+                                {% for value, label in tipus_contracte_choices %}
+                                <option value="{{ value }}" {% if value == tipus_contracte_seleccionat %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Jornada -->
+                        <div class="mb-3">
+                            <label for="jornada" class="form-label">
+                                <i class="bi bi-clock me-1"></i>Jornada
+                            </label>
+                            <select class="form-select" id="jornada" name="jornada">
+                                <option value="">Totes les jornades</option>
+                                {% for value, label in jornada_choices %}
+                                <option value="{{ value }}" {% if value == jornada_seleccionada %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Ordenació -->
+                        <div class="mb-3">
+                            <label for="ordenar" class="form-label">
+                                <i class="bi bi-sort-down me-1"></i>Ordenar per
+                            </label>
+                            <select class="form-select" id="ordenar" name="ordenar">
+                                <option value="-data_publicacio" {% if ordenar == "-data_publicacio" %}selected{% endif %}>
+                                    Més recents
+                                </option>
+                                <option value="data_publicacio" {% if ordenar == "data_publicacio" %}selected{% endif %}>
+                                    Més antigues
+                                </option>
+                                <option value="titol" {% if ordenar == "titol" %}selected{% endif %}>
+                                    Títol A-Z
+                                </option>
+                                <option value="empresa" {% if ordenar == "empresa" %}selected{% endif %}>
+                                    Empresa A-Z
+                                </option>
+                                <option value="data_limit" {% if ordenar == "data_limit" %}selected{% endif %}>
+                                    Data límit (proper)
+                                </option>
+                                <option value="-data_limit" {% if ordenar == "-data_limit" %}selected{% endif %}>
+                                    Data límit (llunyà)
+                                </option>
+                            </select>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search me-2"></i>Aplicar Filtres
+                            </button>
+                            <a href="{% url 'llista_ofertes_estudiant' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Netejar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contingut principal -->
+        <div class="col-lg-9 col-md-8">
+            <!-- Header amb estadístiques -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h4 class="text-dark mb-2">
+                                <i class="bi bi-briefcase-fill text-primary me-2"></i>
+                                Ofertes Disponibles
+                            </h4>
+                            <p class="text-muted mb-0">
+                                Troba la feina perfecta per al teu perfil professional
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <div class="border-end">
+                                        <h5 class="text-primary mb-0">{{ total_ofertes }}</h5>
+                                        <small class="text-muted">Total ofertes</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="border-end">
+                                        <h5 class="text-success mb-0">{{ ofertes_amb_candidatura }}</h5>
+                                        <small class="text-muted">Amb candidatura</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <h5 class="text-warning mb-0">{{ ofertes_sense_candidatura }}</h5>
+                                    <small class="text-muted">Disponibles</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Resultats -->
+            {% if ofertes %}
+            <div class="row g-4">
+                {% for oferta in ofertes %}
+                <div class="col-xl-6 col-lg-12">
+                    <div class="card h-100 shadow-sm border-0 oferta-card">
+                        <div class="card-body p-4">
+                            <!-- Header de l'oferta -->
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="me-3">
+                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" 
+                                         style="width: 50px; height: 50px;">
+                                        <i class="bi bi-briefcase text-white"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="text-dark mb-1">
+                                        <a href="{% url 'detall_oferta_estudiant' oferta.id %}" 
+                                           class="text-decoration-none text-dark">
+                                            {{ oferta.titol }}
+                                        </a>
+                                    </h5>
+                                    <div class="d-flex align-items-center text-muted mb-2">
+                                        
+                                        <i class="bi bi-geo-alt me-2"></i>
+                                        <span>{{ oferta.lloc_treball }}</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Estat candidatura -->
+                                <div class="text-end">
+                                    {% if oferta.id in candidatures_existents %}
+                                    <span class="badge bg-success-subtle text-success">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        Candidatura enviada
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-warning-subtle text-warning">
+                                        <i class="bi bi-clock me-1"></i>
+                                        Disponible
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Descripció -->
+                            <p class="text-muted mb-3" style="line-height: 1.5;">
+                                {{ oferta.descripcio|truncatewords:25 }}
+                            </p>
+                            
+                            <!-- Badges informatius -->
+                            <div class="d-flex flex-wrap align-items-center mb-3">
+                                <span class="badge bg-primary me-2 mb-2">
+                                    {{ oferta.get_tipus_contracte_display }}
+                                </span>
+                                <span class="badge bg-secondary me-2 mb-2">
+                                    {{ oferta.get_jornada_display }}
+                                </span>
+                                {% if oferta.salari %}
+                                <span class="badge bg-success me-2 mb-2">
+                                    <i class="bi bi-currency-euro me-1"></i>
+                                    {{ oferta.salari }}
+                                </span>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Cicles formatius -->
+                            {% if oferta.cicles.exists %}
+                            <div class="mb-3">
+                                <small class="text-muted d-block mb-1">
+                                    <i class="bi bi-mortarboard me-1"></i>Cicles formatius:
+                                </small>
+                                <div class="d-flex flex-wrap">
+                                    {% for cicle in oferta.cicles.all|slice:":2" %}
+                                    <span class="badge bg-info-subtle text-info me-1 mb-1">
+                                        {{ cicle.nom }}
+                                    </span>
+                                    {% endfor %}
+                                    {% if oferta.cicles.count > 2 %}
+                                    <span class="badge bg-light text-muted">
+                                        +{{ oferta.cicles.count|add:"-2" }} més
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Footer amb dates i accions -->
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                                <div class="text-muted">
+                                    <small>
+                                        <i class="bi bi-calendar-event me-1"></i>
+                                        Publicada: {{ oferta.data_publicacio|date:"d/m/Y" }}
+                                    </small>
+                                    <br>
+                                    <small class="{% if oferta.data_limit|timeuntil|slice:':1' <= '7' %}text-danger{% elif oferta.data_limit|timeuntil|slice:':2' <= '14' %}text-warning{% else %}text-success{% endif %}">
+                                        <i class="bi bi-clock me-1"></i>
+                                        Límit: {{ oferta.data_limit|date:"d/m/Y" }}
+                                    </small>
+                                </div>
+                                
+                                <div>
+                                    {% if oferta.id in candidatures_existents %}
+                                    <a href="" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-eye me-1"></i>Veure detalls
+                                    </a>
+                                    {% else %}
+                                    <div class="btn-group">
+                                        <a href="" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-eye me-1"></i>Detalls
+                                        </a>
+                                        <a href="" 
+                                           class="btn btn-primary btn-sm">
+                                            <i class="bi bi-send me-1"></i>Presentar Candidatura
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Paginació -->
+            {% if ofertes.has_other_pages %}
+            <div class="d-flex justify-content-center mt-5">
+                <nav aria-label="Paginació ofertes">
+                    <ul class="pagination pagination-lg">
+                        {% if ofertes.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if cerca %}cerca={{ cerca }}&{% endif %}{% if empresa_seleccionada %}empresa={{ empresa_seleccionada }}&{% endif %}{% if cicle_seleccionat %}cicle={{ cicle_seleccionat }}&{% endif %}{% if tipus_contracte_seleccionat %}tipus_contracte={{ tipus_contracte_seleccionat }}&{% endif %}{% if jornada_seleccionada %}jornada={{ jornada_seleccionada }}&{% endif %}ordenar={{ ordenar }}&page=1">
+                                <i class="bi bi-chevron-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if cerca %}cerca={{ cerca }}&{% endif %}{% if empresa_seleccionada %}empresa={{ empresa_seleccionada }}&{% endif %}{% if cicle_seleccionat %}cicle={{ cicle_seleccionat }}&{% endif %}{% if tipus_contracte_seleccionat %}tipus_contracte={{ tipus_contracte_seleccionat }}&{% endif %}{% if jornada_seleccionada %}jornada={{ jornada_seleccionada }}&{% endif %}ordenar={{ ordenar }}&page={{ ofertes.previous_page_number }}">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for num in ofertes.paginator.page_range %}
+                        {% if ofertes.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                        {% elif num > ofertes.number|add:'-3' and num < ofertes.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if cerca %}cerca={{ cerca }}&{% endif %}{% if empresa_seleccionada %}empresa={{ empresa_seleccionada }}&{% endif %}{% if cicle_seleccionat %}cicle={{ cicle_seleccionat }}&{% endif %}{% if tipus_contracte_seleccionat %}tipus_contracte={{ tipus_contracte_seleccionat }}&{% endif %}{% if jornada_seleccionada %}jornada={{ jornada_seleccionada }}&{% endif %}ordenar={{ ordenar }}&page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                        
+                        {% if ofertes.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if cerca %}cerca={{ cerca }}&{% endif %}{% if empresa_seleccionada %}empresa={{ empresa_seleccionada }}&{% endif %}{% if cicle_seleccionat %}cicle={{ cicle_seleccionat }}&{% endif %}{% if tipus_contracte_seleccionat %}tipus_contracte={{ tipus_contracte_seleccionat }}&{% endif %}{% if jornada_seleccionada %}jornada={{ jornada_seleccionada }}&{% endif %}ordenar={{ ordenar }}&page={{ ofertes.next_page_number }}">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if cerca %}cerca={{ cerca }}&{% endif %}{% if empresa_seleccionada %}empresa={{ empresa_seleccionada }}&{% endif %}{% if cicle_seleccionat %}cicle={{ cicle_seleccionat }}&{% endif %}{% if tipus_contracte_seleccionat %}tipus_contracte={{ tipus_contracte_seleccionat }}&{% endif %}{% if jornada_seleccionada %}jornada={{ jornada_seleccionada }}&{% endif %}ordenar={{ ordenar }}&page={{ ofertes.paginator.num_pages }}">
+                                <i class="bi bi-chevron-double-right"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            
+            <!-- Informació de paginació -->
+            <div class="text-center text-muted mt-3">
+                <small>
+                    Mostrant {{ ofertes.start_index }} - {{ ofertes.end_index }} de {{ ofertes.paginator.count }} ofertes
+                </small>
+            </div>
+            {% endif %}
+            
+            {% else %}
+            <!-- No hi ha resultats -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="bi bi-search text-muted" style="font-size: 4rem;"></i>
+                    </div>
+                    <h4 class="text-muted mb-3">No s'han trobat ofertes</h4>
+                    <p class="text-muted mb-4">
+                        Prova a modificar els filtres de cerca o torna més tard per veure noves ofertes.
+                    </p>
+                    <a href="{% url 'llista_ofertes_estudiants' %}" class="btn btn-primary">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Veure totes les ofertes
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .oferta-card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.08) !important;
+    }
+    
+    .oferta-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        border: none;
+        font-weight: 500;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+    
+    .text-primary {
+        color: #0d6efd !important;
+    }
+    
+    .bg-success-subtle {
+        background-color: rgba(25, 135, 84, 0.1) !important;
+    }
+    
+    .bg-warning-subtle {
+        background-color: rgba(255, 193, 7, 0.1) !important;
+    }
+    
+    .bg-info-subtle {
+        background-color: rgba(13, 202, 240, 0.1) !important;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.5em 0.75em;
+    }
+    
+    .sticky-top {
+        z-index: 1020;
+    }
+    
+    .pagination .page-link {
+        border-radius: 8px;
+        margin: 0 2px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        border-color: #0d6efd;
+    }
+    
+    @media (max-width: 768px) {
+        .row.text-center .col-4 {
+            margin-bottom: 1rem;
+        }
+        
+        .row.text-center .border-end {
+            border-right: none !important;
+        }
+        
+        .sticky-top {
+            position: relative !important;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-submit del formulari quan canvien els filtres
+    const filtresForm = document.getElementById('filtresForm');
+    const selects = filtresForm.querySelectorAll('select');
+    
+    selects.forEach(select => {
+        select.addEventListener('change', function() {
+            filtresForm.submit();
+        });
+    });
+    
+    // Cerca amb delay
+    const cercaInput = document.getElementById('cerca');
+    let cercaTimeout;
+    
+    cercaInput.addEventListener('input', function() {
+        clearTimeout(cercaTimeout);
+        cercaTimeout = setTimeout(() => {
+            filtresForm.submit();
+        }, 500);
+    });
+});
+</script>
+{% endblock %}

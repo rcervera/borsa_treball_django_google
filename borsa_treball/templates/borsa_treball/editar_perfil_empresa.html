@@ -29,407 +29,438 @@
             {% endfor %}
         {% endif %}
 
-        <div class="row">
-            <div class="col-lg-8">
-                <form method="post" enctype="multipart/form-data" id="perfilForm" class="needs-validation" novalidate>
+        <div id="perfil-api-missatges"></div>
+
+        {# PRIMERA CARD: Informació de l'Empresa #}
+        <div class="card shadow-lg border-0 mb-4">
+                      
+            <div class="card-body p-4">
+                 <div class="mb-5">
+                        <h5 class="mb-4 text-primary"><i class="bi bi-building-add me-2"></i>Informació de l'Empresa</h5>
+                 </div>
+                <form method="post" id="empresaProfileForm" class="needs-validation" novalidate>
                     {% csrf_token %}
-                    
-                    <div class="card shadow-sm border-0 mb-4">
-                        <div class="card-body p-4">
-                            <h5 class="text-primary mb-4">
-                                <i class="bi bi-person me-2"></i>Dades de l'Usuari
-                            </h5>
-                            
-                            <div class="row">
-                                <div class="col-md-4 mb-3">                                  
-                                    <label for="id_nom" class="form-label">
-                                        <i class="bi bi-person me-2"></i>Nom *
-                                    </label>
-                                    <div class="input-group">                                       
-                                        <input type="text" 
-                                               class="form-control" 
-                                               id="id_nom" 
-                                               name="nom" 
-                                               value="{{ user.nom }}"
-                                               placeholder="Entra el teu nom"
-                                               required>
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Si us plau, introdueix el teu nom.
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-8 mb-3">                                    
-                                    <label for="id_cognoms" class="form-label">
-                                        <i class="bi bi-person me-2"></i>Cognoms *
-                                    </label>
-                                    <div class="input-group">                                      
-                                        <input type="text" 
-                                               class="form-control" 
-                                               id="id_cognoms" 
-                                               name="cognoms" 
-                                               value="{{ user.cognoms }}"
-                                               placeholder="Entra els teus cognoms"
-                                               required>
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Si us plau, introdueix els teus cognoms.
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row">                                
-                                
-                                <div class="col-md-6 mb-3">                                  
-                                    <label for="id_email" class="form-label">
-                                        <i class="bi bi-envelope me-2"></i>Email *
-                                    </label>
-                                    <div class="input-group">                                       
-                                        <input type="email" 
-                                               class="form-control" 
-                                               id="id_email" 
-                                               name="email" 
-                                               value="{{ user.email }}"
-                                               placeholder="email@exemple.com"
-                                               required>
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Si us plau, introdueix un email vàlid.
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6 mb-3">                                    
-                                    <label for="id_telefon_usuari" class="form-label">
-                                        <i class="bi bi-telephone me-2"></i>Telèfon
-                                    </label>
-                                    <div class="input-group">                                       
-                                        <input type="text" 
-                                               class="form-control" 
-                                               id="id_telefon_usuari" 
-                                               name="telefon_usuari" 
-                                               value="{{ user.telefon|default:'' }}"
-                                               placeholder="Entra telèfon contacte">
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Si us plau, introdueix un telèfon vàlid.
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="nom_comercial" class="form-label">
+                                <i class="bi bi-building me-2 text-muted"></i>Nom Comercial *
+                            </label>
+                            <input type="text" class="form-control" id="nom_comercial" name="nom_comercial" value="{{ empresa.nom_comercial }}" required>
+                            <div id="error-nom_comercial" class="error-validacio form-text text-danger"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="rao_social" class="form-label">
+                                <i class="bi bi-registered me-2 text-muted"></i>Raó Social *
+                            </label>
+                            <input type="text" class="form-control" id="rao_social" name="rao_social" value="{{ empresa.rao_social }}" required>
+                            <div id="error-rao_social" class="error-validacio form-text text-danger"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="cif" class="form-label">
+                                <i class="bi bi-person-badge me-2 text-muted"></i>CIF *
+                            </label>
+                            <input type="text" class="form-control" id="cif" name="cif" value="{{ empresa.cif }}" required>
+                            <div id="error-cif" class="error-validacio form-text text-danger"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="telefon" class="form-label">
+                                <i class="bi bi-telephone me-2 text-muted"></i>Telèfon
+                            </label>
+                            <input type="tel" class="form-control" id="telefon" name="telefon" value="{{ empresa.telefon|default_if_none:'' }}">
+                            <div id="error-telefon" class="error-validacio form-text text-danger"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email_contacte_empresa" class="form-label">
+                                <i class="bi bi-envelope me-2 text-muted"></i>Email de Contacte
+                            </label>
+                            <input type="email" class="form-control" id="email_contacte_empresa" name="email_contacte" value="{{ empresa.email_contacte|default_if_none:'' }}">
+                            <div id="error-email_contacte_empresa" class="error-validacio form-text text-danger"></div>
+                        </div>
+                         <div class="col-md-6">
+                            <label for="num_treballadors" class="form-label">
+                                <i class="bi bi-people-fill me-2 text-muted"></i>Número de Treballadors
+                            </label>
+                            <input type="number" class="form-control" id="num_treballadors" name="num_treballadors" value="{{ empresa.num_treballadors|default_if_none:'' }}" min="0">
+                            <div id="error-num_treballadors" class="error-validacio form-text text-danger"></div>
+                        </div>
+                        <div class="col-12">
+                            <label for="sector" class="form-label">
+                                <i class="bi bi-briefcase me-2 text-muted"></i>Sector
+                            </label>
+                            {# Aquest camp ha de ser un select amb les opcions de Sector #}
+                            <select class="form-select" id="sector" name="sector">
+                                <option value="">Selecciona un sector</option>
+                                {% for s in sectors %}
+                                    <option value="{{ s.id }}" {% if empresa.sector == s %}selected{% endif %}>{{ s.nom }}</option>
+                                {% endfor %}
+                            </select>
+                            <div id="error-sector" class="error-validacio form-text text-danger"></div>
+                        </div>
+                        <div class="col-12">
+                            <label for="web" class="form-label">
+                                <i class="bi bi-globe me-2 text-muted"></i>Pàgina Web
+                            </label>
+                            <input type="url" class="form-control" id="web" name="web" value="{{ empresa.web|default_if_none:'' }}">
+                            <div id="error-web" class="error-validacio form-text text-danger"></div>
+                        </div>
+                        <div class="col-12">
+                            <label for="descripcio" class="form-label">
+                                <i class="bi bi-info-circle me-2 text-muted"></i>Descripció
+                            </label>
+                            <textarea class="form-control" id="descripcio" name="descripcio" rows="4">{{ empresa.descripcio|default_if_none:'' }}</textarea>
+                            <div id="error-descripcio" class="error-validacio form-text text-danger"></div>
                         </div>
                     </div>
-
-                    <div class="card shadow-sm border-0 mb-4">
-                        <div class="card-body p-4">
-                            <h5 class="text-primary mb-4">
-                                <i class="bi bi-building-fill me-2"></i>Dades de l'Empresa
-                            </h5>
-                            
-                            <div class="row">
-                                <div class="col-md-8 mb-3">                                   
-                                    <label for="id_nom_comercial" class="form-label">
-                                        <i class="bi bi-building-fill me-2"></i>Nom comercial *
-                                    </label>
-                                    <div class="input-group">                                       
-                                        <input type="text" 
-                                               class="form-control" 
-                                               id="id_nom_comercial" 
-                                               name="nom_comercial" 
-                                               value="{{ empresa.nom_comercial }}"
-                                               placeholder="Nom comercial de l'empresa"
-                                               required>
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Si us plau, introdueix el nom comercial.
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4 mb-3">                                   
-                                    <label for="id_cif" class="form-label">
-                                        <i class="bi bi-card-text me-2"></i>CIF *
-                                    </label>
-                                    <div class="input-group">                                        
-                                        <input type="text" 
-                                               class="form-control" 
-                                               id="id_cif" 
-                                               name="cif" 
-                                               value="{{ empresa.cif }}"
-                                               placeholder="A12345678"
-                                               pattern="[ABCDEFGHJNPQRSUVW]\d{8}"
-                                               required>
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Format: A12345678
-                                    </div>
-                                </div>
-
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-8 mb-3">                                   
-                                    <label for="id_rao_social" class="form-label">
-                                        <i class="bi bi-file-text me-2"></i>Raó social *
-                                    </label>
-                                    <div class="input-group">                                       
-                                        <input type="text" 
-                                            class="form-control" 
-                                            id="id_rao_social" 
-                                            name="rao_social" 
-                                            value="{{ empresa.rao_social }}"
-                                            placeholder="Raó social oficial de l'empresa"
-                                            required>
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Si us plau, introdueix la raó social.
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4 mb-3">                                   
-                                    <label for="id_telefon_empresa" class="form-label">
-                                        <i class="bi bi-telephone me-2"></i>Telèfon
-                                    </label>
-                                    <div class="input-group">                                       
-                                        <input type="text" 
-                                               class="form-control" 
-                                               id="id_telefon_empresa" 
-                                               name="telefon" 
-                                               value="{{ empresa.telefon|default:'' }}"
-                                               placeholder="telèfon de l'empresa">
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Si us plau, introdueix el telèfon de l'empresa.
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-8 mb-3">                                   
-                                    <label for="id_sector" class="form-label">
-                                        <i class="bi bi-briefcase me-2"></i>Sector
-                                    </label>
-                                    <div class="input-group">                                       
-                                        <select class="form-select" id="id_sector" name="sector">
-                                            <option value="">Selecciona un sector</option>
-                                            {% for sector_obj in sectors %}
-                                                <option value="{{ sector_obj.id }}" {% if empresa.sector and empresa.sector.id == sector_obj.id %}selected{% endif %}>
-                                                    {{ sector_obj.nom }}
-                                                </option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4 mb-3">                                   
-                                    <label for="id_num_treballadors" class="form-label">
-                                        <i class="bi bi-people me-2"></i>Número de treballadors
-                                    </label>
-                                    <div class="input-group">                                       
-                                        <input type="number" 
-                                               class="form-control" 
-                                               id="id_num_treballadors" 
-                                               name="num_treballadors" 
-                                               value="{{ empresa.num_treballadors|default:'' }}"
-                                               placeholder="Ex: 25"
-                                               min="1">
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="id_web" class="form-label">
-                                    <i class="bi bi-globe me-2"></i>Pàgina web
-                                </label>
-                                <div class="input-group">
-                                    <input type="url" 
-                                           class="form-control" 
-                                           id="id_web" 
-                                           name="web" 
-                                           value="{{ empresa.web|default:'' }}"
-                                           placeholder="www.empresa.com">
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="id_descripcio" class="form-label">
-                                    <i class="bi bi-file-text me-2"></i>Descripció de l'empresa
-                                </label>
-                                <div class="input-group">
-                                    <textarea class="form-control border-start-0 ps-0" 
-                                              id="id_descripcio" 
-                                              name="descripcio" 
-                                              rows="4" 
-                                              placeholder="Descriu la teva empresa, els seus valors i activitats...">{{ empresa.descripcio }}</textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center">
-                        <a href="{% url 'llista_ofertes_empresa' %}" class="btn btn-outline-secondary rounded-pill">
-                            <i class="bi bi-arrow-left me-2"></i>Tornar enrere
-                        </a>
-                        <button type="submit" class="btn btn-primary rounded-pill">
-                            <i class="bi bi-save me-2"></i>Desar canvis
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-primary rounded-pill" id="saveProfileBtn">
+                            <i class="bi bi-save me-2"></i>Guardar Canvis
                         </button>
                     </div>
                 </form>
             </div>
+        </div>
 
-            <div class="col-lg-4">
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-body p-4">
-                        <h5 class="text-primary mb-4">
-                            <i class="bi bi-key me-2"></i>Canviar Contrasenya
-                        </h5>
-                        <form id="passwordChangeForm" novalidate>
-                            {% csrf_token %}
-                            <div class="mb-3">
-                                <label for="old_password" class="form-label">Contrasenya actual *</label>
-                                <input type="password" class="form-control" id="old_password" name="old_password" required>
-                                <div class="invalid-feedback">
-                                    Si us plau, introdueix la teva contrasenya actual.
-                                </div>
-                                <div class="form-text text-danger" id="old_password_error"></div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="new_password1" class="form-label">Nova contrasenya *</label>
-                                <input type="password" class="form-control" id="new_password1" name="new_password1" required>
-                                <div class="invalid-feedback">
-                                    Si us plau, introdueix la nova contrasenya.
-                                </div>
-                                <div class="form-text text-danger" id="new_password1_error"></div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="new_password2" class="form-label">Repeteix nova contrasenya *</label>
-                                <input type="password" class="form-control" id="new_password2" name="new_password2" required>
-                                <div class="invalid-feedback">
-                                    Si us plau, repeteix la nova contrasenya.
-                                </div>
-                                <div class="form-text text-danger" id="new_password2_error"></div>
-                            </div>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-outline-primary rounded-pill">
-                                    <i class="bi bi-arrow-repeat me-2"></i>Canviar Contrasenya
-                                </button>
-                            </div>
-                            <div class="mt-3" id="password_change_message"></div>
-                        </form>
+        {# SEGONA CARD: Canviar Contrasenya #}
+        <div class="card shadow-lg border-0 mb-4">
+           
+            <div class="card-body p-4">
+                 <div class="mb-5">
+                        <h5 class="mb-4 text-primary"><i class="bi bi-lock me-2"></i>Canviar Contrasenya</h5>
+                 </div>
+                <form id="changePasswordForm" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="old_password" class="form-label">
+                            <i class="bi bi-key me-2 text-muted"></i>Contrasenya Actual
+                        </label>
+                        <input type="password" class="form-control" id="old_password" name="old_password" required>
+                        <div id="old_password_error" class="text-danger form-text"></div>
                     </div>
-                </div>
+                    <div class="mb-3">
+                        <label for="new_password1" class="form-label">
+                            <i class="bi bi-key-fill me-2 text-muted"></i>Nova Contrasenya
+                        </label>
+                        <input type="password" class="form-control" id="new_password1" name="new_password1" required>
+                        <div id="new_password1_error" class="text-danger form-text"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new_password2" class="form-label">
+                            <i class="bi bi-key-fill me-2 text-muted"></i>Repeteix Nova Contrasenya
+                        </label>
+                        <input type="password" class="form-control" id="new_password2" name="new_password2" required>
+                        <div id="new_password2_error" class="text-danger form-text"></div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-primary rounded-pill" id="changePasswordBtn">
+                            <i class="bi bi-key me-2"></i>Canviar Contrasenya
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        {# TERCERA CARD: Informació del Contacte (Usuari) #}
+        <div class="card shadow-lg border-0 mb-4">
+            
+            <div class="card-body p-4">
+                <div class="mb-5">
+                        <h5 class="mb-4 text-primary"><i class="bi bi-person-circle me-2"></i>Informació del Contacte</h5>
+                 </div>
+                <form method="post" id="userProfileForm" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="user_email" class="form-label">
+                                <i class="bi bi-envelope me-2 text-muted"></i>Email de l'Usuari (No modificable)
+                            </label>
+                            <input type="email" class="form-control" id="user_email" value="{{ user.email }}" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="user_nom" class="form-label">
+                                <i class="bi bi-person me-2 text-muted"></i>Nom de l'Usuari
+                            </label>
+                            <input type="text" class="form-control" id="user_nom" name="nom" value="{{ user.nom }}" required>
+                            <div id="error-nom" class="error-validacio form-text text-danger"></div>
+                        </div>
+                        <div class="col-md-12">
+                            <label for="user_cognoms" class="form-label">
+                                <i class="bi bi-person-vcard me-2 text-muted"></i>Cognoms de l'Usuari
+                            </label>
+                            <input type="text" class="form-control" id="user_cognoms" name="cognoms" value="{{ user.cognoms }}" required>
+                            <div id="error-cognoms" class="error-validacio form-text text-danger"></div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mt-4">
+                        <button type="button" class="btn btn-primary rounded-pill" id="saveUserContactBtn">
+                            <i class="bi bi-save me-2"></i>Guardar Contacte
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'llista_ofertes_empresa' %}" class="btn btn-outline-secondary rounded-pill">
+                <i class="bi bi-arrow-left me-2"></i>Tornar al Llistat d'Ofertes
+            </a>
+            <button type="button" class="btn btn-danger rounded-pill" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+                <i class="bi bi-trash me-2"></i>Eliminar Compte
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminació de Compte</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Estàs segur que vols eliminar el teu compte d'empresa? Aquesta acció és irreversible i s'eliminarà totes les ofertes associades.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
+                <form action="{% url 'eliminar_perfil_empresa' %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Sí, Eliminar Compte</button>
+                </form>
             </div>
         </div>
     </div>
 </div>
+
 {% endblock %}
 
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Funció per mostrar missatges d'alerta
-        function showMessage(modalBody, type, message) {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-            alertDiv.setAttribute('role', 'alert');
-            alertDiv.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>${message}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`;
-            modalBody.prepend(alertDiv);
-            // Auto-remove after 5 seconds
-            setTimeout(() => {
-                alertDiv.classList.remove('show');
-                alertDiv.classList.add('fade');
-                alertDiv.addEventListener('transitionend', () => alertDiv.remove());
-            }, 5000);
+
+        function showApiMessage(containerId, type, message) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = ''; 
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `alert alert-${type} alert-dismissible fade show mt-3`;
+                msgDiv.setAttribute('role', 'alert');
+                msgDiv.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`;
+                container.appendChild(msgDiv);
+            }
         }
 
-        // --- Validació del formulari principal (perfilForm) ---
-        const perfilForm = document.getElementById('perfilForm');
-        if (perfilForm) {
-            perfilForm.addEventListener('submit', function(event) {
-                if (!perfilForm.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
+        function clearFormErrors(formElement) {
+            formElement.querySelectorAll('.error-validacio').forEach(div => div.innerText = '');
+            formElement.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+            formElement.classList.remove('was-validated');
+        }
+
+        // --- Gestió del formulari de la informació de l'Empresa ---
+        const empresaProfileForm = document.getElementById('empresaProfileForm');
+        const saveProfileBtn = document.getElementById('saveProfileBtn');
+        const perfilApiMessages = document.getElementById('perfil-api-missatges');
+
+        if (saveProfileBtn && empresaProfileForm) {
+            saveProfileBtn.addEventListener('click', async function(event) {
+                event.preventDefault();
+
+                clearFormErrors(empresaProfileForm);
+                perfilApiMessages.innerHTML = '';
+
+                // La validació del navegador per defecte no s'executa si no se li força
+                // Amb un formulari manual, cal que la lògica de validació del backend sigui robusta.
+                // Si vols que Bootstrap mostri els missatges d'error HTML5, pots afegir:
+                // if (!empresaProfileForm.checkValidity()) {
+                //    empresaProfileForm.classList.add('was-validated');
+                //    showApiMessage('perfil-api-missatges', 'danger', 'Revisa els camps amb errors.');
+                //    return;
+                // }
+
+
+                const formData = new FormData(empresaProfileForm);
+
+                try {
+                    const response = await fetch('{% url "api_editar_perfil_empresa" %}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                        },
+                        body: formData
+                    });
+
+                    const resultat = await response.json();
+
+                    if (resultat.success) {
+                        showApiMessage('perfil-api-missatges', 'success', resultat.message);
+                    } else {
+                        let errors = {};
+                        try {
+                            errors = JSON.parse(resultat.errors);
+                        } catch (e) {
+                            errors = resultat.errors;
+                        }
+                        
+                        // Per a errors que no estan associats a un camp específic
+                        if (errors.__all__) {
+                            showApiMessage('perfil-api-missatges', 'danger', errors.__all__.join(' '));
+                            delete errors.__all__; // Eliminar-los per no processar-los com a camps
+                        }
+
+                        for (const camp in errors) {
+                            // Canviem l'ID per a email_contacte_empresa ja que el model l'anomena email_contacte
+                            const targetId = (camp === 'email_contacte') ? 'email_contacte_empresa' : camp;
+                            const missatge = errors[camp];
+                            const errorText = Array.isArray(missatge) ? missatge.join(' ') : missatge;
+                            
+                            const input = empresaProfileForm.querySelector(`[name="${camp}"]`);
+                            const errorDiv = document.getElementById(`error-${targetId}`);
+
+                            if (input) input.classList.add('is-invalid');
+                            if (errorDiv) errorDiv.innerText = errorText;
+                        }
+                        showApiMessage('perfil-api-missatges', 'danger', 'Hi ha errors en el formulari de l\'empresa. Si us plau, revisa les dades.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showApiMessage('perfil-api-missatges', 'danger', 'Hi ha hagut un error de connexió amb el servidor.');
                 }
-                perfilForm.classList.add('was-validated');
             });
         }
-        
-        // --- Validació del CIF en temps real ---
-        const cifInput = document.getElementById('id_cif'); // Updated ID
-        if (cifInput) {
-            cifInput.addEventListener('input', function() {
-                const cifPattern = /^[ABCDEFGHJNPQRSUVW]\d{8}$/;
-                if (cifPattern.test(this.value.toUpperCase())) {
-                    this.setCustomValidity('');
-                } else {
-                    this.setCustomValidity('El CIF no té un format vàlid (ex: A12345678).');
+
+        // --- Gestió del formulari de la informació del Contacte (Usuari) ---
+        const userProfileForm = document.getElementById('userProfileForm');
+        const saveUserContactBtn = document.getElementById('saveUserContactBtn');
+
+        if (saveUserContactBtn && userProfileForm) {
+            saveUserContactBtn.addEventListener('click', async function(event) {
+                event.preventDefault();
+
+                clearFormErrors(userProfileForm);
+                perfilApiMessages.innerHTML = '';
+
+                // Si vols que Bootstrap mostri els missatges d'error HTML5, pots afegir:
+                // if (!userProfileForm.checkValidity()) {
+                //    userProfileForm.classList.add('was-validated');
+                //    showApiMessage('perfil-api-missatges', 'danger', 'Revisa els camps de contacte amb errors.');
+                //    return;
+                // }
+
+                const formData = new FormData(userProfileForm);
+
+                try {
+                    const response = await fetch('{% url "api_editar_perfil_usuari" %}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                        },
+                        body: formData
+                    });
+
+                    const resultat = await response.json();
+
+                    if (resultat.success) {
+                        showApiMessage('perfil-api-missatges', 'success', resultat.message);
+                    } else {
+                        let errors = {};
+                        try {
+                            errors = JSON.parse(resultat.errors);
+                        } catch (e) {
+                            errors = resultat.errors;
+                        }
+                        
+                        // Per a errors que no estan associats a un camp específic
+                        if (errors.__all__) {
+                            showApiMessage('perfil-api-missatges', 'danger', errors.__all__.join(' '));
+                            delete errors.__all__; // Eliminar-los per no processar-los com a camps
+                        }
+
+                        for (const camp in errors) {
+                            const missatge = errors[camp];
+                            const errorText = Array.isArray(missatge) ? missatge.join(' ') : missatge;
+
+                            const input = userProfileForm.querySelector(`[name="${camp}"]`);
+                            const errorDiv = document.getElementById(`error-${camp}`);
+
+                            if (input) input.classList.add('is-invalid');
+                            if (errorDiv) errorDiv.innerText = errorText;
+                        }
+                        showApiMessage('perfil-api-missatges', 'danger', 'Hi ha errors en la informació de contacte. Si us plau, revisa les dades.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showApiMessage('perfil-api-missatges', 'danger', 'Hi ha hagut un error de connexió amb el servidor en guardar el contacte.');
                 }
             });
         }
 
-        // --- Canvi de Contrasenya (passwordChangeForm) ---
-        const passwordChangeForm = document.getElementById('passwordChangeForm');
-        const passwordChangeMessageDiv = document.getElementById('password_change_message');
-        const modalBody = passwordChangeForm ? passwordChangeForm.closest('.card-body') : null; // Get the closest card-body for alerts
 
-        if (passwordChangeForm) {
-            passwordChangeForm.addEventListener('submit', function(e) {
+        // --- Gestió del canvi de contrasenya  ---
+        const changePasswordForm = document.getElementById('changePasswordForm');
+        const changePasswordBtn = document.getElementById('changePasswordBtn');
+
+        if (changePasswordBtn && changePasswordForm) {
+            changePasswordBtn.addEventListener('click', async function(e) {
                 e.preventDefault();
 
-                // Clear previous errors
                 document.getElementById('old_password_error').textContent = '';
                 document.getElementById('new_password1_error').textContent = '';
                 document.getElementById('new_password2_error').textContent = '';
-                if (passwordChangeMessageDiv) passwordChangeMessageDiv.innerHTML = '';
-                if (modalBody) modalBody.querySelectorAll('.alert').forEach(alert => alert.remove()); // Remove existing alerts
+                changePasswordForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                changePasswordForm.classList.remove('was-validated');
 
-                if (!passwordChangeForm.checkValidity()) {
-                    e.stopPropagation();
-                    passwordChangeForm.classList.add('was-validated');
+                if (!changePasswordForm.checkValidity()) {
+                    changePasswordForm.classList.add('was-validated');
+                    showApiMessage('perfil-api-missatges', 'danger', 'Revisa els camps de contrasenya.');
                     return;
                 }
 
-                const formData = new FormData(passwordChangeForm);
-                const csrfToken = formData.get('csrfmiddlewaretoken');
+                const formData = new FormData(changePasswordForm);
 
-                fetch('{% url "canviar_contrasenya" %}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': csrfToken,
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest' // Important for Django's is_ajax()
-                    },
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
+                try {
+                    const response = await fetch('{% url "canviar_contrasenya_empresa" %}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                        },
+                        body: formData
+                    });
+
+                    const data = await response.json();
+
                     if (data.success) {
-                        showMessage(modalBody, 'success', data.message);
-                        passwordChangeForm.reset(); // Clear the form
-                        passwordChangeForm.classList.remove('was-validated'); // Remove validation styles
+                        showApiMessage('perfil-api-missatges', 'success', data.message);
+                        changePasswordForm.reset();
+                        changePasswordForm.classList.remove('was-validated');
                     } else {
-                        let errorMessage = '';
-                        if (data.errors) {
-                            data.errors.forEach(error => {
-                                if (error.includes('old password')) { // Specific error for old password
-                                    document.getElementById('old_password_error').textContent = error;
-                                } else if (error.includes('new password1')) { // Specific error for new password1
-                                    document.getElementById('new_password1_error').textContent = error;
-                                } else if (error.includes('new password2')) { // Specific error for new password2
-                                    document.getElementById('new_password2_error').textContent = error;
-                                } else {
-                                    errorMessage += `<li>${error}</li>`;
-                                }
-                            });
+                        let errors = {};
+                        try {
+                            errors = JSON.parse(data.errors);
+                        } catch (e) {
+                            errors = data.errors;
                         }
-                        if (errorMessage) {
-                            showMessage(modalBody, 'danger', `<ul>${errorMessage}</ul>`);
-                        } else if (!data.errors || data.errors.length === 0) {
-                             showMessage(modalBody, 'danger', 'Hi ha hagut un error en el canvi de contrasenya. Si us plau, revisa les dades.');
+                        
+                        for (const field in errors) {
+                            const errorMessages = errors[field];
+                            const errorText = Array.isArray(errorMessages) ? errorMessages.join(' ') : errorMessages;
+
+                            const errorDiv = document.getElementById(`${field}_error`);
+                            if (errorDiv) {
+                                errorDiv.textContent = errorText;
+                                const input = changePasswordForm.querySelector(`[name="${field}"]`);
+                                if (input) input.classList.add('is-invalid');
+                            }
+                        }
+                        
+                        if (data.message && (!errors || Object.keys(errors).length === 0)) {
+                             showApiMessage('perfil-api-missatges', 'danger', data.message);
+                        } else if (!errors || Object.keys(errors).length === 0) {
+                            showApiMessage('perfil-api-missatges', 'danger', 'Hi ha hagut un error en el canvi de contrasenya. Si us plau, revisa les dades.');
                         }
                     }
-                })
-                .catch(error => {
+                } catch (error) {
                     console.error('Error:', error);
-                    showMessage(modalBody, 'danger', 'Hi ha hagut un error de xarxa o del servidor.');
-                });
+                    showApiMessage('perfil-api-missatges', 'danger', 'Hi ha hagut un error de xarxa o del servidor.');
+                }
             });
         }
     });

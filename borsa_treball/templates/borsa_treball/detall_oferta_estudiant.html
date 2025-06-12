@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ oferta.titol }} - Detalls{% endblock %}
+
+{% block page_title %}Detalls de l'Oferta{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Navegació -->
+            <div class="mb-4">
+                <a href="{% url 'llista_ofertes_estudiant' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Tornar a les ofertes
+                </a>
+            </div>
+            
+            <!-- Header de l'oferta -->
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="me-3">
+                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" 
+                                         style="width: 60px; height: 60px;">
+                                        <i class="bi bi-briefcase text-white" style="font-size: 1.5rem;"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h2 class="text-dark mb-1">{{ oferta.titol }}</h2>
+                                    <div class="d-flex align-items-center text-muted">
+                                        
+                                        <i class="bi bi-geo-alt me-2"></i>
+                                        <span>{{ oferta.lloc_treball }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Badges -->
+                            <div class="d-flex flex-wrap align-items-center">
+                                <span class="badge bg-primary me-2 mb-2">
+                                    {{ oferta.get_tipus_contracte_display }}
+                                </span>
+                                <span class="badge bg-secondary me-2 mb-2">
+                                    {{ oferta.get_jornada_display }}
+                                </span>
+                                {% if oferta.salari %}
+                                <span class="badge bg-success me-2 mb-2">
+                                    <i class="bi bi-currency-euro me-1"></i>
+                                    {{ oferta.salari }}
+                                </span>
+                                {% endif %}
+                                <span class="badge bg-{% if dies_restants <= 7 %}danger{% elif dies_restants <= 14 %}warning{% else %}success{% endif %} me-2 mb-2">
+                                    <i class="bi bi-clock me-1"></i>
+                                    {{ dies_restants }} dies restants
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 text-md-end">
+                            {% if candidatura_existent %}
+                            <div class="alert alert-success mb-3">
+                                <i class="bi bi-check-circle me-2"></i>
+                                <strong>Candidatura enviada</strong>
+                                <br><small>{{ candidatura_existent.data_candidatura|date:"d/m/Y H:i" }}</small>
+                            </div>
+                            <a href="#" class="btn btn-outline-primary">
+                                <i class="bi bi-eye me-2"></i>Veure candidatura
+                            </a>
+                            {% else %}
+                            <a href="" class="btn btn-primary btn-lg">
+                                <i class="bi bi-send me-2"></i>Presentar Candidatura
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <!-- Contingut principal -->
+                <div class="col-lg-8">
+                    <!-- Descripció -->
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-body p-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-file-text me-2"></i>Descripció de l'Oferta
+                            </h5>
+                            <div class="text-muted" style="line-height: 1.6;">
+                                {{ oferta.descripcio|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Funcions -->
+                    {% if oferta.funcions.exists %}
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-body p-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-list-task me-2"></i>Funcions del Càrrec
+                            </h5>
+                            {% for funcio in oferta.funcions.all %}
+                            <div class="d-flex align-items-start mb-3">
+                                <span class="badge bg-primary rounded-circle me-3" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                    {{ funcio.ordre }}
+                                </span>
+                                <p class="mb-0 text-dark">{{ funcio.descripcio }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Requisits -->
+                    {% if oferta.requisits %}
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-body p-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-list-check me-2"></i>Requisits
+                            </h5>
+                            <div class="text-muted" style="line-height: 1.6;">
+                                {{ oferta.requisits|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <!-- Informació ràpida -->
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-body p-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-info-circle me-2"></i>Informació
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">
+                                        <i class="bi bi-calendar-event me-2"></i>Publicada
+                                    </span>
+                                    <strong>{{ oferta.data_publicacio|date:"d/m/Y" }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">
+                                        <i class="bi bi-clock me-2"></i>Data límit
+                                    </span>
+                                    <strong class="{% if dies_restants <= 7 %}text-danger{% elif dies_restants <= 14 %}text-warning{% else %}text-success{% endif %}">
+                                        {{ oferta.data_limit|date:"d/m/Y" }}
+                                    </strong>
+                                </div>
+                                {% if oferta.horari %}
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">
+                                        <i class="bi bi-alarm me-2"></i>Horari
+                                    </span>
+                                    <strong>{{ oferta.horari }}</strong>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Cicles formatius -->
+                    {% if oferta.cicles.exists %}
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-body p-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-mortarboard me-2"></i>Cicles Formatius
+                            </h5>
+                            {% for cicle in oferta.cicles.all %}
+                            <div class="d-flex align-items-center p-2 bg-light rounded mb-2">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                <div>
+                                    <strong>{{ cicle.nom }}</strong>
+                                    {% if cicle.grau %}<br><small class="text-muted">{{ cicle.grau }}</small>{% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+
+                    {% if oferta.idiomes.exists %} {# <-- Canviat a 'oferta.idiomes' #}
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-body p-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-translate me-2"></i>Idiomes
+                            </h5>
+                            {% for idioma_obj in oferta.idiomes.all %} {# <-- Iterem sobre 'idiomes' #}
+                            <div class="d-flex align-items-center p-2 bg-light rounded mb-2">
+                                <i class="bi bi-chat-left-text text-info me-2"></i>
+                                <div>
+                                    <strong>{{ idioma_obj.idioma }}</strong> {# <-- Accés directe al camp 'idioma' #}
+                                    {% if idioma_obj.nivell %}
+                                    <br>
+                                    <span class="badge bg-secondary">{{ idioma_obj.nivell }}</span> {# <-- Accés directe al camp 'nivell' #}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                        
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        border: none;
+        font-weight: 500;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+    
+    .text-primary {
+        color: #0d6efd !important;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.5em 0.75em;
+    }
+</style>
+{% endblock %}

@@ -74,6 +74,7 @@ class Empresa(models.Model):
     num_treballadors = models.IntegerField(blank=True, null=True)
     web = models.URLField(blank=True, null=True)
     telefon = models.CharField(max_length=15, blank=True, null=True)
+    email_contacte = models.EmailField(blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "empreses"
@@ -99,13 +100,16 @@ class FamiliaProfessional(models.Model):
 
 class Estudiant(models.Model):
     usuari = models.OneToOneField(Usuari, on_delete=models.CASCADE, primary_key=True)
-        
+    dni = models.CharField(max_length=9, unique=True)  
+    carnet_conduir = models.BooleanField(default=False)
+           
     def clean(self):
         if self.usuari.tipus != 'EST':
             raise ValidationError("Només es poden assignar usuaris amb tipus 'EST' com a estudiant.")
 
     def __str__(self):
         return f"Estudiant: {self.usuari.get_full_name()}"
+    
     
     
 
@@ -299,7 +303,10 @@ class Oferta(models.Model):
     # Activació per part del responsable de borsa
     activa = models.BooleanField(default=False, help_text="Activat pel responsable de la borsa de treball")
 
-   
+    tancada = models.BooleanField(default=False, verbose_name="Oferta tancada", help_text="Indica si l'oferta ha estat tancada (ja s'ha cobert la vacant, etc.)")
+    valoracio_empresa = models.TextField(blank=True, null=True, verbose_name="Valoració de l'Empresa", help_text="La valoració de l'empresa sobre el procés o els candidats.")
+    valoracio_responsable = models.TextField(blank=True, null=True, verbose_name="Valoració del Responsable", help_text="La valoració del responsable de la borsa de treball sobre el procés.")
+  
 
     def __str__(self):
         return f"{self.titol}"
@@ -422,7 +429,7 @@ class Noticia(models.Model):
 class RegistreAuditoria(models.Model):
     accio = models.CharField(max_length=50)  # Ex: "Alta Oferta", "Modificació Estudiant", etc.
     model_afectat = models.CharField(max_length=100)
-    objecte_id = models.PositiveIntegerField(null=True, blank=True)
+   # objecte_id = models.PositiveIntegerField(null=True, blank=True)
     descripcio = models.TextField()
     usuari = models.ForeignKey(Usuari, on_delete=models.SET_NULL, null=True, blank=True)
     data = models.DateTimeField(default=timezone.now)

@@ -50,18 +50,18 @@
         </div>
         
         <nav class="nav flex-column flex-grow-1">
-            <a class="nav-link active" href="{% url 'index' %}">
+            <a class="nav-link {% if current_page == 'inici' %}active{% endif %}" href="{% url 'index' %}">
                 <i class="bi bi-house-door"></i>Inici
             </a>
             
             {% if user.tipus == 'EST' %}
-                <a class="nav-link" href="{% url 'llista_ofertes_estudiants' %}">
+                <a class="nav-link" href="{% url 'llista_ofertes_estudiant' %}">
                     <i class="bi bi-briefcase"></i>Ofertes disponibles
                 </a>
                 <a class="nav-link" href="{% url 'llista_candidatures_estudiant' %}">
                     <i class="bi bi-file-earmark-text"></i>Les meves candidatures
                 </a>
-                <a class="nav-link" href="#">
+                <a class="nav-link {% if current_page == 'editar_perfil' %}active{% endif %}" href="{% url 'perfil_estudiant' %}"> 
                     <i class="bi bi-person"></i>El meu perfil
                 </a>
                
@@ -79,22 +79,10 @@
             
             {% elif user.tipus == 'ADM' %}
                 <a class="nav-link" href="/admin">
-                    <i class="bi bi-gear"></i>Administració Django
-                </a>
+                    <i class="bi bi-gear"></i>Panell Administració
+                </a>              
                 <a class="nav-link" href="#">
-                    <i class="bi bi-people"></i>Gestionar usuaris
-                </a>
-                <a class="nav-link" href="#">
-                    <i class="bi bi-building"></i>Gestionar empreses
-                </a>
-                <a class="nav-link" href="#">
-                    <i class="bi bi-briefcase"></i>Gestionar ofertes
-                </a>
-                <a class="nav-link" href="#">
-                    <i class="bi bi-bar-chart"></i>Estadístiques
-                </a>
-                <a class="nav-link" href="#">
-                    <i class="bi bi-file-earmark-text"></i>Informes
+                    <i class="bi bi-file-earmark-text"></i>Informes (no implementat)
                 </a>
             {% endif %}
         </nav>
