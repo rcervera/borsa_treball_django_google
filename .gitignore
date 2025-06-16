@@ -1,5 +1,7 @@
 # .gitignore per a projecte Django
 
+candidatures/
+
 # Entorns virtuals Python
 venv/
 .env/
