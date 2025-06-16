@@ -192,7 +192,7 @@
                             <div class="row text-center mb-3">
                                 <div class="col-6">
                                     <div class="border-end">
-                                        <h6 class="text-primary mb-0">{{oferta.candidatures.count}}</h6>
+                                        <h6 class="text-primary mb-0">{{ oferta.candidatures_count }}</h6>
                                         <small class="text-muted">Candidatures</small>
                                     </div>
                                 </div>
@@ -235,7 +235,7 @@
                                 </div>
                                 <div>
                                     {% if oferta.candidatures.count > 0 %}
-                                    <a href="" class="btn btn-outline-primary btn-sm me-2 rounded-pill">
+                                    <a href="{% url 'llista_candidatures_oferta' oferta.id %}" class="btn btn-outline-primary btn-sm me-2 rounded-pill">
                                         <i class="bi bi-people"></i>
                                         <span class="d-none d-lg-inline ms-1">Candidatures</span>                                        
                                     </a>

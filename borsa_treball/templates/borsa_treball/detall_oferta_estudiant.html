@@ -8,12 +8,7 @@
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-10">
-            <!-- Navegació -->
-            <div class="mb-4">
-                <a href="{% url 'llista_ofertes_estudiant' %}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-2"></i>Tornar a les ofertes
-                </a>
-            </div>
+            
             
             <!-- Header de l'oferta -->
             <div class="card shadow-lg border-0 mb-4">
@@ -65,11 +60,11 @@
                                 <strong>Candidatura enviada</strong>
                                 <br><small>{{ candidatura_existent.data_candidatura|date:"d/m/Y H:i" }}</small>
                             </div>
-                            <a href="#" class="btn btn-outline-primary">
+                            <a href="{% url 'editar_candidatura_estudiant' candidatura_existent.id %}" class="btn btn-outline-primary">
                                 <i class="bi bi-eye me-2"></i>Veure candidatura
                             </a>
                             {% else %}
-                            <a href="" class="btn btn-primary btn-lg">
+                            <a href="{% url 'afegir_candidatura' oferta.id %}" class="btn btn-primary btn-lg">
                                 <i class="bi bi-send me-2"></i>Presentar Candidatura
                             </a>
                             {% endif %}

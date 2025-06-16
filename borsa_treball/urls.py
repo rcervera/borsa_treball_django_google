@@ -10,10 +10,10 @@ urlpatterns = [
     #path('registre/empresa/', views.registre_empresa, name='registre_empresa'),
     path('registre/empresa/', views.mostrar_registre_empresa, name='registre_empresa'),
     path('api/registre-empresa/', views.registre_empresa, name='registre_empresa_api'),
-     path('api/registre-estudiant/', views.registre_estudiant, name='registre_estudiant_api'),
+    path('api/registre-estudiant/', views.registre_estudiant, name='registre_estudiant_api'),
     
     path('empresa/ofertes/', views_empresa.llista_ofertes, name='llista_ofertes_empresa'),
-    path('empresa/oferta/nova/', views_empresa.afegir_oferta_directe, name='afegir_oferta'),
+    path('empresa/oferta/nova/', views_empresa.afegir_oferta, name='afegir_oferta'),
     path('api/empresa/oferta/nova', views_empresa.crear_oferta_api, name='afegir_oferta_api'),
     path('api/empresa/oferta/<int:oferta_id>/', views_empresa.api_actualitzar_oferta, name='api_actualitzar_oferta'),
     path('empresa/oferta/<int:oferta_id>/toggle-visibilitat/', views_empresa.toggle_visibilitat_oferta, name='toggle_visibilitat_oferta'),
@@ -46,7 +46,7 @@ urlpatterns = [
     
     # rutes incorrectes de moment...
     path('tauler_ofertes', views_estudiant.llista_ofertes_estudiants, name='llista_ofertes_estudiants'),
-    path('tauler_ofertes', views_estudiant.llista_ofertes_estudiants, name='llista_candidatures_estudiant'),
+    path('estudiant/candidatures', views_estudiant.llista_candidatures_estudiant, name='llista_candidatures_estudiant'),
 
     path('perfil/estudiant/', views_estudiant.perfil_estudiant, name='perfil_estudiant'),
     path('api/perfil/estudiant/actualitzar/', views_estudiant.api_actualitzar_perfil_estudiant, name='api_actualitzar_perfil_estudiant'),
@@ -55,4 +55,14 @@ urlpatterns = [
      
     path('estudiant/ofertes/', views_estudiant.llista_ofertes_estudiants_auth, name='llista_ofertes_estudiant'),
     path('estudiant/ofertes/<int:oferta_id>/', views_estudiant.detall_oferta_estudiant, name='detall_oferta_estudiant'),
+    path('estudiant/ofertes/<int:oferta_id>/candidatura/', views_estudiant.afegir_candidatura, name='afegir_candidatura'),
+    path('estudiant/candidatures/<int:candidatura_id>/editar/', views_estudiant.editar_candidatura_estudiant, name='editar_candidatura_estudiant'),
+    path('estudiant/candidatura/cv/<int:candidatura_id>', views_estudiant.descarregar_cv_candidatura, name='descarregar_cv_candidatura'),
+    path('api/candidatures/<int:candidatura_id>/edit/', views_estudiant.editar_candidatura_api, name='editar_candidatura_api'),
+    path('candidatures/<int:candidatura_id>/eliminar_api/', views_estudiant.eliminar_candidatura_api, name='eliminar_candidatura_api'),
+
+    path('ofertes/<int:oferta_id>/candidatures/', views_empresa.candidatures_oferta, name='llista_candidatures_oferta'),
+    path('candidatures/<int:candidatura_id>/carta/',views_empresa.veure_carta_presentacio, name='veure_carta_presentacio'),
+    path('candidatures/<int:candidatura_id>/cv/', views_empresa.descarregar_cv_candidatura, name='descarregar_cv_candidatura'),
+    path('candidatures/<int:candidatura_id>/canviar-estat/', views_empresa.canviar_estat_candidatura, name='canviar_estat_candidatura'),
 ]

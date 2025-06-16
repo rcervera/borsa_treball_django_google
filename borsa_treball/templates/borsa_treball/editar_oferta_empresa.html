@@ -1018,9 +1018,12 @@ document.getElementById("ofertaForm").addEventListener("submit", async function(
     };
 
     try {
+       const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
        const resposta = await fetch(`/api/empresa/oferta/${ofertaId}/`, {
             method: "PUT", 
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json",
+                      'X-CSRFToken': csrftoken,
+             },
             body: JSON.stringify(data)
         });
 

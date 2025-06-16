@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+
+{% block title %}Les meves candidatures{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Sidebar amb filtres -->
+        <div class="col-lg-3 mb-4">
+            <div class="card shadow-sm sticky-top" style="top: 20px;">
+                
+                <div class="card-body">
+                    <h5 class="text-primary mb-3">
+                        <i class="bi bi-funnel me-2"></i>Filtres
+                    </h5>
+                    <form method="get" id="filtresForm">
+                        <div class="mb-3">
+                            <label for="cerca" class="form-label">Cerca</label>
+                            <input type="text" class="form-control" id="cerca" name="cerca" 
+                                   value="{{ cerca }}" placeholder="Títol, empresa...">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="estat" class="form-label">Estat</label>
+                            <select class="form-select" id="estat" name="estat">
+                                <option value="">Tots els estats</option>
+                                {% for value, label in estats %}
+                                <option value="{{ value }}" {% if estat_filter == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary rounded-pill">
+                                <i class="bi bi-search me-1"></i>Filtrar
+                            </button>
+                            <a href="{% url 'llista_candidatures_estudiant' %}" class="btn btn-outline-secondary rounded-pill">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Netejar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Estadístiques -->
+            <div class="card shadow-sm mt-3">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">
+                        <i class="bi bi-graph-up me-2"></i>Estadístiques
+                    </h6>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row g-2 text-center">
+                        <div class="col-6">
+                            <div class="bg-primary bg-opacity-10 rounded p-2">
+                                <div class="fw-bold text-primary">{{ stats.total }}</div>
+                                <small class="text-muted">Total</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-info bg-opacity-10 rounded p-2">
+                                <div class="fw-bold text-info">{{ stats.en_proces }}</div>
+                                <small class="text-muted">En procés</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-warning bg-opacity-10 rounded p-2">
+                                <div class="fw-bold text-warning">{{ stats.preseleccionades }}</div>
+                                <small class="text-muted">Preselec.</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-success bg-opacity-10 rounded p-2">
+                                <div class="fw-bold text-success">{{ stats.contratades }}</div>
+                                <small class="text-muted">Contractes</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contingut principal -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">Les meves candidatures</h2>
+                    <p class="text-muted mb-0">Gestiona totes les teves candidatures</p>
+                </div>
+                
+            </div>
+            
+            {% if candidatures %}
+            <div class="row g-4">
+                {% for candidatura in candidatures %}
+                <div class="col-12">
+                    <div class="card shadow-sm border-0 h-100 candidatura-card">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-lg-8">
+                                    <div class="d-flex align-items-start">
+                                        <div class="avatar-circle bg-primary text-white me-3">
+                                            {{ candidatura.oferta.titol|first|upper }}
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h5 class="mb-1">
+                                                <a href="{% url 'detall_oferta_estudiant' candidatura.oferta.id %}" 
+                                                   class="text-decoration-none text-dark">
+                                                    {{ candidatura.oferta.titol }}
+                                                </a>
+                                            </h5>
+                                            <div class="mb-2">
+                                                {% if not candidatura.activa %}
+                                                    <span class="badge bg-danger">Pendent de validació</span>
+                                                {% elif candidatura.estat == 'EP' %}
+                                                    <span class="badge bg-info">{{ candidatura.get_estat_display }}</span>
+                                                {% elif candidatura.estat == 'PR' %}
+                                                    <span class="badge bg-warning">{{ candidatura.get_estat_display }}</span>
+                                                {% elif candidatura.estat == 'EN' %}
+                                                    <span class="badge bg-primary">{{ candidatura.get_estat_display }}</span>
+                                                {% elif candidatura.estat == 'CO' %}
+                                                    <span class="badge bg-success">{{ candidatura.get_estat_display }}</span>
+                                                {% elif candidatura.estat == 'RJ' %}
+                                                    <span class="badge bg-danger">{{ candidatura.get_estat_display }}</span>
+                                                {% endif %}
+                                                
+                                                
+                                            </div>
+                                            <small class="text-muted">
+                                                <i class="bi bi-calendar me-1"></i>
+                                                Candidatura enviada: {{ candidatura.data_candidatura|date:"d/m/Y H:i" }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 text-lg-end">
+                                    <div class="btn-group" role="group">
+                                       
+                                        <a href="{% url 'editar_candidatura_estudiant' candidatura.id %}" 
+                                           class="btn btn-outline-primary btn-sm rounded-pill">
+                                            <i class="bi bi-pencil me-1"></i>Editar
+                                        </a>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Paginació -->
+            {% if candidatures.has_other_pages %}
+            <nav aria-label="Paginació candidatures" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if candidatures.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ candidatures.previous_page_number }}{% if cerca %}&cerca={{ cerca }}{% endif %}{% if estat_filter %}&estat={{ estat_filter }}{% endif %}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in candidatures.paginator.page_range %}
+                    {% if candidatures.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > candidatures.number|add:'-3' and num < candidatures.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if cerca %}&cerca={{ cerca }}{% endif %}{% if estat_filter %}&estat={{ estat_filter }}{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                    
+                    {% if candidatures.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ candidatures.next_page_number }}{% if cerca %}&cerca={{ cerca }}{% endif %}{% if estat_filter %}&estat={{ estat_filter }}{% endif %}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            
+            {% else %}
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="bi bi-inbox display-1 text-muted"></i>
+                </div>
+                <h4 class="text-muted mb-3">No tens candidatures encara</h4>
+                <p class="text-muted mb-4">Comença a explorar les ofertes disponibles i envia la teva primera candidatura!</p>
+                <a href="{% url 'llista_ofertes_estudiants' %}" class="btn btn-primary">
+                    <i class="bi bi-search me-1"></i>Explorar ofertes
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal confirmació eliminació -->
+<div class="modal fade" id="modalEliminacio" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar eliminació</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Aquesta acció no es pot desfer.
+                </div>
+                <p>Per confirmar l'eliminació, escriu el nom exacte de l'oferta:</p>
+                <p><strong id="nomOferta"></strong></p>
+                <input type="text" class="form-control" id="confirmacioNom" placeholder="Escriu el nom de l'oferta">
+                <div class="invalid-feedback" id="errorConfirmacio"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarEliminacio" disabled>
+                    <i class="bi bi-trash me-1"></i>Eliminar candidatura
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.candidatura-card {
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.candidatura-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+}
+
+.avatar-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+}
+</style>
+
+<script>
+let candidaturaAEliminar = null;
+let nomOfertaOriginal = '';
+
+function confirmarEliminacio(candidaturaId, nomOferta) {
+    candidaturaAEliminar = candidaturaId;
+    nomOfertaOriginal = nomOferta;
+    
+    document.getElementById('nomOferta').textContent = nomOferta;
+    document.getElementById('confirmacioNom').value = '';
+    document.getElementById('btnConfirmarEliminacio').disabled = true;
+    document.getElementById('confirmacioNom').classList.remove('is-invalid');
+    
+    new bootstrap.Modal(document.getElementById('modalEliminacio')).show();
+}
+
+document.getElementById('confirmacioNom').addEventListener('input', function() {
+    const valor = this.value.trim();
+    const btnEliminar = document.getElementById('btnConfirmarEliminacio');
+    const errorDiv = document.getElementById('errorConfirmacio');
+    
+    if (valor.toLowerCase() === nomOfertaOriginal.toLowerCase()) {
+        btnEliminar.disabled = false;
+        this.classList.remove('is-invalid');
+        this.classList.add('is-valid');
+    } else {
+        btnEliminar.disabled = true;
+        this.classList.remove('is-valid');
+        if (valor.length > 0) {
+            this.classList.add('is-invalid');
+            errorDiv.textContent = 'El nom no coincideix';
+        }
+    }
+});
+
+document.getElementById('btnConfirmarEliminacio').addEventListener('click', function() {
+    if (candidaturaAEliminar) {
+        fetch(`/estudiant/candidatures/${candidaturaAEliminar}/eliminar/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `confirmacio=${encodeURIComponent(document.getElementById('confirmacioNom').value)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert(data.message);
+            }
+        });
+    }
+});
+
+// Auto-submit filtres
+document.getElementById('estat').addEventListener('change', function() {
+    document.getElementById('filtresForm').submit();
+});
+
+// Cerca amb delay
+let cercaTimeout;
+document.getElementById('cerca').addEventListener('input', function() {
+    clearTimeout(cercaTimeout);
+    cercaTimeout = setTimeout(() => {
+        document.getElementById('filtresForm').submit();
+    }, 500);
+});
+</script>
+{% endblock %}

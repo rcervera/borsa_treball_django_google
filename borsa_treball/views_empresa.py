@@ -1,14 +1,16 @@
 
+import mimetypes
+import os
 from django.forms import ValidationError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Oferta, Empresa, Cicle, CapacitatClau,Funcio, Sector, Usuari, NivellIdioma, FamiliaProfessional
+from .models import Candidatura, EstatCandidatura, Oferta, Empresa, Cicle, CapacitatClau,Funcio, Sector, Usuari, NivellIdioma, FamiliaProfessional
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q, Count
 from django.utils import timezone
 from datetime import datetime, timedelta
-from django.http import JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
@@ -17,22 +19,32 @@ from django.contrib.auth import update_session_auth_hash
 from django.views.decorators.http import require_POST
 from django.db.models import Prefetch
 
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.dateparse import parse_date
+import json
+
+# --------------------------------------------------------------------------------------------
+# OFERTA
+#
+# --------------------------------------------------------------------------------------------
 
 #
-# AFEGIR OFERTA
+#  Mostra el formulari per afegir una oferta
 #
-
-
-
 @login_required
-def afegir_oferta_directe(request):
+def afegir_oferta(request):
 
+    try:
+        empresa = request.user.empresa
+    except Empresa.DoesNotExist:
+        return redirect('index')
+    
     # Recuperar totes les famílies professionals i precarregar els seus cicles associats
     # Utilitzem Prefetch per carregar els cicles de cada família de manera eficient
     # i els ordenem per nom, tant les famílies com els cicles dins de cada família.
     familias = FamiliaProfessional.objects.order_by('nom').prefetch_related(
         Prefetch(
-            'cicle_set',  # El 'related_name' per defecte si no l'has definit explícitament a ForeignKey
+            'cicle_set',  
             queryset=Cicle.objects.order_by('nom'),
             to_attr='cicles_de_la_familia' # Nom de l'atribut que contindrà els cicles per a cada família
         )
@@ -56,14 +68,8 @@ def afegir_oferta_directe(request):
                 'familia_nom': familia.nom,
                 'cicles': cicles_data
             })
-  
-   # AFEGEIX AQUEST PRINT:
-    print("\n--- Contingut de cicles_agrupats_per_familia ---")
-    import json
-    print(json.dumps(cicles_agrupats_per_familia, indent=2, ensure_ascii=False))
-    print("--------------------------------------------------\n")
-
-    # GET -> mostrar formulari
+    
+    
     context = {
     'cicles': Cicle.objects.all(),
     'cicles_agrupats_per_familia': cicles_agrupats_per_familia,
@@ -76,19 +82,21 @@ def afegir_oferta_directe(request):
     return render(request, 'borsa_treball/afegir_oferta_empresa.html', context)
 
 #
-# AFEGIR OFERTA API
+# Crear l'oferta : API
 #
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.dateparse import parse_date
-import json
 
-@csrf_exempt
+
 @require_POST
 def crear_oferta_api(request):
     try:
         data = json.loads(request.body.decode('utf-8'))
     except json.JSONDecodeError:
         return JsonResponse({'success': False, 'errors': {'global': 'Dades JSON no vàlides'}}, status=400)
+    
+    try:
+        empresa = request.user.empresa
+    except Empresa.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'No tens permisos per accedir a aquesta pàgina.'})    
 
     errors = {}
 
@@ -207,17 +215,16 @@ def llista_ofertes(request):
     except Empresa.DoesNotExist:
         return redirect('index')
     
-    # Obtenir totes les ofertes de l'empresa
+    today = timezone.now().date()
+    
     ofertes = empresa.ofertes.all()
     
-    # Filtres
     search_query = request.GET.get('search', '').strip()
     status_filter = request.GET.get('status', '')
     type_filter = request.GET.get('type', '')
     jornada_filter = request.GET.get('jornada', '')
     order_by = request.GET.get('order_by', '-data_publicacio')
     
-    # Aplicar filtres de cerca
     if search_query:
         ofertes = ofertes.filter(
             Q(titol__icontains=search_query) |
@@ -225,58 +232,50 @@ def llista_ofertes(request):
             Q(lloc_treball__icontains=search_query)
         )
     
-    # Filtrar per estat
     if status_filter:
-        today = timezone.now().date()
+        
         if status_filter == 'activa':
-            # Ofertes visibles i no caducades
             ofertes = ofertes.filter(data_limit__gte=today, visible=True)
         elif status_filter == 'caducada':
-            # Ofertes caducades
             ofertes = ofertes.filter(data_limit__lt=today)
         elif status_filter == 'oculta':
-            # Ofertes ocultes (no visibles)
             ofertes = ofertes.filter(visible=False)
         elif status_filter == 'totes':
-            pass  # No filtrar
+            pass
     
-    # Filtrar per tipus de contracte
     if type_filter:
         ofertes = ofertes.filter(tipus_contracte=type_filter)
     
-    # Filtrar per jornada
     if jornada_filter:
         ofertes = ofertes.filter(jornada=jornada_filter)
+        
+    # Anotació amb el Count de candidatures ACTIVES
+    ofertes = ofertes.annotate(
+        candidatures_count=Count('candidatures', filter=Q(candidatures__activa=True))
+    )
     
+
     # Ordenació
     valid_order_fields = [
         'data_publicacio', '-data_publicacio',
         'data_limit', '-data_limit',
         'titol', '-titol',
-        'candidatures_count', '-candidatures_count'
+        'candidatures_count', '-candidatures_count' # Aquest camp ja existeix per ordenar
     ]
     
     if order_by in valid_order_fields:
-        if 'candidatures_count' in order_by:
-            # Anotar amb el count de candidatures per ordenar
-            ofertes = ofertes.annotate(
-                candidatures_count=Count('candidatures')
-            ).order_by(order_by)
-        else:
-            ofertes = ofertes.order_by(order_by)
+        ofertes = ofertes.order_by(order_by)
     else:
         ofertes = ofertes.order_by('-data_publicacio')
     
-    # Estadístiques generals
-    today = timezone.now().date()
     stats = {
         'total': empresa.ofertes.count(),
         'actives': empresa.ofertes.filter(data_limit__gte=today, visible=True).count(),
         'caducades': empresa.ofertes.filter(data_limit__lt=today).count(),
         'ocultes': empresa.ofertes.filter(visible=False).count(),
+        'total_candidatures_actives': Candidatura.objects.filter(oferta__empresa=empresa, activa=True).count(),
     }
     
-    # Paginació
     items_per_page = request.GET.get('per_page', 6)
     try:
         items_per_page = int(items_per_page)
@@ -295,7 +294,6 @@ def llista_ofertes(request):
     except EmptyPage:
         ofertes_page = paginator.page(paginator.num_pages)
     
-    # Opcions per als filtres (usant els choices del model)
     tipus_contracte_choices = Oferta.TIPUS_CONTRACTE
     jornada_choices = Oferta.JORNADA
     
@@ -336,7 +334,7 @@ def llista_ofertes(request):
     return render(request, 'borsa_treball/llista_ofertes_empresa.html', context)
 
 #
-#  AMAGAR/MOSTRAR OFERTS: API 
+#  AMAGAR/MOSTRAR OFERTES: API 
 #
 
 @login_required
@@ -374,6 +372,7 @@ def toggle_visibilitat_oferta(request, oferta_id):
             'success': False,
             'error': f'Error en canviar la visibilitat: {str(e)}'
         }, status=500)
+
 
 #
 #   ELIMINAR OFERTA
@@ -471,7 +470,7 @@ def detall_oferta(request, oferta_id):
 
 
 #
-# EDITAR EMPRESA
+# EDITAR OFERTA
 #
 @login_required
 def editar_oferta(request, oferta_id):
@@ -558,9 +557,8 @@ def editar_oferta(request, oferta_id):
 
     return render(request, 'borsa_treball/editar_oferta_empresa.html', context)
 
-# EDIT API
+# EDITAR OFERTA:  API
 
-@csrf_exempt
 @require_http_methods(["PUT"])
 @login_required
 def api_actualitzar_oferta(request, oferta_id):
@@ -615,70 +613,6 @@ def api_actualitzar_oferta(request, oferta_id):
     return JsonResponse({'success': True, 'message': 'Oferta actualitzada correctament'})
 
 
-#
-# DUPLICAR OFERTA
-#
-@login_required
-def duplicar_oferta(request, oferta_id):
-    """
-    Vista per duplicar una oferta existent.
-    """
-    try:
-        empresa = request.user.empresa
-    except Empresa.DoesNotExist:
-        messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
-        return redirect('index')
-    
-    # Obtenir l'oferta original i verificar que pertany a l'empresa
-    oferta_original = get_object_or_404(Oferta, id=oferta_id, empresa=empresa)
-    
-    try:
-        # Crear la nova oferta amb les dades de l'original
-        nova_oferta = Oferta.objects.create(
-            empresa=empresa,
-            titol=f"Còpia de {oferta_original.titol}",
-            descripcio=oferta_original.descripcio,
-            lloc_treball=oferta_original.lloc_treball,
-            tipus_contracte=oferta_original.tipus_contracte,
-            jornada=oferta_original.jornada,
-            horari=oferta_original.horari,
-            salari=oferta_original.salari,
-            requisits=oferta_original.requisits,
-            data_limit=timezone.now().date() + timedelta(days=30),  # 30 dies des d'avui
-            contacte_nom=oferta_original.contacte_nom,
-            contacte_email=oferta_original.contacte_email,
-            contacte_telefon=oferta_original.contacte_telefon,
-            visible=False  # Començar com a oculta perquè la revisin
-        )
-        
-        # Copiar les relacions many-to-many
-        # Cicles
-        nova_oferta.cicles.set(oferta_original.cicles.all())
-        
-        # Capacitats clau
-        nova_oferta.capacitats_clau.set(oferta_original.capacitats_clau.all())
-        
-        # Copiar les funcions
-        for funcio_original in oferta_original.funcions.all():
-            Funcio.objects.create(
-                oferta=nova_oferta,
-                descripcio=funcio_original.descripcio,
-                ordre=funcio_original.ordre
-            )
-        
-        messages.success(
-            request, 
-            f'S\'ha creat una còpia de l\'oferta "{oferta_original.titol}". '
-            f'Revisa i modifica les dades necessàries abans de publicar-la.'
-        )
-        
-        # Redirigir a l'edició de la nova oferta
-        return redirect('editar_oferta', oferta_id=nova_oferta.id)
-        
-    except Exception as e:
-        messages.error(request, f'Error en duplicar l\'oferta: {str(e)}')
-        return redirect('detall_oferta', oferta_id=oferta_id)
-
 
 #
 # EDITAR PERFIL 
@@ -690,7 +624,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 import re
 
-@login_required
+
 @login_required
 def editar_perfil_empresa(request):
     """
@@ -973,3 +907,193 @@ def eliminar_perfil_empresa(request):
         messages.error(request, f'Hi ha hagut un error en eliminar el perfil: {str(e)}. Si el problema persisteix, contacta amb suport.')
         # Després d'un logout, ja no estem autenticats. Redirigir a login és el més segur.
         return redirect('login') 
+
+
+# --------------------------------------------------------------------------------------------------------
+#  CANDIDATURES
+#
+# --------------------------------------------------------------------------------------------------------
+
+@login_required
+def candidatures_oferta(request, oferta_id):
+    """
+    Vista per veure les candidatures d'una oferta específica.
+    """
+    try:
+        empresa = request.user.empresa
+    except Empresa.DoesNotExist:
+        messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
+        return redirect('index')
+    
+    # Obtenir l'oferta i verificar que pertany a l'empresa
+    oferta = get_object_or_404(Oferta, id=oferta_id, empresa=empresa)
+    
+    # Filtres
+    estat_filtre = request.GET.get('estat', '')
+    cerca = request.GET.get('cerca', '')
+    ordenar = request.GET.get('ordenar', '-data_candidatura')
+    
+    # Obtenir candidatures i filtrar per 'activa=True'
+   
+    candidatures = oferta.candidatures.select_related('estudiant', 'estudiant__usuari').filter(activa=True)
+   
+    
+    # Aplicar filtres
+    if estat_filtre:
+        candidatures = candidatures.filter(estat=estat_filtre)
+    
+    if cerca:
+        candidatures = candidatures.filter(
+            Q(estudiant__usuari__nom__icontains=cerca) |
+            Q(estudiant__usuari__cognoms__icontains=cerca) |
+            Q(estudiant__usuari__email__icontains=cerca)          
+        )
+    
+    # Ordenar
+    if ordenar == 'nom':
+        candidatures = candidatures.order_by('estudiant__usuari__nom', 'estudiant__usuari__cognoms')
+    elif ordenar == 'estat':
+        candidatures = candidatures.order_by('estat', '-data_candidatura')
+    elif ordenar == 'puntuacio':
+        # Cal tenir en compte que si `puntuacio` és null, es posarà al principi/final segons el SGBD.
+        # Podries voler ordenar els nuls al final si és el cas.
+        candidatures = candidatures.order_by('-puntuacio', '-data_candidatura')
+    else:
+        candidatures = candidatures.order_by('-data_candidatura')
+    
+    # Paginació
+    paginator = Paginator(candidatures, 10)
+    page_number = request.GET.get('page')
+    candidatures_page = paginator.get_page(page_number)
+    
+    # Estadístiques
+    
+    stats = oferta.candidatures.filter(activa=True).aggregate( 
+        total=Count('id'),
+        rebutjades=Count('id', filter=Q(estat=EstatCandidatura.REBUTJADA)),
+        en_proces=Count('id', filter=Q(estat=EstatCandidatura.EN_PROCES)),
+        preseleccionades=Count('id', filter=Q(estat=EstatCandidatura.PRESELECCIONADA)),
+        entrevistes=Count('id', filter=Q(estat=EstatCandidatura.ENTREVISTA)),
+        contratades=Count('id', filter=Q(estat=EstatCandidatura.CONTRATADA)),
+    )
+    
+    # Calcular dies restants
+    today = timezone.now().date()
+    dies_restants = (oferta.data_limit - today).days if oferta.data_limit and oferta.data_limit > today else 0 
+   
+    
+    context = {
+        'oferta': oferta,
+        'candidatures': candidatures_page,
+        'stats': stats,
+        'dies_restants': dies_restants,
+        'estat_filtre': estat_filtre,
+        'cerca': cerca,
+        'ordenar': ordenar,
+        'estats_choices': EstatCandidatura.choices,
+        'today': today,
+    }
+    
+    return render(request, 'borsa_treball/llista_candidatures_oferta.html', context)
+
+
+@login_required
+def veure_carta_presentacio(request, candidatura_id):
+    """
+    Vista AJAX per obtenir la carta de presentació d'una candidatura.
+    """
+    try:
+        empresa = request.user.empresa
+    except Empresa.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'No tens permisos per accedir a aquesta pàgina.'})
+    
+    # Obtenir la candidatura i verificar permisos
+    candidatura = get_object_or_404(Candidatura, id=candidatura_id, oferta__empresa=empresa)
+    
+    return JsonResponse({
+        'success': True,
+        'carta_presentacio': candidatura.carta_presentacio or 'No hi ha carta de presentació.',
+        'estudiant_nom': candidatura.estudiant.usuari.get_full_name(),
+        'data_candidatura': candidatura.data_candidatura.strftime('%d/%m/%Y %H:%M')
+    })
+
+
+@login_required
+def descarregar_cv_candidatura(request, candidatura_id):
+    """
+    Vista per descarregar el CV d'una candidatura.
+    """
+    try:
+        empresa = request.user.empresa
+    except Empresa.DoesNotExist:
+        messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
+        return redirect('index')
+    
+    # Obtenir la candidatura i verificar permisos
+    candidatura = get_object_or_404(Candidatura, id=candidatura_id, oferta__empresa=empresa)
+    
+    if not candidatura.cv_adjunt:
+        raise Http404("CV no trobat")
+    
+    try:
+        # Obtenir el fitxer
+        file_path = candidatura.cv_adjunt.path
+        
+        if not os.path.exists(file_path):
+            raise Http404("Fitxer no trobat")
+        
+        # Determinar el tipus MIME
+        content_type, _ = mimetypes.guess_type(file_path)
+        if content_type is None:
+            content_type = 'application/octet-stream'
+        
+        # Crear la resposta
+        with open(file_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type=content_type)
+            
+        # Nom del fitxer per la descàrrega
+        filename = f"CV_{candidatura.estudiant.usuari.get_full_name()}_{candidatura.oferta.titol}.pdf"
+        filename = filename.replace(' ', '_').replace(',', '')
+        
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+        
+    except Exception as e:
+        messages.error(request, f'Error en descarregar el CV: {str(e)}')
+        return redirect('candidatures_oferta', oferta_id=candidatura.oferta.id)
+    
+
+
+@login_required
+def canviar_estat_candidatura(request, candidatura_id):
+    """
+    Vista AJAX per canviar l'estat d'una candidatura.
+    """
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Mètode no permès'})
+    
+    try:
+        empresa = request.user.empresa
+    except Empresa.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'No tens permisos per accedir a aquesta pàgina.'})
+    
+    # Obtenir la candidatura i verificar permisos
+    candidatura = get_object_or_404(Candidatura, id=candidatura_id, oferta__empresa=empresa)
+    
+    nou_estat = request.POST.get('estat')
+    if nou_estat not in [choice[0] for choice in EstatCandidatura.choices]:
+        return JsonResponse({'success': False, 'error': 'Estat no vàlid'})
+    
+    try:
+        candidatura.estat = nou_estat
+        candidatura.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'Estat canviat a "{candidatura.get_estat_display()}"',
+            'nou_estat': nou_estat,
+            'nou_estat_display': candidatura.get_estat_display()
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': f'Error en canviar l\'estat: {str(e)}'})
+

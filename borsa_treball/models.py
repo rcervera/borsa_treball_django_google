@@ -20,8 +20,6 @@ class UsuariManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-
-
 class Usuari(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     nom = models.CharField(max_length=255, blank=True)
@@ -242,8 +240,7 @@ class Oferta(models.Model):
         ('PR', 'Pràctiques'),
         ('TC', 'Contracte en pràctiques'),
         ('TI', 'Contracte temporal'),
-        ('IN', 'Contracte indefinit'),
-        ('FP', 'Formació professional dual'),
+        ('IN', 'Contracte indefinit'),       
     ]
 
     JORNADA = [
@@ -381,6 +378,10 @@ class Candidatura(models.Model):
         verbose_name='Puntuació (0-100)',
         help_text='Puntuació assignada per l\'empresa'
     )
+
+    # Activació per part del responsable de borsa
+    activa = models.BooleanField(default=False, help_text="Activat pel responsable de la borsa de treball")
+
 
     class Meta:
         verbose_name = 'Candidatura'

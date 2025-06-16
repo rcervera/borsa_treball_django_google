@@ -1,10 +1,12 @@
+import mimetypes
+import os
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q, Count
 from django.utils import timezone
-from .models import Oferta, Empresa, Cicle, Candidatura, Estudiant
+from .models import Oferta, Empresa, Cicle, Candidatura, Estudiant, EstatCandidatura
 
 
 def llista_ofertes_estudiants2(request):
@@ -220,7 +222,7 @@ def detall_oferta_tauler(request, oferta_id):
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST, require_http_methods
 from django.db import transaction
 from django.core.exceptions import ValidationError
@@ -630,6 +632,7 @@ def llista_ofertes_estudiants_auth(request):
         'ofertes_sense_candidatura': ofertes_sense_candidatura,
         'tipus_contracte_choices': Oferta.TIPUS_CONTRACTE,
         'jornada_choices': Oferta.JORNADA,
+        'current_page' : 'llista_ofertes'
     }
     
     return render(request, 'borsa_treball/llista_ofertes_estudiant.html', context)
@@ -672,3 +675,399 @@ def detall_oferta_estudiant(request, oferta_id):
     }
     
     return render(request, 'borsa_treball/detall_oferta_estudiant.html', context)
+
+
+
+@login_required
+def afegir_candidatura(request, oferta_id):
+    # Obtenir l'estudiant loguejat
+    try:
+        estudiant = request.user.estudiant
+    except:
+        # Redirigir si l'usuari no és un estudiant o hi ha algun problema
+        return redirect('index') 
+    
+    # Obtenir l'oferta
+    oferta = get_object_or_404(Oferta, pk=oferta_id, visible=True)
+    
+    # Verificar si ja existeix candidatura
+    if Candidatura.objects.filter(oferta=oferta, estudiant=estudiant).exists():
+        # Pots afegir un missatge de flaix aquí per informar a l'usuari
+        return redirect('llista_candidatures_estudiant') 
+
+    errors = {}
+    carta_presentacio_data = '' # Per mantenir la carta si hi ha errors
+
+    if request.method == 'POST':
+        carta_presentacio = request.POST.get('carta_presentacio', '').strip()
+        cv_adjunt = request.FILES.get('cv_adjunt', None)
+        
+        # --- Validació de servidor ---
+        
+        # Validació de la carta de presentació
+        if not carta_presentacio:
+            errors['carta_presentacio'] = "La carta de presentació és obligatòria."
+        elif len(carta_presentacio) < 50:
+            errors['carta_presentacio'] = f"La carta de presentació ha de tenir un mínim de 50 caràcters. Actualment té {len(carta_presentacio)}."
+        elif len(carta_presentacio) > 2000:
+            errors['carta_presentacio'] = f"La carta de presentació no pot excedir els 2000 caràcters. Actualment té {len(carta_presentacio)}."
+        
+        # Guardar la carta_presentacio per si hi ha errors i es vol mantenir
+        carta_presentacio_data = carta_presentacio
+
+        # Validació del CV adjunt
+        if not cv_adjunt:
+            errors['cv_adjunt'] = "Heu d'adjuntar el vostre Currículum Vitae."
+        else:
+            # Validar tipus de fitxer (extensió)
+            valid_extensions = ['.pdf', '.doc', '.docx']
+            ext = os.path.splitext(cv_adjunt.name)[1].lower()
+            if ext not in valid_extensions:
+                errors['cv_adjunt'] = "Format de fitxer no vàlid. Només s'accepten PDF, DOC i DOCX."
+            
+            # Validar mida del fitxer (5MB = 5 * 1024 * 1024 bytes)
+            max_size_mb = 5
+            max_size_bytes = max_size_mb * 1024 * 1024
+            if cv_adjunt.size > max_size_bytes:
+                errors['cv_adjunt'] = f"El fitxer és massa gran. La mida màxima permesa és de {max_size_mb}MB."
+        
+        # Si no hi ha errors, crear la candidatura
+        if not errors:
+            Candidatura.objects.create(
+                oferta=oferta,
+                estudiant=estudiant,
+                carta_presentacio=carta_presentacio,
+                cv_adjunt=cv_adjunt,        
+                estat='EP'  # En procés
+            )
+            # Pots afegir un missatge de flaix d'èxit aquí
+            return redirect('llista_candidatures_estudiant')
+    
+    # Si hi ha errors o és un GET request, renderitzar el formulari amb els errors
+    context = {
+        'oferta': oferta,
+        'errors': errors,
+        'carta_presentacio': carta_presentacio_data, # Passar la carta per mantenir el text al formulari
+    }
+    return render(request, 'borsa_treball/afegir_candidatura.html', context)
+
+
+
+
+@login_required
+def llista_candidatures_estudiant(request):
+    """Vista per llistar les candidatures de l'estudiant loggejat"""
+    candidatures = Candidatura.objects.filter(
+        estudiant=request.user.estudiant
+    ).select_related('oferta', 'oferta__empresa').order_by('-data_candidatura')
+    
+    # Filtres
+    estat_filter = request.GET.get('estat')
+   
+    cerca = request.GET.get('cerca', '')
+    
+    if estat_filter:
+        candidatures = candidatures.filter(estat=estat_filter)
+    
+    if cerca:
+        candidatures = candidatures.filter(
+            Q(oferta__titol__icontains=cerca) |
+            Q(oferta__empresa__nom_comercial__icontains=cerca) |
+            Q(oferta__descripcio__icontains=cerca)
+        )
+    
+    # Estadístiques
+    stats = {
+        'total': candidatures.count(),
+        'en_proces': candidatures.filter(estat=EstatCandidatura.EN_PROCES).count(),
+        'preseleccionades': candidatures.filter(estat=EstatCandidatura.PRESELECCIONADA).count(),
+        'entrevistes': candidatures.filter(estat=EstatCandidatura.ENTREVISTA).count(),
+        'contratades': candidatures.filter(estat=EstatCandidatura.CONTRATADA).count(),
+        'rebutjades': candidatures.filter(estat=EstatCandidatura.REBUTJADA).count(),
+    }
+    
+    # Paginació
+    paginator = Paginator(candidatures, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'candidatures': page_obj,
+        'stats': stats,
+        'estats': EstatCandidatura.choices,
+        'estat_filter': estat_filter,
+        'cerca': cerca ,
+        'current_page':'candidatures',
+    }
+    
+    return render(request, 'borsa_treball/llista_candidatures_estudiant.html', context)
+
+
+@login_required
+def editar_candidatura_estudiant(request, candidatura_id):
+    """Vista per editar una candidatura sense Django forms"""
+   
+    try:
+        estudiant = request.user.estudiant
+    except Estudiant.DoesNotExist:
+        messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
+        return redirect('index')
+    
+
+
+    candidatura = get_object_or_404(
+        Candidatura,
+        id=candidatura_id,
+        estudiant=request.user.estudiant
+    )
+    
+   
+    
+    if request.method == 'POST':
+
+        # Només es pot editar si està en procés
+        if candidatura.estat != EstatCandidatura.EN_PROCES:
+            messages.error(request, 'No pots editar aquesta candidatura.')
+            return redirect('llista_candidatures_estudiant')
+    
+
+        # Obtenir dades del formulari
+        carta_presentacio = request.POST.get('carta_presentacio', '').strip()
+        cv_adjunt = request.FILES.get('cv_adjunt')
+        altres_adjunts = request.FILES.get('altres_adjunts')
+        
+        # Validacions
+        errors = {}
+        
+        # Validar carta de presentació
+        if not carta_presentacio:
+            errors['carta_presentacio'] = 'La carta de presentació és obligatòria'
+        elif len(carta_presentacio) < 50:
+            errors['carta_presentacio'] = 'La carta ha de tenir almenys 50 caràcters'
+        elif len(carta_presentacio) > 2000:
+            errors['carta_presentacio'] = 'La carta no pot superar els 2000 caràcters'
+        
+        # Validar CV si s'ha pujat
+        if cv_adjunt:
+            if cv_adjunt.size > 5 * 1024 * 1024:  # 5MB
+                errors['cv_adjunt'] = 'El CV no pot superar els 5MB'
+            
+            allowed_types = ['application/pdf', 'application/msword', 
+                           'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+            if cv_adjunt.content_type not in allowed_types:
+                errors['cv_adjunt'] = 'Format no vàlid. Només PDF, DOC o DOCX'
+        
+        # Validar altres adjunts si s'han pujat
+        if altres_adjunts:
+            if altres_adjunts.size > 10 * 1024 * 1024:  # 10MB
+                errors['altres_adjunts'] = 'Els altres documents no poden superar els 10MB'
+        
+        # Si no hi ha errors, guardar
+        if not errors:
+            candidatura.carta_presentacio = carta_presentacio
+            
+            if cv_adjunt:
+                candidatura.cv_adjunt = cv_adjunt
+            
+            if altres_adjunts:
+                candidatura.altres_adjunts = altres_adjunts
+            
+            candidatura.save()
+            messages.success(request, 'Candidatura actualitzada correctament!')
+            return redirect('llista_candidatures_estudiant')
+        else:
+            # Afegir errors als missatges
+            for field, error in errors.items():
+                messages.error(request, error)
+    
+    context = {
+        'candidatura': candidatura,
+        'today': timezone.now().date(),
+    }
+    
+    return render(request, 'borsa_treball/editar_candidatura_estudiant.html', context)
+
+
+@login_required
+def descarregar_cv_candidatura(request, candidatura_id):
+    """
+    Vista per descarregar el CV d'una candidatura.
+    """
+    try:
+        estudiant = request.user.estudiant
+    except Estudiant.DoesNotExist:
+        messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
+        return redirect('index')
+    
+    # Obtenir la candidatura i verificar permisos
+    candidatura = get_object_or_404(Candidatura, id=candidatura_id)
+    
+    if not candidatura.cv_adjunt:
+        raise Http404("CV no trobat")
+    
+    try:
+        # Obtenir el fitxer
+        file_path = candidatura.cv_adjunt.path
+        
+        if not os.path.exists(file_path):
+            raise Http404("Fitxer no trobat")
+        
+        # Determinar el tipus MIME
+        content_type, _ = mimetypes.guess_type(file_path)
+        if content_type is None:
+            content_type = 'application/octet-stream'
+        
+        # Crear la resposta
+        with open(file_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type=content_type)
+            
+        # Nom del fitxer per la descàrrega
+        filename = f"CV_{candidatura.estudiant.usuari.get_full_name()}_{candidatura.oferta.titol}.pdf"
+        filename = filename.replace(' ', '_').replace(',', '')
+        
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+        
+    except Exception as e:
+        messages.error(request, f'Error en descarregar el CV: {str(e)}')
+        return redirect('candidatures_oferta', oferta_id=candidatura.oferta.id)
+
+
+@login_required
+@require_POST
+def eliminar_candidatura_api(request, candidatura_id):
+    """
+    Vista API per eliminar una candidatura.
+    Retorna JsonResponse amb missatges i codis d'estat HTTP.
+    """
+    try:
+        # Comprovar si l'usuari és un estudiant.
+        # Si no ho és, no hauria de poder eliminar candidatures d'estudiant.
+        # Això pot llançar Estudiant.DoesNotExist si no hi ha un perfil d'estudiant associat.
+        estudiant = request.user.estudiant 
+    except Estudiant.DoesNotExist:
+        # L'usuari loggejat no té un perfil d'estudiant.
+        return JsonResponse(
+            {'error': 'Accés denegat. No estàs associat a un perfil d\'estudiant.'},
+            status=403 # Forbidden
+        )
+    
+    try:
+        candidatura = get_object_or_404(
+            Candidatura,
+            id=candidatura_id,
+            estudiant=estudiant # Assegura que només pot eliminar les seves pròpies candidatures
+        )
+    except Exception: # Pot capturar Http404 de get_object_or_404 o altres errors
+        return JsonResponse(
+            {'error': 'Candidatura no trobada o no tens permís per accedir-hi.'},
+            status=404 # Not Found
+        )
+    
+    # Verificar que es pot eliminar segons el seu estat
+    if candidatura.estat not in [EstatCandidatura.EN_PROCES, EstatCandidatura.REBUTJADA]:
+        return JsonResponse(
+            {'error': 'No es pot eliminar aquesta candidatura en el seu estat actual.'},
+            status=400 # Bad Request
+        )
+    
+    try:
+        candidatura.delete()
+        return JsonResponse(
+            {'message': 'Candidatura eliminada correctament.'},
+            status=200 # OK
+        )
+    except Exception as e:
+        # Capturar qualsevol altre error durant l'eliminació (p.ex., error de base de dades)
+        return JsonResponse(
+            {'error': f'Error intern del servidor al eliminar la candidatura: {str(e)}'},
+            status=500 # Internal Server Error
+        )
+
+
+@login_required
+@require_http_methods(["POST"])
+def editar_candidatura_api(request, candidatura_id):
+    """
+    API endpoint to edit a 'candidatura' and return JSON with validation errors.
+    """
+    errors = {}
+
+    try:
+        estudiant = request.user.estudiant
+    except Estudiant.DoesNotExist:
+        return JsonResponse(
+            {'error': 'No tens permisos per accedir a aquesta pàgina.'},
+            status=403
+        )
+
+    candidatura = get_object_or_404(
+        Candidatura,
+        id=candidatura_id,
+        estudiant=request.user.estudiant
+    )
+
+    # Only editable if in 'EN_PROCES' state
+    if candidatura.estat != EstatCandidatura.EN_PROCES:
+        return JsonResponse(
+            {'error': 'No pots editar aquesta candidatura, ja no està en procés.'},
+            status=400
+        )
+
+    # Get data from JSON body for non-file fields or from request.POST for form data
+    # For file uploads, request.FILES should be used.
+    # Assuming content-type is application/json for non-file fields or multipart/form-data for files.
+
+    # When handling file uploads with other fields, you typically use FormData on the client-side,
+    # which results in a 'multipart/form-data' content type. In this case, request.POST and request.FILES
+    # are directly populated by Django.
+
+    carta_presentacio = request.POST.get('carta_presentacio', '').strip()
+    cv_adjunt = request.FILES.get('cv_adjunt')
+    altres_adjunts = request.FILES.get('altres_adjunts')
+
+    # Validations
+    if not carta_presentacio:
+        errors['carta_presentacio'] = 'La carta de presentació és obligatòria.'
+    elif len(carta_presentacio) < 50:
+        errors['carta_presentacio'] = 'La carta ha de tenir almenys 50 caràcters.'
+    elif len(carta_presentacio) > 2000:
+        errors['carta_presentacio'] = 'La carta no pot superar els 2000 caràcters.'
+
+    if cv_adjunt:
+        # Check against Django's FILE_UPLOAD_MAX_MEMORY_SIZE if applicable or set a custom limit
+        # Default FILE_UPLOAD_MAX_MEMORY_SIZE is 2.5MB. You set 5MB in original.
+        # Ensure your Django settings accommodate larger files if needed.
+        if cv_adjunt.size > 5 * 1024 * 1024:  # 5MB
+            errors['cv_adjunt'] = 'El CV no pot superar els 5MB.'
+
+        allowed_types = [
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ]
+        if cv_adjunt.content_type not in allowed_types:
+            errors['cv_adjunt'] = 'Format no vàlid. Només PDF, DOC o DOCX.'
+
+    if altres_adjunts:
+        if altres_adjunts.size > 10 * 1024 * 1024:  # 10MB
+            errors['altres_adjunts'] = 'Els altres documents no poden superar els 10MB.'
+
+    if errors:
+        return JsonResponse({'errors': errors}, status=400) # Bad Request
+
+    # If no errors, save
+    try:
+        candidatura.carta_presentacio = carta_presentacio
+        
+        if cv_adjunt:
+            candidatura.cv_adjunt = cv_adjunt
+        
+        if altres_adjunts:
+            candidatura.altres_adjunts = altres_adjunts
+        
+        candidatura.save()
+        return JsonResponse({'message': 'Candidatura actualitzada correctament!'}, status=200) # OK
+    except Exception as e:
+        # Catch any unexpected errors during save
+        return JsonResponse({'error': f'Hi ha hagut un error inesperat en desar la candidatura: {str(e)}'}, status=500) # Internal Server Error

@@ -105,8 +105,9 @@ from django.contrib import admin
 from .models import Candidatura
 
 class CandidaturaAdmin(admin.ModelAdmin):
-    list_display = ('empresa_nom', 'estudiant_nom', 'data_candidatura', 'estat')
-    list_filter = ('estat', 'oferta__empresa__nom_comercial')
+    list_display = ('empresa_nom', 'estudiant_nom', 'data_candidatura', 'estat', 'activa') 
+    list_filter = ('estat', 'activa', 'oferta__empresa__nom_comercial') 
+   
     search_fields = (
         'estudiant__usuari__nom',
         'estudiant__usuari__cognoms',

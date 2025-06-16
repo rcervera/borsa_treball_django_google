@@ -55,10 +55,10 @@
             </a>
             
             {% if user.tipus == 'EST' %}
-                <a class="nav-link" href="{% url 'llista_ofertes_estudiant' %}">
+                <a class="nav-link {% if current_page == 'llista_ofertes' %}active{% endif %}" href="{% url 'llista_ofertes_estudiant' %}">
                     <i class="bi bi-briefcase"></i>Ofertes disponibles
                 </a>
-                <a class="nav-link" href="{% url 'llista_candidatures_estudiant' %}">
+                <a class="nav-link {% if current_page == 'candidatures' %}active{% endif %}" href="{% url 'llista_candidatures_estudiant' %}">
                     <i class="bi bi-file-earmark-text"></i>Les meves candidatures
                 </a>
                 <a class="nav-link {% if current_page == 'editar_perfil' %}active{% endif %}" href="{% url 'perfil_estudiant' %}"> 

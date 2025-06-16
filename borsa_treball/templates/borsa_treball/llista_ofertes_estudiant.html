@@ -254,19 +254,19 @@
                                 
                                 <div>
                                     {% if oferta.id in candidatures_existents %}
-                                    <a href="" 
-                                       class="btn btn-outline-primary btn-sm">
+                                    <a href="{% url 'detall_oferta_estudiant' oferta.id %}" 
+                                       class="btn btn-outline-primary btn-sm rounded-pill">
                                         <i class="bi bi-eye me-1"></i>Veure detalls
                                     </a>
                                     {% else %}
                                     <div class="btn-group">
-                                        <a href="" 
+                                        <a href="{% url 'detall_oferta_estudiant' oferta.id %}" 
                                            class="btn btn-outline-primary btn-sm">
                                             <i class="bi bi-eye me-1"></i>Detalls
                                         </a>
-                                        <a href="" 
+                                        <a href="{% url 'afegir_candidatura' oferta.id %}" 
                                            class="btn btn-primary btn-sm">
-                                            <i class="bi bi-send me-1"></i>Presentar Candidatura
+                                            <i class="bi bi-send me-1"></i>Presentar Candidat
                                         </a>
                                     </div>
                                     {% endif %}

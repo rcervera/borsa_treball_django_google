@@ -1,0 +1,479 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar candidatura - {{ candidatura.oferta.titol }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3 class="mb-0 text-primary">
+                        <i class="bi bi-send me-2"></i>Editar Candidatura
+                    </h3>
+                    <p class="mb-5 mt-2 opacity-75">
+                        Dades de la teva candidatura
+                    </p>
+
+                    <div class="mb-2">
+                        {% if not candidatura.activa %}
+                                <span class="badge bg-danger">Pendent de validació</span>
+                        {% elif candidatura.estat == 'EP' %}
+                            <span class="badge bg-info">{{ candidatura.get_estat_display }}</span>
+                        {% elif candidatura.estat == 'PR' %}
+                            <span class="badge bg-warning">{{ candidatura.get_estat_display }}</span>
+                        {% elif candidatura.estat == 'EN' %}
+                            <span class="badge bg-primary">{{ candidatura.get_estat_display }}</span>
+                        {% elif candidatura.estat == 'CO' %}
+                            <span class="badge bg-success">{{ candidatura.get_estat_display }}</span>
+                        {% elif candidatura.estat == 'RJ' %}
+                               <span class="badge bg-danger">{{ candidatura.get_estat_display }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Pots modificar la carta de presentació i els documents adjunts mentre la candidatura estigui en procés.
+                    </div>
+
+                    <div id="feedbackMessage" class="alert d-none" role="alert"></div>
+                    
+                    <form method="post" enctype="multipart/form-data" id="formEditarCandidatura">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                             <label for="carta_presentacio" class="form-label fw-bold">
+                                     <i class="bi bi-file-text me-2 text-primary"></i>
+                                     Carta de presentació *
+                            </label>
+                            <textarea class="form-control" id="carta_presentacio" name="carta_presentacio" 
+                                     rows="8" required {% if candidatura.estat != 'EN' %}readonly{% endif %}>{{ candidatura.carta_presentacio }}</textarea>
+                            <div class="form-text d-flex justify-content-between">
+                                <span>Explica per què ets el candidat ideal per aquesta oferta</span>
+                                <span id="comptadorCaracters" class="text-muted">0 caràcters</span>
+                            </div>
+                            <div class="invalid-feedback" id="errorCarta"></div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-4">
+                                    <label for="cv_adjunt" class="form-label fw-bold">
+                                        <i class="bi bi-file-earmark-pdf me-2 text-primary"></i>
+                                        Currículum Vitae *
+                                    </label>
+                                    {% if candidatura.cv_adjunt %}
+                                    <div class="current-file mb-2">
+                                        <div class="alert alert-light d-flex align-items-center">
+                                            <i class="bi bi-file-earmark-pdf text-danger me-2"></i>
+                                            <div class="flex-grow-1">
+                                                <strong>Fitxer actual:</strong><br>
+                                                <small>{{ candidatura.cv_adjunt.name|slice:"15:" }}</small>
+                                            </div>
+                                            <a href="{% url 'descarregar_cv_candidatura' candidatura.id %}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if candidatura.estat in 'EP,RJ' %}
+                                        <input class="form-control" type="file" id="cv_adjunt" name="cv_adjunt" 
+                                                accept=".pdf,.doc,.docx">
+                                        <div class="form-text">PDF, DOC o DOCX (màx. 5MB)</div>
+                                        <div class="invalid-feedback" id="errorCV"></div>
+                                     {% endif %}
+                                </div>
+                            </div>
+                            
+                             
+                        </div>
+                        
+                           <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                               
+                                {% if candidatura.estat in 'EP,RJ' %}
+                                    <button type="submit" class="btn btn-primary rounded-pill" id="btnGuardar">
+                                        <span class="spinner-border spinner-border-sm me-2 d-none" id="loadingSpinner"></span>
+                                        <i class="bi bi-check-lg me-1"></i>Guardar canvis
+                                    </button>
+
+                                        <div class="btn btn-danger rounded-pill" 
+                                                 onclick="confirmarEliminacio({{ candidatura.id }}, '{{ candidatura.oferta.titol }}')">
+                                                 <i class="bi bi-trash me-1"></i>Eliminar
+                                        </div>
+                                {% endif %}
+                           </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+                    <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+                        <div class="card-body p-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-briefcase me-2"></i>Resum de l'Oferta
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <h6 class="text-dark mb-2">{{ candidatura.oferta.titol }}</h6>
+                                
+                                <div class="d-flex align-items-center text-muted">
+                                    <i class="bi bi-geo-alt me-2"></i>
+                                    <span>{{ candidatura.oferta.lloc_treball }}</span>
+                                </div>
+
+                                <p class="text-muted mb-3" style="line-height: 1.5;">
+                                    {{ candidatura.oferta.descripcio|truncatewords:25 }}
+                                </p>
+
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex flex-wrap">
+                                    <span class="badge bg-primary me-2 mb-2">
+                                        {{ candidatura.oferta.get_tipus_contracte_display }}
+                                    </span>
+                                    <span class="badge bg-secondary me-2 mb-2">
+                                        {{ candidatura.oferta.get_jornada_display }}
+                                    </span>
+                                    {% if candidatura.oferta.salari %}
+                                    <span class="badge bg-success mb-2">
+                                        <i class="bi bi-currency-euro me-1"></i>
+                                        {{ candidatura.oferta.salari }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="border-top pt-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Data límit:</span>
+                                    <strong class="{% if dies_restants <= 7 %}text-danger{% elif dies_restants <= 14 %}text-warning{% else %}text-success{% endif %}">
+                                        {{ candidatura.oferta.data_limit|date:"d/m/Y" }}
+                                    </strong>
+                                </div>
+                                
+                            </div>
+                            
+                            <div class="mt-4 p-3 bg-light rounded">
+                                <h6 class="text-primary mb-2">
+                                    <i class="bi bi-lightbulb me-2"></i>Consells
+                                </h6>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li class="mb-1">
+                                        <i class="bi bi-check text-success me-2"></i>
+                                        Personalitza la carta per aquesta oferta
+                                    </li>
+                                    <li class="mb-1">
+                                        <i class="bi bi-check text-success me-2"></i>
+                                        Destaca la teva experiència rellevant
+                                    </li>
+                                    <li class="mb-1">
+                                        <i class="bi bi-check text-success me-2"></i>
+                                        Revisa l'ortografia abans d'enviar
+                                    </li>
+                                    <li>
+                                        <i class="bi bi-check text-success me-2"></i>
+                                        Adjunta un CV actualitzat
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalEliminacio" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar eliminació</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Aquesta acció no es pot desfer. Està segur que vols eliminar-la?
+                </div>
+                <div id="deleteFeedbackMessage" class="alert d-none" role="alert"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
+                <button class="btn btn-danger" id="btnConfirmarEliminacio">
+                    <i class="bi bi-trash me-1"></i>Eliminar candidatura
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+}
+
+.current-file {
+    border-radius: 8px;
+}
+</style>
+
+<script>
+let candidaturaAEliminar = null;
+
+function confirmarEliminacio(candidaturaId) {
+    candidaturaAEliminar = candidaturaId;
+    // Netejar missatges anteriors del modal d'eliminació
+    const deleteFeedbackDiv = document.getElementById('deleteFeedbackMessage');
+    deleteFeedbackDiv.classList.add('d-none');
+    deleteFeedbackDiv.classList.remove('alert-success', 'alert-danger');
+    deleteFeedbackDiv.textContent = '';
+    new bootstrap.Modal(document.getElementById('modalEliminacio')).show();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const cartaTextarea = document.getElementById('carta_presentacio');
+    const comptadorCaracters = document.getElementById('comptadorCaracters');
+    const cvInput = document.getElementById('cv_adjunt');
+    //const altresInput = document.getElementById('altres_adjunts');
+    const form = document.getElementById('formEditarCandidatura');
+    const btnGuardar = document.getElementById('btnGuardar');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const feedbackMessageDiv = document.getElementById('feedbackMessage');
+    const deleteFeedbackDiv = document.getElementById('deleteFeedbackMessage');
+
+    // Funció per mostrar missatges (èxit/error)
+    function showFeedbackMessage(message, type) {
+        feedbackMessageDiv.classList.remove('d-none', 'alert-success', 'alert-danger');
+        feedbackMessageDiv.classList.add(`alert-${type}`);
+        feedbackMessageDiv.textContent = message;
+        // Opcional: amagar el missatge després d'uns segons
+        setTimeout(() => {
+            feedbackMessageDiv.classList.add('d-none');
+        }, 5000); // Amaga després de 5 segons
+    }
+
+    // Funció per mostrar missatges dins del modal d'eliminació
+    function showDeleteFeedbackMessage(message, type) {
+        deleteFeedbackDiv.classList.remove('d-none', 'alert-success', 'alert-danger');
+        deleteFeedbackDiv.classList.add(`alert-${type}`);
+        deleteFeedbackDiv.textContent = message;
+    }
+
+    // Function to display validation errors
+    function displayErrors(errors) {
+        // Clear previous errors
+        document.querySelectorAll('.invalid-feedback').forEach(div => div.textContent = '');
+        document.querySelectorAll('.form-control').forEach(input => input.classList.remove('is-invalid', 'is-valid'));
+
+        for (const fieldName in errors) {
+            const errorDiv = document.getElementById(`error${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}`);
+            const inputField = document.getElementById(fieldName);
+
+            if (errorDiv && inputField) {
+                errorDiv.textContent = errors[fieldName];
+                inputField.classList.add('is-invalid');
+            } else {
+                console.warn(`Error element or input field not found for: ${fieldName}`);
+            }
+        }
+    }
+
+    // Function to clear all validation errors
+    function clearErrors() {
+        document.querySelectorAll('.invalid-feedback').forEach(div => div.textContent = '');
+        document.querySelectorAll('.form-control').forEach(input => input.classList.remove('is-invalid', 'is-valid'));
+    }
+
+    // Character counter for 'carta_presentacio'
+    function actualitzarComptador() {
+        const longitud = cartaTextarea.value.length;
+        comptadorCaracters.textContent = `${longitud} caràcters`;
+        
+        if (longitud < 50) {
+            comptadorCaracters.className = 'text-danger';
+        } else if (longitud > 2000) {
+            comptadorCaracters.className = 'text-warning';
+        } else {
+            comptadorCaracters.className = 'text-success';
+        }
+    }
+    
+    cartaTextarea.addEventListener('input', actualitzarComptador);
+    actualitzarComptador(); // Initialize on page load
+
+    // Initial validation check on blur for carta_presentacio
+    cartaTextarea.addEventListener('blur', function() {
+        const longitud = this.value.trim().length;
+        const errorDiv = document.getElementById('errorCarta');
+        
+        if (longitud < 50) {
+            this.classList.add('is-invalid');
+            errorDiv.textContent = 'La carta ha de tenir almenys 50 caràcters.';
+        } else if (longitud > 2000) {
+            this.classList.add('is-invalid');
+            errorDiv.textContent = 'La carta no pot superar els 2000 caràcters.';
+        } else {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+            errorDiv.textContent = ''; // Clear error message
+        }
+    });
+
+    // File validation function
+    function validarFitxer(input, maxSize, allowedTypes, errorId) {
+        const file = input.files[0];
+        const errorDiv = document.getElementById(errorId);
+        
+        if (!file) { // Si no s'ha seleccionat cap fitxer nou
+            input.classList.remove('is-invalid', 'is-valid');
+            errorDiv.textContent = '';
+            return true; 
+        }
+
+        // Validate size
+        if (file.size > maxSize) {
+            input.classList.add('is-invalid');
+            errorDiv.textContent = `El fitxer és massa gran (màx. ${maxSize / 1024 / 1024}MB).`;
+            return false;
+        }
+        
+        // Validate type (if allowedTypes are specified)
+        if (allowedTypes && !allowedTypes.includes(file.type)) {
+            input.classList.add('is-invalid');
+            errorDiv.textContent = 'Format de fitxer no vàlid.';
+            return false;
+        }
+        
+        input.classList.remove('is-invalid');
+        input.classList.add('is-valid');
+        errorDiv.textContent = ''; // Clear error message
+        return true;
+    }
+    
+    cvInput.addEventListener('change', function() {
+        const allowedTypes = [
+            'application/pdf',
+            'application/msword', // .doc
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
+        ];
+        validarFitxer(this, 5 * 1024 * 1024, allowedTypes, 'errorCV');
+    });
+    
+    
+
+    // Form submission handler
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        clearErrors(); // Clear previous errors
+        feedbackMessageDiv.classList.add('d-none'); // Hide general feedback message
+
+        let isValid = true;
+        const cartaLongitud = cartaTextarea.value.trim().length;
+        if (cartaLongitud < 50 || cartaLongitud > 2000) {
+            cartaTextarea.classList.add('is-invalid');
+            document.getElementById('errorCarta').textContent = cartaLongitud < 50 ? 'La carta ha de tenir almenys 50 caràcters.' : 'La carta no pot superar els 2000 caràcters.';
+            isValid = false;
+        }
+
+        // **MODIFICACIÓ AQUÍ**: Validació del CV només si no hi ha un CV actual o si se n'està pujant un de nou.
+        
+        const hasExistingCv = {% if candidatura.cv_adjunt %}'{{ candidatura.cv_adjunt.url }}' !== '';{% else %}false;{% endif %};
+
+        
+        if (!cvInput.files.length && !hasExistingCv) {
+            document.getElementById('cv_adjunt').classList.add('is-invalid');
+            document.getElementById('errorCV').textContent = 'Has d\'adjuntar un currículum.';
+            isValid = false;
+        } else if (cvInput.files.length) { // Si s'està pujant un nou CV, validar-lo.
+            const allowedTypesCV = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            if (!validarFitxer(cvInput, 5 * 1024 * 1024, allowedTypesCV, 'errorCV')) {
+                isValid = false;
+            }
+        }
+        // Si hi ha un CV existent i no es puja un de nou, es considera vàlid i no s'aplica validació.
+        
+        
+
+        if (!isValid) {
+            showFeedbackMessage('Si us plau, revisa els errors del formulari.', 'danger');
+            return;
+        }
+
+        // Show loading state
+        btnGuardar.disabled = true;
+        loadingSpinner.classList.remove('d-none');
+
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch(`{% url 'editar_candidatura_api' candidatura.id %}`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': csrftoken
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                showFeedbackMessage(data.message, 'success');
+            } else if (response.status === 400) {
+                displayErrors(data.errors);
+                showFeedbackMessage(data.error || 'Hi ha hagut errors de validació.', 'danger');
+            } else {
+                showFeedbackMessage(`Error: ${data.error || 'S\'ha produït un error inesperat.'}`, 'danger');
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            showFeedbackMessage('S\'ha produït un error en connectar amb el servidor. Torna-ho a intentar.', 'danger');
+        } finally {
+            // Hide loading state
+            btnGuardar.disabled = false;
+            loadingSpinner.classList.add('d-none');
+        }
+    });
+
+    // Confirmation for deletion
+    document.getElementById('btnConfirmarEliminacio').addEventListener('click', async function() {
+        const modalElement = document.getElementById('modalEliminacio');
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        
+        // Ocultar missatges anteriors del modal
+        deleteFeedbackDiv.classList.add('d-none');
+
+        if (candidaturaAEliminar) {
+            try {
+                const response = await fetch(`/candidatures/${candidaturaAEliminar}/eliminar_api/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showDeleteFeedbackMessage(data.message + ' Redirigint...', 'success');
+                    // Redirecció retardada després de l'èxit
+                    setTimeout(() => {
+                        window.location.href = '{% url "llista_candidatures_estudiant" %}';
+                    }, 2000); // Redirigeix després de 2 segons
+                } else {
+                    showDeleteFeedbackMessage(`Error: ${data.error || 'No s\'ha pogut eliminar la candidatura.'}`, 'danger');
+                }
+            } catch (error) {
+                console.error('Error deleting candidacy:', error);
+                showDeleteFeedbackMessage('Hi ha hagut un error en intentar eliminar la candidatura.', 'danger');
+            } finally {
+                candidaturaAEliminar = null; // Clear the ID
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

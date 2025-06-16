@@ -1,0 +1,621 @@
+{% extends 'base.html' %}
+
+{% block title %}Candidatures - {{ oferta.titol }}{% endblock %}
+
+{% block page_title %}Candidatures de l'Oferta{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        <!-- Header amb resum de l'oferta -->
+        <div class="card shadow-lg border-0 mb-4">
+            <div class="card-body p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3">
+                                <i class="bi bi-briefcase-fill text-primary" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <div>
+                                <h2 class="h4 text-dark mb-1">{{ oferta.titol }}</h2>
+                                <div class="d-flex align-items-center text-muted">
+                                    <i class="bi bi-geo-alt me-2"></i>
+                                    <span>{{ oferta.lloc_treball }}</span>
+                                    <span class="mx-2">•</span>
+                                    <i class="bi bi-calendar-event me-2"></i>
+                                    <span>Publicada {{ oferta.data_publicacio|timesince }} enrere</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Badges d'informació -->
+                        <div class="d-flex flex-wrap align-items-center">
+                            <span class="badge bg-primary me-2 mb-2">
+                                {{ oferta.get_tipus_contracte_display }}
+                            </span>
+                            <span class="badge bg-secondary me-2 mb-2">
+                                {{ oferta.get_jornada_display }}
+                            </span>
+                            {% if dies_restants > 0 %}
+                            <span class="badge bg-{% if dies_restants <= 7 %}danger{% elif dies_restants <= 14 %}warning{% else %}success{% endif %} me-2 mb-2">
+                                <i class="bi bi-clock me-1"></i>
+                                {{ dies_restants }} dies restants
+                            </span>
+                            {% else %}
+                            <span class="badge bg-danger me-2 mb-2">
+                                <i class="bi bi-x-circle me-1"></i>
+                                Caducada
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <!-- Estadístiques ràpides -->
+                        <div class="row text-center">
+                            <div class="col-6 mb-2">
+                                <div class="p-2 bg-light rounded">
+                                    <h4 class="text-primary mb-0">{{ stats.total }}</h4>
+                                    <small class="text-muted">Total candidatures</small>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <div class="p-2 bg-light rounded">
+                                    <h4 class="text-success mb-0">{{ stats.contratades }}</h4>
+                                    <small class="text-muted">Contratades</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-2 bg-light rounded">
+                                    <h4 class="text-info mb-0">{{ stats.preseleccionades }}</h4>
+                                    <small class="text-muted">Preseleccionades</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-2 bg-light rounded">
+                                    <h4 class="text-warning mb-0">{{ stats.entrevistes }}</h4>
+                                    <small class="text-muted">Entrevistes</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+            </div>
+        </div>
+
+        <!-- Filtres i cerca -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body p-3">
+                <form method="get" class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label for="cerca" class="form-label">Cercar candidat</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="cerca" 
+                                   name="cerca" 
+                                   value="{{ cerca }}"
+                                   placeholder="Nom, email, cicle...">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <label for="estat" class="form-label">Estat</label>
+                        <select class="form-select" id="estat" name="estat">
+                            <option value="">Tots els estats</option>
+                            {% for value, label in estats_choices %}
+                            <option value="{{ value }}" {% if estat_filtre == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <label for="ordenar" class="form-label">Ordenar per</label>
+                        <select class="form-select" id="ordenar" name="ordenar">
+                            <option value="-data_candidatura" {% if ordenar == '-data_candidatura' %}selected{% endif %}>Data (més recent)</option>
+                            <option value="nom" {% if ordenar == 'nom' %}selected{% endif %}>Nom</option>
+                            <option value="estat" {% if ordenar == 'estat' %}selected{% endif %}>Estat</option>
+                            
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="bi bi-funnel me-2"></i>Filtrar
+                        </button>
+                        <a href="{% url 'llista_candidatures_oferta' oferta.id %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-lg me-2"></i>Netejar
+                        </a>
+                    </div>
+                    
+                    <div class="col-md-2 text-end">
+                        <small class="text-muted">
+                            {{ candidatures.start_index }}-{{ candidatures.end_index }} de {{ candidatures.paginator.count }}
+                        </small>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Llista de candidatures -->
+        {% if candidatures %}
+            <div class="row">
+                {% for candidatura in candidatures %}
+                <div class="col-12 mb-3">
+                    <div class="card shadow-sm border-0 candidatura-card">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center">
+                                <!-- Informació del candidat -->
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <div class="avatar-circle bg-primary text-white d-flex align-items-center justify-content-center">
+                                                {{ candidatura.estudiant.usuari.nom.0 }}{{ candidatura.estudiant.usuari.cognoms.0 }}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1 text-dark">
+                                                {{ candidatura.estudiant.usuari.get_full_name }}
+                                            </h6>
+                                            
+                                            
+                                            <small class="text-muted">
+                                                <i class="bi bi-envelope me-1"></i>
+                                                {{ candidatura.estudiant.usuari.email }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Estat i data -->
+                                <div class="col-md-2">
+                                    <div class="mb-2">
+                                        <select class="form-select  estat-select" 
+                                                data-candidatura-id="{{ candidatura.id }}"
+                                                data-estat-actual="{{ candidatura.estat }}">
+                                            {% for value, label in estats_choices %}
+                                            <option value="{{ value }}" {% if candidatura.estat == value %}selected{% endif %}>
+                                                {{ label }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock me-1"></i>
+                                        {{ candidatura.data_candidatura|timesince }} enrere
+                                    </small>
+                                </div>
+                                
+                                
+                                <!-- Accions -->
+                                <div class="col-md-4">
+                                    <div class="d-flex flex-wrap gap-2 justify-content-end">
+                                        {% if candidatura.cv_adjunt %}
+                                        <a href="{% url 'descarregar_cv_candidatura' candidatura.id %}" 
+                                           class="btn btn-sm btn-outline-primary" 
+                                           title="Descarregar CV">
+                                            <i class="bi bi-download"></i>
+                                        </a>
+                                        {% endif %}
+                                        
+                                        {% if candidatura.carta_presentacio %}
+                                        <button class="btn btn-sm btn-outline-info" 
+                                                onclick="veureCarta({{ candidatura.id }})"
+                                                title="Veure carta de presentació">
+                                            <i class="bi bi-envelope-open"></i>
+                                        </button>
+                                        {% endif %}
+                                        
+                                       
+                                        
+                                        
+                                    </div>
+                                    
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Paginació -->
+            {% if candidatures.has_other_pages %}
+            <nav aria-label="Paginació candidatures">
+                <ul class="pagination justify-content-center">
+                    {% if candidatures.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ candidatures.previous_page_number }}{% if cerca %}&cerca={{ cerca }}{% endif %}{% if estat_filtre %}&estat={{ estat_filtre }}{% endif %}{% if ordenar %}&ordenar={{ ordenar }}{% endif %}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in candidatures.paginator.page_range %}
+                    {% if candidatures.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > candidatures.number|add:'-3' and num < candidatures.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if cerca %}&cerca={{ cerca }}{% endif %}{% if estat_filtre %}&estat={{ estat_filtre }}{% endif %}{% if ordenar %}&ordenar={{ ordenar }}{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                    
+                    {% if candidatures.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ candidatures.next_page_number }}{% if cerca %}&cerca={{ cerca }}{% endif %}{% if estat_filtre %}&estat={{ estat_filtre }}{% endif %}{% if ordenar %}&ordenar={{ ordenar }}{% endif %}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        {% else %}
+            <!-- Estat buit -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-people text-muted" style="font-size: 4rem;"></i>
+                    <h4 class="text-muted mt-3">No hi ha candidatures</h4>
+                    {% if estat_filtre or cerca %}
+                    <p class="text-muted">No s'han trobat candidatures amb els filtres aplicats.</p>
+                    <a href="{% url 'llista_candidatures_oferta' oferta.id %}" class="btn btn-outline-primary">
+                        <i class="bi bi-x-lg me-2"></i>Netejar filtres
+                    </a>
+                    {% else %}
+                    <p class="text-muted">Encara no hi ha candidatures per aquesta oferta.</p>
+                    <a href="{% url 'detall_oferta' oferta.id %}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-left me-2"></i>Tornar a l'oferta
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal per veure carta de presentació -->
+<div class="modal fade" id="cartaModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-envelope-open text-info me-2"></i>
+                    Carta de Presentació
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <strong id="cartaEstudiantNom"></strong>
+                    <br>
+                    <small class="text-muted" id="cartaDataCandidatura"></small>
+                </div>
+                <div class="border-start border-primary ps-3">
+                    <p id="cartaContingut" style="white-space: pre-line;"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tancar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal per editar notes -->
+<div class="modal fade" id="notesModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="notesForm">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-pencil text-secondary me-2"></i>
+                        Editar Notes i Puntuació
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="puntuacio" class="form-label">Puntuació (0-100)</label>
+                        <input type="number" 
+                               class="form-control" 
+                               id="puntuacio" 
+                               name="puntuacio" 
+                               min="0" 
+                               max="100"
+                               placeholder="Opcional">
+                        <small class="text-muted">Deixa en blanc per no assignar puntuació</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes internes</label>
+                        <textarea class="form-control" 
+                                  id="notes" 
+                                  name="notes" 
+                                  rows="5"
+                                  placeholder="Escriu aquí les teves notes sobre aquest candidat..."></textarea>
+                        <small class="text-muted">Aquestes notes només són visibles per la teva empresa</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle me-2"></i>Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .candidatura-card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .candidatura-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+    }
+    
+    .avatar-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    
+    .puntuacio-badge {
+        width: 40px;
+        height: 40px;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+    
+    .estat-select {
+       
+        transition: all 0.3s ease;
+    }
+    
+    .estat-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        border: none;
+        font-weight: 500;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+    
+    .text-primary {
+        color: #0d6efd !important;
+    }
+    
+    @media (max-width: 768px) {
+        .candidatura-card .row > div {
+            margin-bottom: 1rem;
+        }
+        
+        .candidatura-card .d-flex.gap-2 {
+            justify-content: center !important;
+        }
+    }
+</style>
+
+<script>
+let candidaturaActual = null;
+
+// Canviar estat de candidatura
+document.addEventListener('DOMContentLoaded', function() {
+    const estatSelects = document.querySelectorAll('.estat-select');
+    
+    estatSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            const candidaturaId = this.dataset.candidaturaId;
+            const nouEstat = this.value;
+            const estatActual = this.dataset.estatActual;
+            
+            if (nouEstat === estatActual) return;
+            
+            // Mostrar loading
+            this.disabled = true;
+            
+            fetch(`/candidatures/${candidaturaId}/canviar-estat/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `estat=${nouEstat}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.dataset.estatActual = nouEstat;
+                    
+                    // Mostrar notificació
+                    mostrarNotificacio(data.message, 'success');
+                } else {
+                    // Revertir el canvi
+                    this.value = estatActual;
+                    mostrarNotificacio(data.error || 'Error en canviar l\'estat', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.value = estatActual;
+                mostrarNotificacio('Error de connexió', 'error');
+            })
+            .finally(() => {
+                this.disabled = false;
+            });
+        });
+    });
+});
+
+// Veure carta de presentació
+function veureCarta(candidaturaId) {
+    fetch(`/candidatures/${candidaturaId}/carta/`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('cartaEstudiantNom').textContent = data.estudiant_nom;
+            document.getElementById('cartaDataCandidatura').textContent = `Candidatura enviada el ${data.data_candidatura}`;
+            document.getElementById('cartaContingut').textContent = data.carta_presentacio;
+            
+            const modal = new bootstrap.Modal(document.getElementById('cartaModal'));
+            modal.show();
+        } else {
+            mostrarNotificacio(data.error || 'Error en carregar la carta', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarNotificacio('Error de connexió', 'error');
+    });
+}
+
+// Editar notes
+function editarNotes(candidaturaId, notesActuals, puntuacioActual) {
+    candidaturaActual = candidaturaId;
+    
+    document.getElementById('notes').value = notesActuals || '';
+    document.getElementById('puntuacio').value = puntuacioActual || '';
+    
+    const modal = new bootstrap.Modal(document.getElementById('notesModal'));
+    modal.show();
+}
+
+// Guardar notes
+document.getElementById('notesForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    if (!candidaturaActual) return;
+    
+    const formData = new FormData(this);
+    
+    // Mostrar loading
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Guardant...';
+    submitBtn.disabled = true;
+    
+    fetch(`/candidatures/${candidaturaActual}/notes/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            mostrarNotificacio(data.message, 'success');
+            
+            // Tancar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('notesModal'));
+            modal.hide();
+            
+            // Actualitzar la pàgina per mostrar els canvis
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            mostrarNotificacio(data.error || 'Error en guardar les notes', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarNotificacio('Error de connexió', 'error');
+    })
+    .finally(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+});
+
+// Contactar candidatura (placeholder)
+function contactarCandidatura(candidaturaId) {
+    mostrarNotificacio('Funcionalitat de contacte en desenvolupament', 'info');
+}
+
+// Exportar candidatures (placeholder)
+function exportarCandidatures() {
+    mostrarNotificacio('Funcionalitat d\'exportació en desenvolupament', 'info');
+}
+
+// Funcions auxiliars
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function mostrarNotificacio(missatge, tipus) {
+    // Crear notificació toast
+    const toastContainer = document.getElementById('toast-container') || createToastContainer();
+    
+    const toastId = 'toast-' + Date.now();
+    const toastHtml = `
+        <div id="${toastId}" class="toast align-items-center text-white bg-${tipus === 'success' ? 'success' : tipus === 'error' ? 'danger' : 'info'} border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-${tipus === 'success' ? 'check-circle' : tipus === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+                    ${missatge}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    
+    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+    
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement, { delay: 5000 });
+    toast.show();
+    
+    // Eliminar el toast del DOM després que es tanqui
+    toastElement.addEventListener('hidden.bs.toast', function() {
+        this.remove();
+    });
+}
+
+function createToastContainer() {
+    const container = document.createElement('div');
+    container.id = 'toast-container';
+    container.className = 'toast-container position-fixed top-0 end-0 p-3';
+    container.style.zIndex = '1055';
+    document.body.appendChild(container);
+    return container;
+}
+</script>
+{% endblock %}

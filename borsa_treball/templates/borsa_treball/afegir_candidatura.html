@@ -1,0 +1,384 @@
+{% extends 'base.html' %}
+
+{% block title %}Presentar Candidatura - {{ oferta.titol }}{% endblock %}
+
+{% block page_title %}Presentar Candidatura{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            
+            
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-body p-4">
+                            <h3 class="mb-0 text-primary">
+                                <i class="bi bi-send me-2"></i>Presentar Candidatura
+                            </h3>
+                            <p class="mb-5 mt-2 opacity-75">
+                                Completa el formulari per enviar la teva candidatura
+                            </p>
+                            
+                            {% if errors.general %}
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                {{ errors.general }}
+                            </div>
+                            {% endif %}
+                            
+                            <form method="post" enctype="multipart/form-data" id="candidaturaForm" novalidate>
+                                {% csrf_token %}
+                                
+                                <div class="mb-4">
+                                    <label for="carta_presentacio" class="form-label fw-bold">
+                                        <i class="bi bi-file-text me-2 text-primary"></i>
+                                        Carta de presentació *
+                                    </label>
+                                    <div class="position-relative">
+                                        <textarea class="form-control {% if errors.carta_presentacio %}is-invalid{% endif %}" 
+                                                  id="carta_presentacio" 
+                                                  name="carta_presentacio" 
+                                                  rows="8" 
+                                                  placeholder="Explica per què ets el candidat ideal per aquesta oferta. Destaca la teva experiència, habilitats i motivació..."
+                                                  maxlength="2000"
+                                                  required>{% if carta_presentacio %}{{ carta_presentacio }}{% endif %}</textarea>
+                                        
+                                        <div class="d-flex justify-content-between mt-2">
+                                            <small class="text-muted">
+                                                <span id="charCount">0</span> / 2000 caràcters
+                                                <span class="ms-2" id="charStatus"></span>
+                                            </small>
+                                            <small class="text-muted">Mínim 50 caràcters</small>
+                                        </div>
+                                        
+                                        {% if errors.carta_presentacio %}
+                                        <div class="invalid-feedback d-block">
+                                            <i class="bi bi-exclamation-circle me-1"></i>
+                                            {{ errors.carta_presentacio }}
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <div class="valid-feedback" id="cartaValidFeedback" style="display: none;">
+                                            <i class="bi bi-check-circle me-1"></i>
+                                            Carta de presentació correcta
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="cv_adjunt" class="form-label fw-bold">
+                                        <i class="bi bi-file-earmark-pdf me-2 text-primary"></i>
+                                        Currículum Vitae *
+                                    </label>
+                                    <div class="position-relative">
+                                        <input class="form-control {% if errors.cv_adjunt %}is-invalid{% endif %}" 
+                                               type="file" 
+                                               id="cv_adjunt" 
+                                               name="cv_adjunt" 
+                                               accept=".pdf,.doc,.docx"
+                                               required>
+                                        
+                                        <div class="form-text">
+                                            <i class="bi bi-info-circle me-1"></i>
+                                            Formats acceptats: PDF, DOC, DOCX. Mida màxima: 5MB
+                                        </div>
+                                        
+                                        {% if errors.cv_adjunt %}
+                                        <div class="invalid-feedback d-block">
+                                            <i class="bi bi-exclamation-circle me-1"></i>
+                                            {{ errors.cv_adjunt }}
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <div id="cvPreview" class="mt-2" style="display: none;">
+                                            <div class="alert alert-info d-flex align-items-center">
+                                                <i class="bi bi-file-check me-2"></i>
+                                                <div>
+                                                    <strong>Fitxer seleccionat:</strong>
+                                                    <span id="cvFileName"></span>
+                                                    <br><small class="text-muted">Mida: <span id="cvFileSize"></span></small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" disabled>
+                                        <span class="spinner-border spinner-border-sm me-2" role="status" 
+                                              id="submitSpinner" style="display: none;"></span>
+                                        <i class="bi bi-send me-2" id="submitIcon"></i>
+                                        Enviar Candidatura
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+                        <div class="card-body p-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-briefcase me-2"></i>Resum de l'Oferta
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <h6 class="text-dark mb-2">{{ oferta.titol }}</h6>
+                                
+                                <div class="d-flex align-items-center text-muted">
+                                    <i class="bi bi-geo-alt me-2"></i>
+                                    <span>{{ oferta.lloc_treball }}</span>
+                                </div>
+
+                                <!-- Descripció -->
+                                <p class="text-muted mb-3" style="line-height: 1.5;">
+                                    {{ oferta.descripcio|truncatewords:25 }}
+                                </p>
+
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex flex-wrap">
+                                    <span class="badge bg-primary me-2 mb-2">
+                                        {{ oferta.get_tipus_contracte_display }}
+                                    </span>
+                                    <span class="badge bg-secondary me-2 mb-2">
+                                        {{ oferta.get_jornada_display }}
+                                    </span>
+                                    {% if oferta.salari %}
+                                    <span class="badge bg-success mb-2">
+                                        <i class="bi bi-currency-euro me-1"></i>
+                                        {{ oferta.salari }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="border-top pt-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Data límit:</span>
+                                    <strong class="{% if dies_restants <= 7 %}text-danger{% elif dies_restants <= 14 %}text-warning{% else %}text-success{% endif %}">
+                                        {{ oferta.data_limit|date:"d/m/Y" }}
+                                    </strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Dies restants:</span>
+                                    <strong class="{% if dies_restants <= 7 %}text-danger{% elif dies_restants <= 14 %}text-warning{% else %}text-success{% endif %}">
+                                        {{ dies_restants }} dies
+                                    </strong>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 p-3 bg-light rounded">
+                                <h6 class="text-primary mb-2">
+                                    <i class="bi bi-lightbulb me-2"></i>Consells
+                                </h6>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li class="mb-1">
+                                        <i class="bi bi-check text-success me-2"></i>
+                                        Personalitza la carta per aquesta oferta
+                                    </li>
+                                    <li class="mb-1">
+                                        <i class="bi bi-check text-success me-2"></i>
+                                        Destaca la teva experiència rellevant
+                                    </li>
+                                    <li class="mb-1">
+                                        <i class="bi bi-check text-success me-2"></i>
+                                        Revisa l'ortografia abans d'enviar
+                                    </li>
+                                    <li>
+                                        <i class="bi bi-check text-success me-2"></i>
+                                        Adjunta un CV actualitzat
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+    }
+    
+    .card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        border: none;
+        font-weight: 500;
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+        background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+    
+    .btn-primary:disabled {
+        background: #6c757d;
+        opacity: 0.6;
+    }
+    
+    .text-primary {
+        color: #0d6efd !important;
+    }
+    
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .progress-bar {
+        transition: width 0.3s ease;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.5em 0.75em;
+    }
+    
+    .sticky-top {
+        z-index: 1020;
+    }
+    
+    @media (max-width: 768px) {
+        .sticky-top {
+            position: relative !important;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('candidaturaForm');
+    const cartaTextarea = document.getElementById('carta_presentacio');
+    const charCount = document.getElementById('charCount');
+    const charStatus = document.getElementById('charStatus');
+    const cartaValidFeedback = document.getElementById('cartaValidFeedback');
+    const submitBtn = document.getElementById('submitBtn');
+    const cvInput = document.getElementById('cv_adjunt');
+    
+    // Funció per actualitzar el comptador de caràcters i la validació de la carta
+    function updateCharCount() {
+        const length = cartaTextarea.value.length;
+        charCount.textContent = length;
+        
+        cartaTextarea.classList.remove('is-valid', 'is-invalid');
+        cartaValidFeedback.style.display = 'none';
+
+        if (length === 0) {
+            charStatus.textContent = '';
+            charStatus.className = 'text-muted';
+        } else if (length < 50) {
+            charStatus.textContent = `Falten ${50 - length} caràcters`;
+            charStatus.className = 'text-warning';
+            cartaTextarea.classList.add('is-invalid');
+        } else if (length > 2000) {
+            charStatus.textContent = `Sobren ${length - 2000} caràcters`;
+            charStatus.className = 'text-danger';
+            cartaTextarea.classList.add('is-invalid');
+        } else {
+            charStatus.textContent = 'Longitud correcta';
+            charStatus.className = 'text-success';
+            cartaTextarea.classList.add('is-valid');
+            cartaValidFeedback.style.display = 'block';
+        }
+        
+        checkFormValidity();
+    }
+    
+    // Funció per validar el CV adjunt
+    function validateCv() {
+        cvInput.classList.remove('is-valid', 'is-invalid');
+        const cvPreview = document.getElementById('cvPreview');
+        const fileNameSpan = document.getElementById('cvFileName');
+        const fileSizeSpan = document.getElementById('cvFileSize');
+        const previewAlert = cvPreview.querySelector('.alert');
+
+        if (cvInput.files.length > 0) {
+            const file = cvInput.files[0];
+            fileNameSpan.textContent = file.name;
+            fileSizeSpan.textContent = formatFileSize(file.size);
+            cvPreview.style.display = 'block';
+
+            const allowedTypes = ['.pdf', '.doc', '.docx'];
+            const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+            
+            previewAlert.classList.remove('alert-info', 'alert-danger', 'alert-success');
+
+            if (!allowedTypes.includes(fileExtension)) {
+                cvInput.classList.add('is-invalid');
+                previewAlert.classList.add('alert-danger');
+                fileNameSpan.textContent = file.name + ' (format no vàlid)';
+            } else if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                cvInput.classList.add('is-invalid');
+                previewAlert.classList.add('alert-danger');
+                fileNameSpan.textContent = file.name + ' (massa gran)';
+            } else {
+                cvInput.classList.add('is-valid');
+                previewAlert.classList.add('alert-info');
+            }
+        } else {
+            cvPreview.style.display = 'none';
+        }
+        checkFormValidity();
+    }
+
+    // Funció principal per comprovar la validesa del formulari i habilitar/deshabilitar el botó
+    function checkFormValidity() {
+        const isCartaValid = cartaTextarea.value.length >= 50 && cartaTextarea.value.length <= 2000;
+        const isCvAttached = cvInput.files.length > 0 && cvInput.classList.contains('is-valid'); // Check if CV is attached AND valid
+
+        // Habilitar/deshabilitar botó d'enviar
+        submitBtn.disabled = !(isCartaValid && isCvAttached);
+    }
+    
+    // Formatar mida de fitxer
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Event listeners
+    cartaTextarea.addEventListener('input', updateCharCount);
+    cvInput.addEventListener('change', validateCv);
+    
+    // Validació del formulari abans d'enviar (per mostrar spinner)
+    form.addEventListener('submit', function(e) {
+        // Només si el botó no està disabled (és a dir, el formulari és vàlid)
+        if (!submitBtn.disabled) {
+            const submitIcon = document.getElementById('submitIcon');
+            const submitSpinner = document.getElementById('submitSpinner');
+            
+            // Mostrar spinner
+            submitIcon.style.display = 'none';
+            submitSpinner.style.display = 'inline-block';
+            submitBtn.disabled = true; // Deshabilita el botó per evitar múltiples enviaments
+            submitBtn.textContent = ' Enviant candidatura...';
+            submitBtn.prepend(submitSpinner);
+        } else {
+            e.preventDefault(); // Evita l'enviament si el botó està deshabilitat
+        }
+    });
+    
+    // Inicialitzar l'estat del formulari en carregar la pàgina
+    updateCharCount();
+    validateCv();
+    checkFormValidity();
+});
+</script>
+{% endblock %}

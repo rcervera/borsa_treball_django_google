@@ -39,73 +39,9 @@
         </div>
     </div>
 
-    {% if user.tipus == 'EST' and estudiant %}
-        <!-- Student Dashboard -->
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-briefcase me-2"></i>Ofertes recomanades</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle me-2"></i>
-                            Aquí es mostrarien les ofertes més rellevants per al teu perfil
-                        </div>
-                        <div class="text-center">
-                            <a href="#" class="btn btn-primary">
-                                <i class="bi bi-search me-2"></i>Veure totes les ofertes
-                            </a>
-                        </div>
-                    </div>
-                </div>
+    
 
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Activitat recent</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="text-muted text-center py-3">
-                            <i class="bi bi-inbox" style="font-size: 2rem;"></i>
-                            <p class="mt-2 mb-0">No hi ha activitat recent</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-person me-2"></i>El teu perfil</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <strong>Cicle:</strong><br>
-                            <span class="text-muted">{{ estudiant.cicle.nom }}</span><br>
-                            <small class="badge bg-secondary">{{ estudiant.cicle.grau }}</small>
-                        </div>
-                        <div class="mb-3">
-                            <strong>Període:</strong><br>
-                            <span class="text-muted">{{ estudiant.any_inici }} - {{ estudiant.any_fi }}</span>
-                        </div>
-                        <div class="d-grid">
-                            <a href="#" class="btn btn-outline-primary">
-                                <i class="bi bi-pencil me-2"></i>Actualitzar perfil
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card stat-card">
-                    <div class="card-body text-center">
-                        <h3 class="text-primary mb-0">0</h3>
-                        <p class="text-muted mb-0">Candidatures enviades</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    {% elif user.tipus == 'EMP' and empresa %}
+  {% if user.tipus == 'EST' and estudiant or user.tipus == 'EMP' and empresa %}
         <!-- Container de notícies -->
 <div class="container my-5">
     <div class="row g-4">
