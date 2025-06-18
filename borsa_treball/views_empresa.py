@@ -422,54 +422,6 @@ def esborrar_oferta(request, oferta_id):
     
 
 #
-# DETALL OFERTA
-#
-
-@login_required
-def detall_oferta(request, oferta_id):
-    """
-    Vista per veure els detalls complets d'una oferta.
-    """
-    try:
-        empresa = request.user.empresa
-    except Empresa.DoesNotExist:
-        messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
-        return redirect('index')
-    
-    # Obtenir l'oferta i verificar que pertany a l'empresa
-    oferta = get_object_or_404(Oferta, id=oferta_id, empresa=empresa)
-    
-    # Calcular estadístiques
-    today = timezone.now().date()
-    dies_restants = (oferta.data_limit - today).days if oferta.data_limit > today else 0
-    
-    # Estat de l'oferta
-    if not oferta.visible:
-        estat = 'oculta'
-        estat_class = 'secondary'
-        estat_icon = 'eye-slash'
-    elif oferta.data_limit < today:
-        estat = 'caducada'
-        estat_class = 'danger'
-        estat_icon = 'x-circle'
-    else:
-        estat = 'activa'
-        estat_class = 'success'
-        estat_icon = 'check-circle'
-    
-    context = {
-        'oferta': oferta,
-        'dies_restants': dies_restants,
-        'estat': estat,
-        'estat_class': estat_class,
-        'estat_icon': estat_icon,
-        'today': today,
-    }
-    
-    return render(request, 'borsa_treball/detall_oferta_empresa.html', context)
-
-
-#
 # EDITAR OFERTA
 #
 @login_required

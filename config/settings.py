@@ -131,15 +131,17 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 # Configuració opcional de django-bootstrap5
 BOOTSTRAP5 = {
     'include_jquery': True,
     'theme_url': None,
     'javascript_url': {
-        'url': 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
+        "url": "/static/django_bootstrap5/bootstrap.bundle.min.js",
     },
     'css_url': {
-        'url': 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
+         "url": "/static/django_bootstrap5/bootstrap.min.css",
     },
     'horizontal_label_class': 'col-md-3',
     'horizontal_field_class': 'col-md-9',

@@ -2,8 +2,10 @@ from django.urls import path
 from . import views
 from . import views_empresa
 from . import views_estudiant
+from django.views.generic import TemplateView
 
 urlpatterns = [
+    path('landing', TemplateView.as_view(template_name='landing.html'), name='landing'),
     path('login/', views.login_view, name='login'),
     path('', views.index, name='index'),
     path('registre/estudiant/', views.mostrar_registre_estudiant, name='registre_estudiant'),
@@ -18,7 +20,7 @@ urlpatterns = [
     path('api/empresa/oferta/<int:oferta_id>/', views_empresa.api_actualitzar_oferta, name='api_actualitzar_oferta'),
     path('empresa/oferta/<int:oferta_id>/toggle-visibilitat/', views_empresa.toggle_visibilitat_oferta, name='toggle_visibilitat_oferta'),
     path('empresa/oferta/<int:oferta_id>/esborrar/', views_empresa.esborrar_oferta, name='esborrar_oferta'),
-    path('empresa/oferta/<int:oferta_id>/', views_empresa.detall_oferta, name='detall_oferta'),
+    # path('empresa/oferta/<int:oferta_id>/', views_empresa.detall_oferta, name='detall_oferta'),
     path('empresa/oferta/<int:oferta_id>/editar/', views_empresa.editar_oferta, name='editar_oferta'),
      # URLs per gestió del perfil
     path('empresa/perfil/editar', views_empresa.editar_perfil_empresa, name='editar_perfil_empresa'),

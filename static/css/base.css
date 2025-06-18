@@ -16,7 +16,7 @@ body {
     position: relative;
     background: linear-gradient(135deg, rgba(13, 109, 253, 0.021) 0%, rgba(0, 81, 147, 0.114) 100%),
         /* Imatge de fons */
-        url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+       url("../img/landing.jpg");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -194,8 +194,115 @@ body {
             font-weight: 600;
             border-radius: 12px 12px 0 0 !important;
 }
+
+.candidatura-card {
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.candidatura-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+}
+
+.oferta-card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.08) !important;
+    }
+    
+   
+
+
+.avatar-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+  .candidatura-card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .candidatura-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+    }
+    
+   
+    
+    
+    .pagination .page-link {
+        border-radius: 8px;
+        margin: 0 2px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        border-color: #0d6efd;
+    }
+
+    .img-fixed {
+      height: 200px;
+      object-fit: cover;
+      width: 100%;
+    }
+    
+    .puntuacio-badge {
+        width: 40px;
+        height: 40px;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+    
+    .estat-select {
+       
+        transition: all 0.3s ease;
+    }
+    
+    .estat-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+
+
+    .current-file {
+    border-radius: 8px;
+    }
+   
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .progress-bar {
+        transition: width 0.3s ease;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.5em 0.75em;
+    }
+    
+    .sticky-top {
+        z-index: 1020;
+    }
+    
+   
+
     
 @media (max-width: 768px) {
+
+     .sticky-top {
+            position: relative !important;
+        }
             .sidebar {
                 transform: translateX(-100%);
             }
@@ -211,6 +318,14 @@ body {
             .sidebar.show {
                 transform: translateX(0);
             }
+
+             .candidatura-card .row > div {
+            margin-bottom: 1rem;
+        }
+        
+        .candidatura-card .d-flex.gap-2 {
+            justify-content: center !important;
+        }
 }
     
 .welcome-card {

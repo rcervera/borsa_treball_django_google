@@ -3,155 +3,311 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ofertes Disponibles</title>
+    <title>Ofertes Disponibles - Borsa de Treball</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        /* Estils personalitzats per a un look més modern */
+        /* Estils unificats amb el landing page */
         body {
-            background-color: #f8f9fa; /* Fons lleugerament gris */
-        }
-        .header-section {
-            background-color: #ffffff;
-            border-bottom: 1px solid #e0e0e0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .container {
-            padding-top: 30px;
-            padding-bottom: 30px;
-        }
-        h2 {
-            color: #343a40; /* Negre més suau */
-            font-weight: 600; /* Negreta subtil */
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-        .table-ofertes {
-            border-radius: 0.75rem; /* Cantonades arrodonides per la taula */
-            overflow: hidden; /* Per aplicar el border-radius al contingut */
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08); /* Ombra més pronunciada */
-        }
-        .table-ofertes thead th {
-            background-color: #007bff; /* Blau primari de Bootstrap */
-            color: white;
-            font-weight: 600;
-            vertical-align: middle;
-            padding: 1rem 0.75rem;
-            border-bottom: none; /* Elimina la vora inferior de la capçalera */
-        }
-        .table-ofertes tbody tr {
-            background-color: #ffffff;
-            transition: background-color 0.2s ease; /* Transició suau al passar el ratolí */
-        }
-        .table-ofertes tbody tr:hover {
-            background-color: #f1f7fe; /* Fons clar en hover */
-        }
-        .table-ofertes tbody td {
-            padding: 1rem 0.75rem;
-            border-top: 1px solid #dee2e6; /* Vores entre files */
-            border-bottom: none;
-        }
-        .table-ofertes tbody tr:last-child td {
-            border-bottom: none; /* Elimina la vora inferior de la darrera fila */
-        }
-        .badge {
-            font-size: 0.8rem; /* Una mica més grans */
-            padding: 0.6em 0.9em;
-            border-radius: 0.5rem; /* Més arrodonits */
-            font-weight: 500;
-        }
-        .badge.bg-info-subtle {
-            background-color: #e0f2f7 !important; /* Més suau */
-            color: #008cba !important; /* Més fosc */
-        }
-        .badge.bg-secondary {
-            background-color: #e9ecef !important;
-            color: #6c757d !important;
-        }
-        .btn-sm {
-            padding: 0.4rem 0.75rem;
-            font-size: 0.85rem;
-            border-radius: 0.5rem;
-        }
-        .btn-outline-primary {
-            color: #007bff;
-            border-color: #007bff;
-            transition: all 0.2s ease;
-        }
-        .btn-outline-primary:hover {
-            background-color: #007bff;
-            color: white;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-            transition: all 0.2s ease;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
-        }
-        .alert-warning {
-            border-radius: 0.75rem;
-        }
-        .pagination .page-link {
-            border-radius: 0.5rem !important;
-            margin: 0 3px;
-        }
-        .pagination .page-item.active .page-link {
-            background-color: #007bff;
-            border-color: #007bff;
+            background: linear-gradient(135deg, #1e293b 0%, #1e40af 50%, #4338ca 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        /* Estils per la columna de Data Límit i dies restants */
-        .data-limit-cell {
-            white-space: nowrap; /* Evita que el text es trenqui */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.05"><circle cx="30" cy="30" r="2"/></g></g></svg>');
+            opacity: 0.3;
+            z-index: -1;
         }
-        .dias-restantes {
-            font-size: 0.9em;
+
+        /* Header modern */
+        .header-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-section .logo-link {
+            transition: transform 0.3s ease;
+        }
+
+        .header-section .logo-link:hover {
+            transform: scale(1.05);
+        }
+
+        .header-section .logo-text {
+            color: white !important;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Logo animat simplificat */
+        .animated-dots {
+            display: inline-flex;
+            gap: 0.3rem;
+            align-items: center;
+            margin-right: 0.5rem;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: bounce 2s infinite;
+        }
+
+        .dot-1 {
+            background-color: #60a5fa;
+            animation-delay: 0s;
+        }
+
+        .dot-2 {
+            background-color: #3b82f6;
+            animation-delay: 0.2s;
+        }
+
+        .dot-3 {
+            background-color: #1d4ed8;
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+                opacity: 0.7;
+            }
+            40% {
+                transform: translateY(-5px);
+                opacity: 1;
+            }
+            60% {
+                transform: translateY(-2px);
+                opacity: 0.9;
+            }
+        }
+
+        /* Títol principal */
+        h2 {
+            color: white !important;
+            font-weight: 700;
+            text-align: center;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            margin-bottom: 3rem !important;
+        }
+
+        /* Formulari de filtratge */
+        .filter-section {
+            background: rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 1rem !important;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-section label {
+            color: white !important;
             font-weight: 600;
-            display: block; /* Per posar-lo sota la data */
-            margin-top: 0.2em;
         }
+
+        .form-select {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 0.75rem !important;
+            backdrop-filter: blur(5px);
+        }
+
+        .form-select:focus {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25) !important;
+        }
+
+        /* Botó de filtre */
+        .btn-filter {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+            border: none !important;
+            border-radius: 50px !important;
+            padding: 12px 30px !important;
+            font-weight: 600 !important;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .btn-filter:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4) !important;
+            background: linear-gradient(135deg, #1d4ed8, #1e40af) !important;
+        }
+
+        /* Taula moderna */
+        .table-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .table-ofertes {
+            margin-bottom: 0 !important;
+            background: transparent;
+        }
+
+        /* Header de taula simplificat */
+        .table-ofertes thead th {
+            background: rgba(30, 41, 59, 0.9) !important;
+            color: white !important;
+            font-weight: 600;
+            padding: 1rem;
+            border: none !important;
+        }
+
+        .table-ofertes tbody tr {
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            border: none !important;
+        }
+
+        .table-ofertes tbody tr:hover {
+            background: rgba(255, 255, 255, 0.95) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-ofertes tbody td {
+            padding: 1.2rem 1rem;
+            border: none !important;
+            vertical-align: middle;
+        }
+
+        /* Enllaços de la taula */
+        .table-ofertes a {
+            color: #1d4ed8 !important;
+            font-weight: 600;
+            text-decoration: none !important;
+            transition: color 0.3s ease;
+        }
+
+        .table-ofertes a:hover {
+            color: #1e40af !important;
+        }
+
+        /* Badges i etiquetes */
+        .estudis-badge {
+            background: rgba(59, 130, 246, 0.1) !important;
+            color: #1d4ed8 !important;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .dias-restantes {
+            font-size: 0.85em;
+            font-weight: 600;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.5rem;
+            display: inline-block;
+            margin-top: 0.3rem;
+        }
+
         .dias-restantes.text-danger {
+            background: rgba(220, 53, 69, 0.1);
             color: #dc3545 !important;
         }
+
         .dias-restantes.text-warning {
-            color: #ffc107 !important;
+            background: rgba(255, 193, 7, 0.1);
+            color: #f57c00 !important;
         }
+
         .dias-restantes.text-success {
+            background: rgba(40, 167, 69, 0.1);
             color: #28a745 !important;
+        }
+
+        /* Paginació simplificada */
+        .pagination {
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .pagination .page-link {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            color: #1d4ed8 !important;
+            border-radius: 0.4rem !important;
+            margin: 0 0.1rem;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .pagination .page-link:hover {
+            background: rgba(255, 255, 255, 1) !important;
+            border-color: #3b82f6 !important;
+            color: #1d4ed8 !important;
+        }
+
+        .pagination .page-item.active .page-link {
+            background: #3b82f6 !important;
+            border-color: #3b82f6 !important;
+            color: white !important;
+        }
+
+        .pagination-info {
+            color: rgba(255, 255, 255, 0.9) !important;
+            margin-top: 1rem;
+        }
+
+        /* Alert modern */
+        .alert-modern {
+            background: rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 1rem !important;
+            color: white !important;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .table-responsive {
+                border-radius: 1rem;
+                overflow: hidden;
+            }
+            
+            .table-ofertes thead th,
+            .table-ofertes tbody td {
+                padding: 0.8rem 0.5rem;
+                font-size: 0.9rem;
+            }
+            
+            h2 {
+                font-size: 1.8rem !important;
+            }
         }
     </style>
 </head>
 <body>
 <header class="header-section py-3 mb-4">
     <div class="container d-flex align-items-center">
-        <a href="{% url 'index' %}" class="d-flex align-items-center text-decoration-none">
-            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100" height="40" viewBox="115 105 310 90">
-                            <style>
-                              circle {
-                                opacity: 0;
-                                animation: fadeInOut 4s infinite;
-                              }
-                          
-                              .circle1 { animation-delay: 0s; }
-                              .circle2 { animation-delay: 0.5s; }
-                              .circle3 { animation-delay: 1s; }
-                          
-                              @keyframes fadeInOut {
-                                0% { opacity: 0; }
-                                20% { opacity: 1; }
-                                80% { opacity: 1; }
-                                100% { opacity: 0; }
-                              }
-                            </style>
-                          
-                            <circle class="circle1" cx="160" cy="150" r="45" fill="#4B49AC"/>
-                            <circle class="circle2" cx="270" cy="150" r="45" fill="#7DA0FA"/>
-                            <circle class="circle3" cx="380" cy="150" r="45" fill="#98BDFF"/>
-                          </svg>
-            <span class="fs-4 text-dark fw-bold p-2">Borsa de Treball</span>
+        <a href="{% url 'index' %}" class="d-flex align-items-center text-decoration-none logo-link">
+            <div class="animated-dots">
+                <span class="dot dot-1"></span>
+                <span class="dot dot-2"></span>
+                <span class="dot dot-3"></span>
+            </div>
+            <span class="fs-4 logo-text fw-bold">Borsa de Treball</span>
         </a>
     </div>
 </header>
@@ -159,7 +315,7 @@
 <div class="container">
     <h2 class="mb-5">Descobreix les nostres oportunitats de feina</h2>
 
-    <div class="mb-4 p-4 bg-light rounded shadow-sm">
+    <div class="mb-4 p-4 filter-section">
         <form method="GET" action="{% url 'tauler_ofertes' %}">
             <div class="row align-items-end">
                 <div class="col-md-6 mb-3 mb-md-0">
@@ -174,8 +330,8 @@
                     </select>
                 </div>
                 <div class="col-md-6">
-                    <button type="submit" class="btn btn-primary w-100 rounded-pill">
-                        <i class="bi bi-funnel me-2 "></i>Aplicar Filtre
+                    <button type="submit" class="btn btn-primary w-100 btn-filter">
+                        <i class="bi bi-funnel me-2"></i>Aplicar Filtre
                     </button>
                 </div>
             </div>
@@ -183,13 +339,13 @@
     </div>
 
     {% if ofertes %}
-    <div class="table-responsive">
+    <div class="table-responsive table-container">
         <table class="table table-striped align-middle table-ofertes">
-            <thead class="table-light">
+            <thead>
                 <tr>
                     <th>Títol de l'Oferta</th>
                     <th>Estudis Requerits</th>                  
-                    <th> <i class="bi bi-geo-alt me-2"></i>Lloc de Treball</th>
+                    <th><i class="bi bi-geo-alt me-2"></i>Lloc de Treball</th>
                     <th>Tipus Contracte</th>
                     <th>Jornada</th>
                     <th>Data Límit</th>
@@ -199,7 +355,7 @@
                 {% for oferta in ofertes %}
                 <tr>
                     <td>
-                        <a href="{% url 'detall_oferta_tauler'  oferta.id %}" class="text-decoration-none fw-semibold text-primary">
+                        <a href="{% url 'detall_oferta_tauler' oferta.id %}">
                             {{ oferta.titol }}
                         </a>
                         <br>
@@ -207,25 +363,18 @@
                     </td>
                     <td>
                         {% for cicle in oferta.cicles.all %}
-                           
-                             
-                                    <div class="d-flex align-items-center p-1 bg-light rounded">
-                                        <i class="bi bi-check-circle text-success me-2"></i>
-                                        <div>
-                                            <strong>{{ cicle.nom }}</strong>
-                                            {% if cicle.grau %}<br><small class="text-muted">{{ cicle.get_grau_display }}</small>{% endif %}
-                                        </div>
-                                    </div>
-                               
+                            <div class="estudis-badge">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                <strong>{{ cicle.nom }}</strong>
+                                {% if cicle.grau %}<br><small class="text-muted">{{ cicle.get_grau_display }}</small>{% endif %}
+                            </div>
                         {% empty %}
                             <span class="text-muted small">No especificat</span>
                         {% endfor %}
                     </td>
-                   
                     <td>{{ oferta.lloc_treball }}</td>
                     <td>{{ oferta.get_tipus_contracte_display }}</td>
                     <td>{{ oferta.get_jornada_display }}</td>
-                   
                     <td class="data-limit-cell">
                         <span class="text-muted d-block">{{ oferta.data_limit|date:"d/m/Y" }}</span>
                         {% if oferta.days_remaining is not None %}
@@ -244,17 +393,16 @@
                             {% endif %}
                         {% endif %}
                     </td>
-                    
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
-    {# Paginació #}
+    {# Paginació simplificada #}
     {% if ofertes.has_other_pages %}
     <nav aria-label="Paginació" class="mt-4">
-        <ul class="pagination justify-content-center">
+        <ul class="pagination">
             {% if ofertes.has_previous %}
             <li class="page-item">
                 <a class="page-link" href="?page=1{% if selected_cicle %}&cicle_id={{ selected_cicle }}{% endif %}" aria-label="Primera">
@@ -289,14 +437,14 @@
             </li>
             {% endif %}
         </ul>
-        <div class="text-center text-muted mt-2">
-            <small>Mostrant {{ ofertes.start_index }} - {{ ofertes.end_index }} de {{ ofertes.paginator.count }} ofertes</small>
+        <div class="text-center">
+            <small class="pagination-info">Mostrant {{ ofertes.start_index }} - {{ ofertes.end_index }} de {{ ofertes.paginator.count }} ofertes</small>
         </div>
     </nav>
     {% endif %}
 
     {% else %}
-    <div class="alert alert-warning text-center p-4 rounded-3 shadow-sm">
+    <div class="alert alert-modern text-center p-4">
         <i class="bi bi-search fs-4 me-2"></i> No s'han trobat ofertes disponibles en aquest moment.
     </div>
     {% endif %}
