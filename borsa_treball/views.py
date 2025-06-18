@@ -36,6 +36,10 @@ def login_view(request):
 #  INDEX
 #
 def index(request):
+
+    if not request.user.is_authenticated:
+        return render(request, 'landing.html')
+    
     user = request.user
     context = {}
 

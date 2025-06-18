@@ -87,7 +87,6 @@
         .main-container {
             min-height: calc(100vh - 120px);
             padding: 4rem 0;
-            position: relative;
         }
 
         /* Seccions d'usuari - completament planes */
@@ -110,8 +109,8 @@
 
         /* Imatges quadrades per a fons transparent */
         .user-avatar {
-            width: 200px;
-            height: 200px;
+            width: 250px;
+            height: 250px;
             object-fit: contain;
             margin-bottom: 1.5rem;
             display: block;
@@ -130,30 +129,15 @@
             color: #64748b;
             font-size: 1.1rem;
             line-height: 1.6;
-            margin-bottom: 0;
+            margin-bottom: 1.5rem;
         }
 
-        /* Botons centrals - tots de la mateixa mida */
-        .central-buttons {
-            text-align: center;
-            padding: 3rem 0;
-            position: relative;
-            z-index: 2;
-        }
-
-        .btn-group-custom {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
-        /* Tots els botons amb mides uniformes */
-        .modern-btn {
+        /* Botons de registre compactes - una sola línia */
+        .user-register-btn {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             border: none;
             border-radius: 50px;
-            padding: 1.2rem 2rem;
+            padding: 0.8rem 1.5rem;
             font-weight: 600;
             color: white;
             transition: all 0.3s ease;
@@ -161,89 +145,54 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
-            /* Mides fixes per uniformitat */
-            width: 220px;
-            height: 60px;
+            font-size: 1rem;
+            white-space: nowrap;
+            min-width: 180px;
+            height: 50px;
         }
 
-        .modern-btn:hover {
+        .user-register-btn:hover {
             transform: translateY(-3px);
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
             color: white;
         }
 
-        .modern-btn i {
+        .user-register-btn i {
             margin-right: 0.5rem;
         }
 
-        /* Colors específics per cada botó */
-        .btn-estudiant {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-        }
-
-        .btn-estudiant:hover {
-            background: linear-gradient(135deg, #1d4ed8, #1e40af);
-        }
-
-        .btn-empresa {
-            background: linear-gradient(135deg, #059669, #047857);
-        }
-
-        .btn-empresa:hover {
-            background: linear-gradient(135deg, #047857, #065f46);
+        /* Botó central del tauler */
+        .central-buttons {
+            text-align: center;
+            padding: 3rem 0;
         }
 
         .btn-tauler {
-            background: linear-gradient(135deg, #7c3aed, #5b21b6);
+            background: linear-gradient(135deg, #f6c13b, #d85e1d);
+            border: none;
+            border-radius: 50px;
+            padding: 1.2rem 2.5rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            white-space: nowrap;
+            min-width: 220px;
+            height: 65px;
         }
 
         .btn-tauler:hover {
-            background: linear-gradient(135deg, #5b21b6, #4c1d95);
+            transform: translateY(-3px);
+            background: linear-gradient(135deg, #d8c21d, #af6b1e);
+            color: white;
         }
 
-        /* Fletxes curvades */
-        .arrow-container {
-            position: absolute;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .arrow-student {
-            top: 20%;
-            left: 25%;
-            width: 200px;
-            height: 150px;
-        }
-
-        .arrow-company {
-            bottom: 20%;
-            right: 25%;
-            width: 200px;
-            height: 150px;
-            transform: scaleY(-1);
-        }
-
-        .curved-arrow {
-            width: 100%;
-            height: 100%;
-        }
-
-        .arrow-path {
-            fill: none;
-            stroke: #3b82f6;
-            stroke-width: 3;
-            stroke-dasharray: 8, 4;
-            animation: dash 3s linear infinite;
-        }
-
-        .arrow-head {
-            fill: #3b82f6;
-        }
-
-        @keyframes dash {
-            to {
-                stroke-dashoffset: -24;
-            }
+        .btn-tauler i {
+            margin-right: 0.5rem;
         }
 
         /* Informació inferior - completament plana */
@@ -290,21 +239,18 @@
                 font-size: 1rem;
             }
 
-            .btn-group-custom {
-                flex-direction: column;
-                align-items: center;
+            .user-register-btn {
+                min-width: 200px;
+                height: 45px;
+                font-size: 0.9rem;
+                padding: 0.7rem 1.2rem;
             }
 
-            .modern-btn {
-                width: 280px;
+            .btn-tauler {
+                min-width: 220px;
                 height: 55px;
-                margin-bottom: 0.5rem;
-                font-size: 1rem;
-                padding: 1rem 1.5rem;
-            }
-
-            .arrow-container {
-                display: none;
+                font-size: 1.1rem;
+                padding: 1rem 2rem;
             }
 
             .header-login-btn {
@@ -317,18 +263,18 @@
             }
         }
 
-        @media (max-width: 992px) {
-            .arrow-container {
-                display: none;
-            }
-        }
-
         /* Ajustos per pantalles mitjanes */
         @media (max-width: 1200px) and (min-width: 769px) {
-            .modern-btn {
-                width: 200px;
-                height: 55px;
-                font-size: 1rem;
+            .user-register-btn {
+                min-width: 170px;
+                height: 48px;
+                font-size: 0.95rem;
+            }
+
+            .btn-tauler {
+                min-width: 200px;
+                height: 60px;
+                font-size: 1.1rem;
             }
         }
     </style>
@@ -355,70 +301,34 @@
 
     <!-- Contingut principal -->
     <div class="main-container">
-        <div class="container position-relative">
-            
-            <!-- Fletxes curvades -->
-            <div class="arrow-container arrow-student">
-                <svg class="curved-arrow" viewBox="0 0 200 150">
-                    <defs>
-                        <marker id="arrowhead1" markerWidth="10" markerHeight="7" 
-                                refX="9" refY="3.5" orient="auto">
-                            <polygon class="arrow-head" points="0 0, 10 3.5, 0 7" />
-                        </marker>
-                    </defs>
-                    <path class="arrow-path" 
-                          d="M 20 30 Q 100 10, 180 80" 
-                          marker-end="url(#arrowhead1)" />
-                </svg>
-            </div>
-
-            <div class="arrow-container arrow-company">
-                <svg class="curved-arrow" viewBox="0 0 200 150">
-                    <defs>
-                        <marker id="arrowhead2" markerWidth="10" markerHeight="7" 
-                                refX="9" refY="3.5" orient="auto">
-                            <polygon class="arrow-head" points="0 0, 10 3.5, 0 7" />
-                        </marker>
-                    </defs>
-                    <path class="arrow-path" 
-                          d="M 20 30 Q 100 10, 180 80" 
-                          marker-end="url(#arrowhead2)" />
-                </svg>
-            </div>
-
+        <div class="container">
             <div class="row align-items-center">
                 <!-- Secció Estudiant -->
                 <div class="col-lg-4 mb-4">
                     <div class="user-section">
                         <div class="user-card">
-                            <img src="{% static 'img/estudiants.png' %}"
+                            <img src="{% static 'imgs/estudiants.png' %}" 
                                  alt="Estudiant" 
                                  class="user-avatar">
                             <h3 class="user-title">Sóc estudiant</h3>
                             <p class="user-description">
                                 Accedeix per veure ofertes de feina i pràctiques, gestiona el teu perfil professional i fes el seguiment de les teves candidatures.
                             </p>
+                            <a href="{% url 'registre_estudiant' %}" class="user-register-btn">
+                                <i class="bi bi-person-plus"></i>
+                                Registre estudiant
+                            </a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Botons centrals -->
+                <!-- Botó central del tauler -->
                 <div class="col-lg-4">
                     <div class="central-buttons">
-                        <div class="btn-group-custom">
-                            <a href="{% url 'registre_estudiant' %}" class="modern-btn btn-estudiant">
-                                <i class="bi bi-person-plus"></i>
-                                Registre estudiant
-                            </a>
-                            <a href="{% url 'registre_empresa' %}" class="modern-btn btn-empresa">
-                                <i class="bi bi-building-add"></i>
-                                Registre empresa
-                            </a>
-                            <a href="{% url 'tauler_ofertes' %}" class="modern-btn btn-tauler">
-                                <i class="bi bi-list-ul"></i>
-                                Tauler d'ofertes
-                            </a>
-                        </div>
+                        <a href="{% url 'tauler_ofertes' %}" class="btn-tauler">
+                            <i class="bi bi-list-ul"></i>
+                            Tauler d'ofertes
+                        </a>
                     </div>
                 </div>
 
@@ -426,13 +336,17 @@
                 <div class="col-lg-4 mb-4">
                     <div class="user-section">
                         <div class="user-card">
-                            <img src="/placeholder.svg?height=120&width=120" 
+                            <img src="{% static 'imgs/empreses.png' %}" 
                                  alt="Empresa" 
                                  class="user-avatar">
                             <h3 class="user-title">Sóc empresa</h3>
                             <p class="user-description">
                                 Accedeix per publicar ofertes de feina i pràctiques, buscar talent jove i gestionar les candidatures rebudes.
                             </p>
+                            <a href="{% url 'registre_empresa' %}" class="user-register-btn">
+                                <i class="bi bi-building-add"></i>
+                                Registre empresa
+                            </a>
                         </div>
                     </div>
                 </div>
