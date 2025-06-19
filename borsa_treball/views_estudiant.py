@@ -9,110 +9,6 @@ from django.utils import timezone
 from .models import Oferta, Empresa, Cicle, Candidatura, Estudiant, EstatCandidatura
 
 
-def llista_ofertes_estudiants2(request):
-   
-    
-    # Obtenir ofertes visibles i no caducades
-    ofertes = Oferta.objects.filter(
-        visible=True,
-        data_limit__gte=timezone.now().date()
-    ).select_related('empresa').prefetch_related('cicles', 'candidatures')
-    
-    # Filtres
-    cerca = request.GET.get('cerca', '')
-    empresa_id = request.GET.get('empresa', '')
-    cicle_id = request.GET.get('cicle', '')
-    tipus_contracte = request.GET.get('tipus_contracte', '')
-    jornada = request.GET.get('jornada', '')
-    ordenar = request.GET.get('ordenar', '-data_publicacio')
-    
-    # Aplicar filtres
-    if cerca:
-        ofertes = ofertes.filter(
-            Q(titol__icontains=cerca) |
-            Q(descripcio__icontains=cerca) |
-            Q(lloc_treball__icontains=cerca) |
-            Q(empresa__nom_comercial__icontains=cerca)
-        )
-    
-    if empresa_id:
-        ofertes = ofertes.filter(empresa_id=empresa_id)
-    
-    if cicle_id:
-        ofertes = ofertes.filter(cicles__id=cicle_id)
-    
-    if tipus_contracte:
-        ofertes = ofertes.filter(tipus_contracte=tipus_contracte)
-    
-    if jornada:
-        ofertes = ofertes.filter(jornada=jornada)
-    
-    # Ordenació
-    if ordenar == 'titol':
-        ofertes = ofertes.order_by('titol')
-    elif ordenar == 'empresa':
-        ofertes = ofertes.order_by('empresa__nom_comercial')
-    elif ordenar == 'data_limit':
-        ofertes = ofertes.order_by('data_limit')
-    elif ordenar == '-data_limit':
-        ofertes = ofertes.order_by('-data_limit')
-    elif ordenar == 'lloc_treball':
-        ofertes = ofertes.order_by('lloc_treball')
-    else:  # -data_publicacio (per defecte)
-        ofertes = ofertes.order_by('-data_publicacio')
-    
-    # Eliminar duplicats si hi ha filtres per cicles
-    if cicle_id:
-        ofertes = ofertes.distinct()
-    
-   
-    
-    # Paginació
-    paginator = Paginator(ofertes, 12)  # 12 ofertes per pàgina
-    page = request.GET.get('page')
-    
-    try:
-        ofertes_paginades = paginator.page(page)
-    except PageNotAnInteger:
-        ofertes_paginades = paginator.page(1)
-    except EmptyPage:
-        ofertes_paginades = paginator.page(paginator.num_pages)
-    
-    # Dades per filtres
-    empreses = Empresa.objects.filter(
-        ofertes__visible=True,
-        ofertes__data_limit__gte=timezone.now().date()
-    ).distinct().order_by('nom_comercial')
-    
-    cicles = Cicle.objects.filter(
-        ofertes__visible=True,
-        ofertes__data_limit__gte=timezone.now().date()
-    ).distinct().order_by('nom')
-    
-    # Estadístiques
-    total_ofertes = ofertes.count()
- 
-   
-    
-    context = {
-        'ofertes': ofertes_paginades,       
-        'empreses': empreses,
-        'cicles': cicles,
-        'cerca': cerca,
-        'empresa_seleccionada': empresa_id,
-        'cicle_seleccionat': cicle_id,
-        'tipus_contracte_seleccionat': tipus_contracte,
-        'jornada_seleccionada': jornada,
-        'ordenar': ordenar,
-        'total_ofertes': total_ofertes,
-      
-      
-        'tipus_contracte_choices': Oferta.TIPUS_CONTRACTE,
-        'jornada_choices': Oferta.JORNADA,
-    }
-    
-    return render(request, 'borsa_treball/tauler_ofertes.html', context)
-
 
 
 from django.shortcuts import render, get_object_or_404, redirect
@@ -125,18 +21,19 @@ from django.core.paginator import Paginator
 from .models import Oferta, Empresa, Cicle, Funcio, NivellIdioma, CapacitatClau # Make sure you import Cicle
 
 
-def llista_ofertes_estudiants(request):
+def llista_ofertes_tauler(request):
     """
     Vista pública per llistar ofertes de feina actives i visibles.
     Calcula els dies restants per a cada oferta.
     Permet filtrar per Cicle (estudis).
     """
-    # Filtrem les ofertes que són visibles i actives
-    # Si vols mostrar nom només ofertes futures, afegeix: data_limit__gte=timezone.now().date()
+    # Filtrem les ofertes que són visibles, actives i futures
+   
     ofertes_queryset = Oferta.objects.filter(
         visible=True,
-        activa=True
-    ).order_by('-data_publicacio')
+        activa=True,
+        data_limit__gte=timezone.now().date()
+    ).order_by('-data_publicacio', 'data_limit')
 
     # Get all Cicles for the filter dropdown
     cicles = Cicle.objects.all().order_by('nom')
@@ -172,9 +69,8 @@ def llista_ofertes_estudiants(request):
     context = {
         'ofertes': page_obj,
         'cicles': cicles,  # Pass the list of Cicles to the template
-        'selected_cicle': int(cicle_id) if cicle_id else None, # Pass the selected cicle_id back
-        'user': request.user, # Passem l'objecte usuari per la lògica d'autenticació
-        # No cal passar 'now' si ja calculem 'days_remaining' a la vista
+        'selected_cicle': int(cicle_id) if cicle_id else None, # Pass the selected cicle_id back    
+       
     }
     return render(request, 'borsa_treball/tauler_ofertes.html', context)
 

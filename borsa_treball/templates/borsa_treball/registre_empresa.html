@@ -5,11 +5,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Iniciar Sessió - Borsa de Treball{% endblock %}</title>
+    <title>{% block title %}Registre Empresa - Borsa de Treball{% endblock %}</title>
     
     {% bootstrap_css %}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/base.css' %}">
     
     {% block extra_css %}{% endblock %}
 </head>
@@ -57,10 +56,8 @@
 
                 <!-- Registration Form -->
                 <form id="registrationForm" class="needs-validation" novalidate>
-                    {% csrf_token %}
+                    {% csrf_token %}                    
                     
-                    
-
                     <!-- Account Information Section -->
                     <div class="mb-4">
                         <h6 class="text-primary mb-3">
@@ -72,7 +69,7 @@
                             <!-- Email -->
                             <div class="col-md-6 mb-3">
                                
-                                <label for="password" class="form-label">
+                                <label for="email" class="form-label">
                                     <i class="bi bi-envelope text-muted me-2"></i>Correu electrònic *
                                 </label>
                                 <div class="input-group">                                   
@@ -91,7 +88,7 @@
                             <!-- Password -->
                             <div class="col-md-6 mb-3">
                              
-                                <label for="password" class="form-label">
+                                <label for="password1" class="form-label">
                                     <i class="bi bi-lock text-muted me-2"></i>Contrasenya *
                                 </label>
                                 <div class="input-group">                                 
@@ -108,7 +105,7 @@
 
                             <!-- Confirm Password -->
                             <div class="col-md-6 mb-3">                               
-                                <label for="password" class="form-label">
+                                <label for="password2" class="form-label">
                                     <i class="bi bi-lock text-muted me-2"></i>Confirma la contrasenya *
                                 </label>
                                 <div class="input-group">                                    
@@ -147,7 +144,7 @@
 
                             <!-- cognoms  -->
                             <div class="col-md-6 mb-3">                              
-                                <label for="cognoma" class="form-label">
+                                <label for="cognoms" class="form-label">
                                     <i class="bi bi-person-badge text-muted me-2"></i>Cognoms *
                                 </label>
                                 <div class="input-group">
@@ -292,7 +289,7 @@
 
                     <!-- Submit Button -->
                     <div class="d-grid mb-4">
-                        <button type="submit" class="btn btn-primary btn-lg" id="registerButton">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill" id="registerButton">
                             <i class="bi bi-building-add me-2"></i>
                             Registrar empresa
                         </button>
@@ -315,7 +312,7 @@
             <span>Les teves dades estan protegides i segures.</span>
             <ul class="list-unstyled mt-2 mb-0">
                 <li><strong>Responsable:</strong> Institut Francesc Vidal i Barraquer</li>
-                <li><strong>Finalitat:</strong> Publicació de l’oferta al web de la Borsa de Treball. (No es publicarà cap nom d’empresa ni dada/correu personal)</li>
+                <li><strong>Finalitat:</strong> Publicació de l'oferta al web de la Borsa de Treball. (No es publicarà cap nom d'empresa ni dada/correu personal)</li>
                 <li><strong>Legitimació:</strong> Consentiment de la persona interessada.</li>
                 <li><strong>Destinataris:</strong> Institut F. Vidal i Barraquer, el seu portal de transparència, estudiants i titulats/des.</li>
                 <li><strong>Drets:</strong> Accedir, rectificar, suprimir, oposar-se, limitar o sol·licitar la portabilitat de les dades.</li>
@@ -325,6 +322,11 @@
 </div>
 
 <style>
+    body {
+        background-color:white !important;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
     .min-vh-100 {
         min-height: calc(100vh - 140px) !important;
     }
@@ -339,8 +341,9 @@
     }
     
     .card {
-        border-radius: 15px;
-        overflow: hidden;
+        background-color: #ffffff !important;
+        border: 1px solid #e2e8f0 !important; /* Borde gris molt clar */
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important; /* Ombra subtil */
     }
     
     .form-control:focus,
@@ -399,6 +402,11 @@
     }
 </style>
 
+
+{% bootstrap_javascript %}
+
+<script src="{% static 'js/toast.js' %}"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('registrationForm');
@@ -426,6 +434,7 @@
            
             event.preventDefault(); // Evita l'enviament tradicional del formulari
             clearFormErrors(); // Neteja errors anteriors
+            
 
             // Deshabilita el botó per evitar múltiples enviaments
             registerButton.disabled = true;
@@ -436,11 +445,12 @@
             const data = Object.fromEntries(formData.entries());
 
             try {
-                // Aquesta URL hauràs de definir-la al teu urls.py (p.ex., path('api/registre-empresa/', views.registre_empresa, name='registre_empresa_api'))
+                
+                const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
                 const response = await fetch('{% url "registre_empresa_api" %}', {
                     method: 'POST',
                      headers: {
-                            'X-CSRFToken': getCookie('csrftoken'),
+                            'X-CSRFToken': csrftoken,
                             'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(data)
@@ -449,20 +459,28 @@
                 const result = await response.json();
 
                 if (response.ok) { // Si la resposta és 2xx (200, 201, etc.)
-                    showApiMessage('success', result.message);
+                    //showApiMessage('success', result.message);
+                    // TOAST D'ÈXIT
+                    if (typeof window.showSuccessToast === 'function') {
+                        showSuccessToast('Empresa registrada correctament!');
+                    }
                     form.reset(); // Neteja el formulari
                     // Pots redirigir l'usuari després d'un petit retard
                     setTimeout(() => {
                         window.location.href = '{% url "login" %}'; // Redirecciona a la pàgina de login
                     }, 2000); // Espera 2 segons abans de redirigir
                 } else { // Si la resposta és un error (4xx, 5xx)
-                    showApiMessage('danger', result.message || 'Hi ha hagut un error en el registre. Revisa les dades.');
+                    //showApiMessage('danger', result.message || 'Hi ha hagut un error en el registre. Revisa les dades.');
+                    // TOAST D'ERROR
+                    if (typeof window.showErrorToast === 'function') {
+                        showErrorToast('Error en el registre. Revisa les dades.');
+                    }
                     if (result.errors) {
                         for (const fieldName in result.errors) {
                             const errorMessages = result.errors[fieldName];
                             const inputElement = form.querySelector(`[name="${fieldName}"]`);
                             const errorDiv = document.getElementById(`error-${fieldName}`);
-                            console.log(errorDiv)
+                           
 
                             if (inputElement) {
                                 inputElement.classList.add('is-invalid');
@@ -474,12 +492,16 @@
                     }
                 }
             } catch (error) {
-                console.error('Error en la petició fetch:', error);
-                showApiMessage('danger', 'Error de connexió amb el servidor. Si us plau, prova-ho més tard.');
+                
+                //showApiMessage('danger', 'Error de connexió amb el servidor. Si us plau, prova-ho més tard.');
+                // TOAST D'ERROR DE CONNEXIÓ
+                if (typeof window.showErrorToast === 'function') {
+                    showErrorToast('Error de connexió amb el servidor.');
+                }
             } finally {
                 // Habilita el botó de nou
                 registerButton.disabled = false;
-                registerButton.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>Registrar Empresa';
+                registerButton.innerHTML = '<i class="bi bi-building-add me-2"></i>Registrar Empresa';
             }
         });
 
@@ -521,22 +543,6 @@
             });
         }
     });
-
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
 </script>
 </body>
 </html>

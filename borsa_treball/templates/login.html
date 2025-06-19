@@ -57,10 +57,10 @@
                     
                     {% if messages %}
                         {% for message in messages %}
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <div class="alert alert-danger  fade show" role="alert">
                             <i class="bi bi-exclamation-triangle me-2"></i>
                             <strong>Error!</strong> {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                           
                         </div>
                         {% endfor %}
                     {% endif %}
@@ -101,7 +101,7 @@
                         <div class="form-check">
                             
                         </div>
-                        <a href="#" class="text-decoration-none small">Has oblidat la contrasenya?</a>
+                        
                     </div>
 
                     <!-- Submit Button -->
@@ -161,6 +161,11 @@
 </div>
 
 <style>
+     body {
+            background-color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
     .min-vh-100 {
         min-height: calc(100vh - 140px) !important;
     }
@@ -174,9 +179,10 @@
         transform: scale(1.05);
     }
     
-    .card {
-        border-radius: 15px;
-        overflow: hidden;
+   .card {
+        background-color: #ffffff !important;
+        border: 1px solid #e2e8f0 !important; /* Borde gris molt clar */
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important; /* Ombra subtil */
     }
     
     .form-control:focus {

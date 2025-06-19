@@ -11,9 +11,7 @@
             <div class="card-body p-5">
                 <!-- Header Section -->
                 <div class="text-center mb-4">
-                    <div class="mb-3">
-                        <i class="bi bi-megaphone text-primary" style="font-size: 2rem;"></i>
-                    </div>
+                    
                     <h2 class="h4 text-dark mb-2">Nova Oferta de Treball</h2>
                     <p class="text-muted">Publica una nova oferta per trobar el millor talent</p>
                 </div>
@@ -887,9 +885,16 @@ document.getElementById("ofertaForm").addEventListener("submit", async function(
 
         if (resultat.success) {
             
-            cont.innerHTML = `<div class="alert alert-success">${resultat.message}</div>`;
+            //cont.innerHTML = `<div class="alert alert-success">${resultat.message}</div>`;
+            if (typeof window.showSuccessToast === 'function') {
+                        showSuccessToast('Oferta registrada correctament!');
+            }
+                    
+            setTimeout(() => {
+                        window.location.href = "{% url 'llista_ofertes_empresa' %}";
+             }, 2000); 
            
-            window.location.href = "{% url 'llista_ofertes_empresa' %}";
+            
                 
 
 
@@ -899,14 +904,17 @@ document.getElementById("ofertaForm").addEventListener("submit", async function(
                 const missatge = errors[camp];
                 const input = form.querySelector(`[name="${camp}"]`);
                 const errorDiv = document.getElementById(`error-${camp}`);
-
-                console.log(errorDiv)
+               
 
                 if (input) input.classList.add('is-invalid');
                 if (errorDiv) errorDiv.innerText = missatge;
             }
 
-            cont.innerHTML = `<div class="alert alert-danger">Hi ha errors en el formulari.</div>`;
+            if (typeof window.showErrorToast === 'function') {
+                        showErrorToast('Hi ha errors en el formulari. Revisa les dades.');
+            }
+
+            // cont.innerHTML = `<div class="alert alert-danger">Hi ha errors en el formulari.</div>`;
         }
 
     } catch (error) {

@@ -7,17 +7,7 @@
 {% block content %}
 <div class="row justify-content-center mb-4">
     <div class="col-lg-10 col-md-11">
-        <div class="card shadow-lg border-0 mb-4">
-            <div class="card-body p-4">
-                <div class="text-center mb-4">
-                    <div class="mb-3">                        
-                        <i class="bi bi-person-fill text-primary" style="font-size: 2rem;"></i>                      
-                    </div>
-                    <h2 class="h4 text-dark mb-2">{{ empresa.nom_comercial }}</h2>
-                    <p class="text-muted">Gestiona la informació de la teva empresa i del teu compte d'usuari</p>
-                </div>
-            </div>
-        </div>
+       
 
         {% if messages %}
             {% for message in messages %}
@@ -266,17 +256,7 @@
 
                 clearFormErrors(empresaProfileForm);
                 perfilApiMessages.innerHTML = '';
-
-                // La validació del navegador per defecte no s'executa si no se li força
-                // Amb un formulari manual, cal que la lògica de validació del backend sigui robusta.
-                // Si vols que Bootstrap mostri els missatges d'error HTML5, pots afegir:
-                // if (!empresaProfileForm.checkValidity()) {
-                //    empresaProfileForm.classList.add('was-validated');
-                //    showApiMessage('perfil-api-missatges', 'danger', 'Revisa els camps amb errors.');
-                //    return;
-                // }
-
-
+               
                 const formData = new FormData(empresaProfileForm);
 
                 try {
@@ -291,7 +271,10 @@
                     const resultat = await response.json();
 
                     if (resultat.success) {
-                        showApiMessage('perfil-api-missatges', 'success', resultat.message);
+                        // showApiMessage('perfil-api-missatges', 'success', resultat.message);
+                        if (typeof window.showSuccessToast === 'function') {
+                            showSuccessToast(resultat.message);
+                        }
                     } else {
                         let errors = {};
                         try {
@@ -359,7 +342,10 @@
                     const resultat = await response.json();
 
                     if (resultat.success) {
-                        showApiMessage('perfil-api-missatges', 'success', resultat.message);
+                        // showApiMessage('perfil-api-missatges', 'success', resultat.message);
+                        if (typeof window.showSuccessToast === 'function') {
+                                 showSuccessToast(resultat.message);
+                        }
                     } else {
                         let errors = {};
                         try {
@@ -428,7 +414,10 @@
                     const data = await response.json();
 
                     if (data.success) {
-                        showApiMessage('perfil-api-missatges', 'success', data.message);
+                        //showApiMessage('perfil-api-missatges', 'success', data.message);
+                        if (typeof window.showSuccessToast === 'function') {
+                            showSuccessToast(data.message);
+                        }
                         changePasswordForm.reset();
                         changePasswordForm.classList.remove('was-validated');
                     } else {

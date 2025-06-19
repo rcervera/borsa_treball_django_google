@@ -43,11 +43,12 @@ urlpatterns = [
     # path('ofertes/empresa/', views.llista_ofertes_empresa, name='llista_ofertes_empresa'),
 
 
-    path('tauler_ofertes', views_estudiant.llista_ofertes_estudiants, name='tauler_ofertes'),
+    path('tauler_ofertes', views_estudiant.llista_ofertes_tauler, name='tauler_ofertes'),
     path('detall_oferta_tauler/<int:oferta_id>', views_estudiant.detall_oferta_tauler, name='detall_oferta_tauler'),
     
     # rutes incorrectes de moment...
-    path('tauler_ofertes', views_estudiant.llista_ofertes_estudiants, name='llista_ofertes_estudiants'),
+    
+    #path('tauler_ofertes', views_estudiant.llista_ofertes_estudiants, name='llista_ofertes_estudiants'),
     path('estudiant/candidatures', views_estudiant.llista_candidatures_estudiant, name='llista_candidatures_estudiant'),
 
     path('perfil/estudiant/', views_estudiant.perfil_estudiant, name='perfil_estudiant'),
