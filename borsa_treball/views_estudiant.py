@@ -214,13 +214,7 @@ def api_actualitzar_perfil_estudiant(request):
             estudiant.carnet_conduir = carnet_conduir
             estudiant.save()
 
-            # Log audit (optional)
-            RegistreAuditoria.objects.create(
-                accio="Actualització Perfil Estudiant",
-                model_afectat="Estudiant",
-                descripcio=f"Estudiant {user.get_full_name()} (ID: {user.id}) ha actualitzat el seu perfil.",
-                usuari=user
-            )
+            
 
         return JsonResponse({
             'success': True,

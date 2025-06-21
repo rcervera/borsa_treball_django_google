@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
-{% block title %}Nova Oferta - Borsa de Treball{% endblock %}
+{% block title %}Borsa de Treball - Editar oferta{% endblock %}
 
-{% block page_title %}Les meves ofertes de Treball{% endblock %}
+{% block page_title %}Les meves ofertes{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -10,6 +10,7 @@
         <div class="card shadow-lg border-0">
             <div class="card-body p-5">
 
+              
                 <!-- Dropdown alineat a la dreta -->
                 <div class="d-flex justify-content-end mb-3">
                     <div class="dropdown">
@@ -17,26 +18,35 @@
                             <i class="bi bi-gear me-2"></i>Accions
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            {% if oferta.candidatures.count > 0 %}
-                                <li><a class="dropdown-item" href="#">
-                                    <i class="bi bi-people me-2"></i>Veure candidatures
+                            {% if oferta.candidatures_count > 0 %}
+                                <!-- Si hi ha candidatures: només mostrar opció de veure candidatures -->
+                                <li><a class="dropdown-item" href="{% url 'llista_candidatures_oferta' oferta.id %}">
+                                    <i class="bi bi-people me-2"></i>Veure candidatures ({{ oferta.candidatures_count }})
                                 </a></li>
                             {% else %}
-                               <i class="dropdown-item bi bi-people me-2 mr-2"></i>cap candidatura
+                                <!-- Si NO hi ha candidatures: mostrar totes les opcions de gestió -->
+                                <li><span class="dropdown-item-text text-muted">
+                                    <i class="bi bi-people me-2"></i>Cap candidatura
+                                </span></li>
+                                <li><hr class="dropdown-divider"></li>
+                                
+                                <!-- Opció de canviar visibilitat -->
+                                 
+                                {% if oferta.visible %}
+                                <li><a class="dropdown-item" href="#" onclick="toggleVisibilitat('{{ oferta.id }}',this)">
+                                    <i class="bi bi-eye-slash me-2"></i>Ocultar l'oferta
+                                </a></li>
+                                {% else %}
+                                <li><a class="dropdown-item" href="#" onclick="toggleVisibilitat('{{ oferta.id }}',this)">
+                                    <i class="bi bi-eye me-2"></i>Fer visible l'oferta
+                                </a></li>
+                                {% endif %}
+                                
+                                <!-- Opció d'eliminar -->
+                                <li><a class="dropdown-item text-danger" href="#" onclick="confirmarEliminacio('{{ oferta.id }}')">
+                                    <i class="bi bi-trash me-2"></i>Eliminar oferta
+                                </a></li>
                             {% endif %}
-                            <li><hr class="dropdown-divider"></li>
-                            {% if oferta.visible %}
-                            <li><a class="dropdown-item" href="#" onclick="toggleVisibilitat('{{ oferta.id }}')">
-                                <i class="bi bi-eye-slash me-2"></i>Ocultar oferta
-                            </a></li>
-                            {% else %}
-                            <li><a class="dropdown-item" href="#" onclick="toggleVisibilitat('{{ oferta.id }}')">
-                                <i class="bi bi-eye me-2"></i>Mostrar oferta
-                            </a></li>
-                            {% endif %}
-                            <li><a class="dropdown-item text-danger" href="#" onclick="confirmarEliminacio('{{ oferta.id }}')">
-                                <i class="bi bi-trash me-2"></i>Eliminar oferta
-                            </a></li>
                         </ul>
                     </div>
                 </div>
@@ -45,38 +55,67 @@
 
                 <!-- Header Section -->
                 <div class="text-center mb-4">
-                    <div class="mb-3">
-                        <i class="bi bi-megaphone text-primary" style="font-size: 2rem;"></i>
-                    </div>
+                    
                     <h2 class="h4 text-dark mb-2">Editar Oferta de Treball</h2>
                     <p class="text-muted">Pots modificar les dades de l'oferta de treball</p>
 
                      <div class="mb-2">
                                     {% now "Y-m-d" as today %}
+
                                     {% if not oferta.activa %}
                                         <span class="badge bg-secondary-subtle text-danger">
                                             <i class="bi bi bi-lightbulb-off me-1"></i>Pendent aprovar
                                         </span>
-                                     {% endif %}
-                                    {% if not oferta.visible %}
-                                        <span class="badge bg-secondary-subtle text-secondary">
-                                            <i class="bi bi-eye-slash me-1"></i>Oculta
+                                    {% endif %}
+                                    <span  id="estat-oferta">
+                                        {% if not oferta.visible %}
+                                            <span class="badge bg-secondary-subtle text-secondary">
+                                                <i class="bi bi-eye-slash me-1"></i>Oculta
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-success-subtle text-success">
+                                                <i class="bi bi-check-circle me-1"></i>Visible
+                                            </span>
+                                        {% endif %}   
                                         </span>
-                                    {% elif oferta.data_limit|date:"Y-m-d" >= today %}
-                                        <span class="badge bg-success-subtle text-success">
-                                            <i class="bi bi-check-circle me-1"></i>Activa
-                                        </span>
+
+                                    {% if oferta.data_limit|date:"Y-m-d" >= today %}
+                                      
                                     {% else %}
                                         <span class="badge bg-danger-subtle text-danger">
                                             <i class="bi bi-x-circle me-1"></i>Caducada
                                         </span>
                                     {% endif %}
-                                </div>
+                    </div>
 
                    
                 </div>
 
-                
+                <div class="alert alert-info alert-info-small">
+                    <div class="d-flex">
+                        <div class="alert-icon me-2">
+                            <i class="bi bi-question-circle"></i>
+                        </div>
+                        <div class="alert-content">
+                            <p class="mb-2">
+                                Pots eliminar i canviar l'estat de l'oferta mentre no hi hagi cap candidatura en procés.
+                            </p>
+                            {% if not oferta.activa %}
+                            <p class="mb-2">
+                                L'oferta està pendent de validació per part del responsable de la borsa de treball.
+                            </p>
+                            {% endif %}
+                            {% if not oferta.visible %}
+                            <p class="mb-0">
+                                Mentre l'oferta estigui oculta els estudiants no poden presentar-hi candidatura.
+                            </p>
+                            {% endif %}
+                            <p class="mb-0">
+                                Pot haver-hi candidatures pendents de revisió per part del responsable de la borsa.
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Messages -->
                 {% if messages %}
@@ -121,8 +160,7 @@
                                
                                
                             </div>
-                            {{ oferta.data_limit }}
-                            {{data_limit_formated}}
+                           
                             <div class="col-md-4 mb-3">                               
                                 <label for="data_limit" class="form-label">
                                     <i class="bi  bi-calendar-event text-muted me-2"></i>Data límit *
@@ -184,8 +222,7 @@
                                         <input type="number" 
                                             class="form-control" 
                                             id="numero_vacants" 
-                                            name="numero_vacants" 
-                                            value="1"
+                                            name="numero_vacants"                                             
                                             min = "1"
                                             max = "100"
                                             value="{{ oferta.numero_vacants }}"
@@ -261,7 +298,7 @@
                                            class="form-control border-start-0 ps-0" 
                                            id="horari" 
                                            name="horari"
-                                            value="{{ oferta.horari }}"
+                                           value="{{ oferta.horari }}"
                                            placeholder="Ex: 9:00 - 17:00">
                                 </div>
                                 <div  id="error-horari" class="error-validacio form-text text-danger"></div>
@@ -349,11 +386,11 @@
                                                     </optgroup>
                                                 {% endfor %}
                                             </select>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="afegirCicle()">
-                                                <i class="bi bi-plus-lg"></i> Afegir
+                                            <button class="btn btn-warning" type="button" onclick="afegirCicle()">
+                                                <i class="bi bi-plus-lg"></i>
                                             </button>
                                         </div>
-                                        <small class="text-muted mt-2 d-block">Selecciona un cicle per afegir-lo.</small>
+                                        <small class="text-muted mt-2 d-block">Selecciona un cicle i prem el botó + per afegir-lo.</small>
                                         <div  id="error-cicles" class="error-validacio form-text text-danger"></div>
                                     </div>
                                 </div>
@@ -381,8 +418,8 @@
                                                 <option value="{{ capacitat.id }}" data-nom="{{ capacitat.nom }}" data-categoria="{{ capacitat.categoria }}">{{ capacitat.nom }} ({{ capacitat.categoria }})</option>
                                                 {% endfor %}
                                             </select>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="afegirCapacitat()">
-                                                <i class="bi bi-plus-lg"></i> Afegir
+                                            <button class="btn btn-warning" type="button" onclick="afegirCapacitat()">
+                                                <i class="bi bi-plus-lg"></i>
                                             </button>
                                         </div>
                                         <small class="text-muted mt-2 d-block">Selecciona una capacitat per afegir-la.</small>
@@ -411,11 +448,11 @@
                                            id="nova-funcio" 
                                            class="form-control" 
                                            placeholder="Descripció de la funció (Ex: Desenvolupar aplicacions web amb React)">
-                                    <button class="btn btn-outline-secondary" type="button" onclick="afegirFuncio()">
-                                        <i class="bi bi-plus-lg"></i> Afegir
+                                    <button class="btn btn-warning" type="button" onclick="afegirFuncio()">
+                                        <i class="bi bi-plus-lg"></i>
                                     </button>
                                 </div>
-                                <small class="text-muted mt-2 d-block">Prem Enter o fes clic a "Afegir" per afegir una funció</small>
+                                <small class="text-muted mt-2 d-block">Prem Enter o fes clic a "+" per afegir una funció</small>
                                 <div  id="error-funcions" class="error-validacio form-text text-danger"></div>
                             </div>
                         </div>
@@ -432,7 +469,7 @@
                         <div class="card border-dashed">
                             <div class="card-body">
                                 <div class="row g-2 align-items-end">
-                                    <div class="col-md-5">
+                                    <div class="col-md-6">
                                         <label for="idioma_nom" class="form-label">Idioma</label>
                                         <input type="text" id="idioma_nom" list="llista_idiomes" class="form-control" placeholder="Ex: Català">
                                         <datalist id="llista_idiomes">
@@ -455,9 +492,9 @@
                                             <option value="Nadiu">
                                         </datalist>
                                     </div>
-                                    <div class="col-md-2 text-end">
-                                        <button type="button" class="btn btn-outline-secondary w-100" onclick="afegirIdioma()">
-                                            <i class="bi bi-plus-lg me-1"></i> Afegir
+                                    <div class="col-md-1 text-end">
+                                        <button type="button" class="btn btn-warning w-100" onclick="afegirIdioma()">
+                                            <i class="bi bi-plus-lg me-1"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -486,7 +523,7 @@
                                             name="requisits" 
                                             rows="4" 
                                             placeholder="Escriu altres requisits necessaris per al lloc de treball..."
-                                            required>{{ oferta.requisits }}</textarea>
+                                    >{{ oferta.requisits }}</textarea>
                                 </div>
                                 <div  id="error-requisits" class="error-validacio form-text text-danger"></div>
                             </div> 
@@ -508,7 +545,7 @@
                         <div>
                            
                             <button type="submit" class="btn btn-primary rounded-pill">
-                                <i class="bi bi-check-circle me-2"></i>Desar Oferta
+                                <i class="bi bi-check-circle me-2"></i>Desar canvis
                             </button>
                         </div>
                     </div>
@@ -533,7 +570,7 @@
                 <p>Estàs segur que vols eliminar aquesta oferta? Aquesta acció no es pot desfer.</p>
                 <div class="alert alert-warning">
                     <i class="bi bi-info-circle me-2"></i>
-                    <strong>Atenció:</strong> També s'eliminaran totes les candidatures associades.
+                    <strong>Atenció:</strong> S'eliminarà l'oferta {{ oferta.titol}}
                 </div>
             </div>
             <div class="modal-footer">
@@ -617,8 +654,7 @@ function afegirIdioma() {
 
     if (idioma && nivell) {
         idiomes.push({ idioma, nivell });
-        console.log("array idiomes: ")
-        console.log(idiomes)
+       
         renderitzarIdiomes();
         document.getElementById('idioma_nom').value = '';
         document.getElementById('idioma_nivell').value = '';
@@ -836,8 +872,7 @@ function eliminarCicle(index) {
     // Ordenar els cicles dins de la seva família per mantenir l'ordre alfabètic
     tots_els_cicles_disponibles[familiaDelCicle].sort((a, b) => a.nom.localeCompare(b.nom));
 
-    console.log(tots_els_cicles_disponibles)
-
+    
     renderitzarCiclesDisponibles();
     renderitzarCiclesSeleccionats();
 }
@@ -915,8 +950,7 @@ document.addEventListener('DOMContentLoaded', function() {
     funcions = {{ funcions_existents|safe }};
     idiomes = {{ idiomes_existents|safe }};
 
-    console.log("array odiomes:")
-    console.log(idiomes)
+    
     capacitats_clau_seleccionades = {{ capacitats_existents|safe }};
     cicles_seleccionats = {{ cicles_existents|safe }};
     cicles_seleccionats.forEach(c => c.id = c.id.toString());
@@ -928,7 +962,7 @@ document.addEventListener('DOMContentLoaded', function() {
     renderitzarIdiomes();
     renderitzarFuncions();
 
-     console.log(cicles_seleccionats)
+   
 
     // Afegir funció amb Enter
     document.getElementById('nova-funcio').addEventListener('keypress', function(e) {
@@ -949,10 +983,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Fer la crida AJAX per eliminar
            
-            fetch(`/empresa/oferta/${ofertaToDelete}/esborrar/`, {
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;   
+            fetch("{% url 'esborrar_oferta' oferta.id %}", {
                 method: 'POST',
                 headers: {
-                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-CSRFToken': csrftoken,
                     'Content-Type': 'application/json',
                 },
             })
@@ -960,9 +995,19 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     // Redirigir a la llista d'ofertes
-                    window.location.href = "{% url 'llista_ofertes_empresa' %}";
+                    if (typeof window.showSuccessToast === 'function') {
+                        showSuccessToast('Oferta esborrada!');
+                    }
+                    
+                    setTimeout(() => {
+                                window.location.href = "{% url 'llista_ofertes_empresa' %}";
+                    }, 2000); 
+                   
                 } else {
-                    alert(data.error || 'Error en eliminar l\'oferta');
+                    //alert(data.error || 'Error en eliminar l\'oferta');
+                    if (typeof window.showErrorToast === 'function') {
+                        showErrorToast('Error en eliminar l\'oferta.');
+                    }
                     button.innerHTML = originalText;
                     button.disabled = false;
                 }
@@ -970,7 +1015,10 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error de connexió');
+                
+                if (typeof window.showErrorToast === 'function') {
+                        showErrorToast('Error de connexió.');
+                }
                 button.innerHTML = originalText;
                 button.disabled = false;
             });
@@ -992,7 +1040,7 @@ document.addEventListener('DOMContentLoaded', function() {
 document.getElementById("ofertaForm").addEventListener("submit", async function(e) {
     e.preventDefault();
 
-    console.log('enviar per actualitzar')
+    
     const form = e.target;
     const formData = new FormData(form);
 
@@ -1010,6 +1058,7 @@ document.getElementById("ofertaForm").addEventListener("submit", async function(
         lloc_treball: formData.get("lloc_treball"),
         destinatari: formData.get("destinatari"),
         experiencia: formData.get("experiencia"),
+        requisits: formData.get("requisits"),
         visible: formData.get("visible") === "on",
         cicles: cicles_seleccionats.map(c => c.id), 
         capacitats_clau: capacitats_clau_seleccionades.map(c => c.id), 
@@ -1018,8 +1067,8 @@ document.getElementById("ofertaForm").addEventListener("submit", async function(
     };
 
     try {
-       const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-       const resposta = await fetch(`/api/empresa/oferta/${ofertaId}/`, {
+       const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;       
+       const resposta = await fetch("{% url 'api_actualitzar_oferta' oferta.id %}", {
             method: "PUT", 
             headers: { "Content-Type": "application/json",
                       'X-CSRFToken': csrftoken,
@@ -1028,8 +1077,6 @@ document.getElementById("ofertaForm").addEventListener("submit", async function(
         });
 
         const resultat = await resposta.json();
-
-
         const cont = document.getElementById("api-missatges");
         cont.innerHTML = "";
 
@@ -1040,9 +1087,10 @@ document.getElementById("ofertaForm").addEventListener("submit", async function(
 
         if (resultat.success) {
             
-            cont.innerHTML = `<div class="alert alert-success">${resultat.message}</div>`;
-            // form.reset();
-
+            //cont.innerHTML = `<div class="alert alert-success">${resultat.message}</div>`;
+           if (typeof window.showSuccessToast === 'function') {
+                        showSuccessToast('Oferta actualitzada correctament!');
+           }
 
         } else {
             const errors = resultat.errors;
@@ -1051,17 +1099,23 @@ document.getElementById("ofertaForm").addEventListener("submit", async function(
                 const input = form.querySelector(`[name="${camp}"]`);
                 const errorDiv = document.getElementById(`error-${camp}`);
 
-                console.log(errorDiv)
+                
 
                 if (input) input.classList.add('is-invalid');
                 if (errorDiv) errorDiv.innerText = missatge;
             }
 
-            cont.innerHTML = `<div class="alert alert-danger">Hi ha errors en el formulari.</div>`;
+            //cont.innerHTML = `<div class="alert alert-danger">Hi ha errors en el formulari.</div>`;
+            if (typeof window.showErrorToast === 'function') {
+                        showErrorToast('Hi ha errors en el formulari. Revisa les dades.');
+            }
         }
 
     } catch (error) {
-        document.getElementById("api-missatges").innerHTML = `<div class="alert alert-danger">Error de connexió amb el servidor.</div>`;
+        //document.getElementById("api-missatges").innerHTML = `<div class="alert alert-danger">Error de connexió amb el servidor.</div>`;
+         if (typeof window.showErrorToast === 'function') {
+                        showErrorToast('Error de connexió amb el servidor.');
+            }
     }
 });
 
@@ -1076,30 +1130,43 @@ document.getElementById("ofertaForm").addEventListener("submit", async function(
     });
 
 
-    function toggleVisibilitat(ofertaId) {
+    function toggleVisibilitat(ofertaId, el) {
         // Mostrar loading
-        const button = event.target.closest('a');
+        //const button = event.target.closest('a');
+        const button = el.closest('a');
         const originalText = button.innerHTML;
         button.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Processant...';
         button.classList.add('disabled');
         
-        fetch(`/empresa/oferta/${ofertaId}/toggle-visibilitat/`, {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; 
+        //   
+        fetch("{% url 'toggle_visibilitat_oferta' oferta.id %}", {
             method: 'POST',
             headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
+                'X-CSRFToken': csrftoken,
                 'Content-Type': 'application/json',
             },
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Mostrar missatge d'èxit
+                 // Actualitzar el botó
+                const nouText = data.visible
+                    ? '<i class="bi bi-eye-slash me-2"></i>Ocultar l\'oferta'
+                    : '<i class="bi bi-eye me-2"></i>Fer visible l\'oferta';
+                button.innerHTML = nouText;
+                button.classList.remove('disabled');
+
+                // Actualitzar estat del div
+                const estatDiv = document.getElementById(`estat-oferta`);
+                if (estatDiv) {
+                    estatDiv.innerHTML = data.visible
+                        ? `<span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle me-1"></i>Visible</span>`
+                        : `<span class="badge bg-secondary-subtle text-secondary"><i class="bi bi-eye-slash me-1"></i>Oculta</span>`;
+                }
+
                 showToast(data.message, 'success');
-                
-                // Recarregar la pàgina per actualitzar l'estat
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
+
             } else {
                 showToast(data.error || 'Error en canviar la visibilitat', 'error');
                 button.innerHTML = originalText;
@@ -1114,61 +1181,9 @@ document.getElementById("ofertaForm").addEventListener("submit", async function(
         });
     }
     
-    function showToast(message, type = 'info') {
-        // Crear toast notification
-        const toastContainer = document.getElementById('toastContainer') || createToastContainer();
-        
-        const toastId = 'toast-' + Date.now();
-        const bgClass = type === 'success' ? 'bg-success' : type === 'error' ? 'bg-danger' : 'bg-info';
-        
-        const toastHTML = `
-            <div id="${toastId}" class="toast align-items-center text-white ${bgClass} border-0" role="alert">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
-                        ${message}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                </div>
-            </div>
-        `;
-        
-        toastContainer.insertAdjacentHTML('beforeend', toastHTML);
-        
-        const toastElement = document.getElementById(toastId);
-        const toast = new bootstrap.Toast(toastElement, { delay: 4000 });
-        toast.show();
-        
-        // Eliminar el toast del DOM després que es tanqui
-        toastElement.addEventListener('hidden.bs.toast', () => {
-            toastElement.remove();
-        });
-    }
+   
+
     
-    function createToastContainer() {
-        const container = document.createElement('div');
-        container.id = 'toastContainer';
-        container.className = 'toast-container position-fixed top-0 end-0 p-3';
-        container.style.zIndex = '1055';
-        document.body.appendChild(container);
-        return container;
-    }
-
-     function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
 
     function confirmarEliminacio(ofertaId) {
         ofertaToDelete = ofertaId;

@@ -295,7 +295,43 @@ body {
         z-index: 1020;
     }
     
+
+    /* Estil per al text informatiu del dropdown */
+    .dropdown-item-text {
+        padding: 0.375rem 1rem;
+        font-size: 0.875rem;
+        font-style: italic;
+    }
+
+    /* Estil per destacar el nombre de candidatures */
+    .dropdown-item:has(.bi-people) {
+        font-weight: 500;
+    }
    
+    .alert-info-small {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    padding: 0.75rem 1rem;
+    }
+
+    .alert-info-small .alert-icon {
+        flex-shrink: 0;
+        margin-top: 0.1rem;
+        color: #0ea5e9;
+    }
+
+    .alert-info-small .alert-content {
+        flex-grow: 1;
+    }
+
+    .alert-info-small .alert-content p {
+        margin-bottom: 0.5rem;
+        line-height: 1.4;
+    }
+
+    .alert-info-small .alert-content p:last-child {
+        margin-bottom: 0;
+    }
 
     
 @media (max-width: 768px) {

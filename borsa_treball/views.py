@@ -388,14 +388,12 @@ def registre_empresa(request):
                 sector=sector,
                 telefon=telefon
             )
-            
-            print(empresa.usuari.id)
+                                    
 
             # Registrar al log d'auditoria (opcional, si el teu model ho permet)
             RegistreAuditoria.objects.create(
                 accio="Alta Empresa",
-                model_afectat="Empresa",
-                #objecte_id=empresa.id,
+                model_afectat="Empresa",               
                 descripcio=f"Nova empresa registrada: {nom_comercial} ({cif})",
                 usuari=user # L'usuari que s'acaba de crear
             )

@@ -13,29 +13,23 @@
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <div class="d-flex align-items-center mb-3">
-                            <div class="me-3">
-                                <i class="bi bi-briefcase-fill text-primary" style="font-size: 2.5rem;"></i>
-                            </div>
+                            
                             <div>
                                 <h2 class="h4 text-dark mb-1">{{ oferta.titol }}</h2>
+                                <small class="text-muted">{{ oferta.descripcio }}</small>
                                 <div class="d-flex align-items-center text-muted">
                                     <i class="bi bi-geo-alt me-2"></i>
                                     <span>{{ oferta.lloc_treball }}</span>
                                     <span class="mx-2">•</span>
                                     <i class="bi bi-calendar-event me-2"></i>
-                                    <span>Publicada {{ oferta.data_publicacio|timesince }} enrere</span>
+                                    <span>Publicada {{ oferta.data_publicacio}}</span>
                                 </div>
                             </div>
                         </div>
                         
                         <!-- Badges d'informació -->
                         <div class="d-flex flex-wrap align-items-center">
-                            <span class="badge bg-primary me-2 mb-2">
-                                {{ oferta.get_tipus_contracte_display }}
-                            </span>
-                            <span class="badge bg-secondary me-2 mb-2">
-                                {{ oferta.get_jornada_display }}
-                            </span>
+                            
                             {% if dies_restants > 0 %}
                             <span class="badge bg-{% if dies_restants <= 7 %}danger{% elif dies_restants <= 14 %}warning{% else %}success{% endif %} me-2 mb-2">
                                 <i class="bi bi-clock me-1"></i>
@@ -127,11 +121,11 @@
                     </div>
                     
                     <div class="col-md-3">
-                        <button type="submit" class="btn btn-primary me-2">
-                            <i class="bi bi-funnel me-2"></i>Filtrar
+                        <button type="submit" class="btn btn-primary w-50 rounded-pill" title="Aplicar filtres">
+                            <i class="bi bi-funnel me-2"></i>
                         </button>
-                        <a href="{% url 'llista_candidatures_oferta' oferta.id %}" class="btn btn-outline-secondary">
-                            <i class="bi bi-x-lg me-2"></i>Netejar
+                        <a href="{% url 'llista_candidatures_oferta' oferta.id %}" class="btn btn-outline-secondary btn-sm ms-2" title="Netejar filtres">
+                            <i class="bi bi-arrow-clockwise"></i>
                         </a>
                     </div>
                     
@@ -274,7 +268,7 @@
                     </a>
                     {% else %}
                     <p class="text-muted">Encara no hi ha candidatures per aquesta oferta.</p>
-                    <a href="{% url 'detall_oferta' oferta.id %}" class="btn btn-outline-primary">
+                    <a href="{% url 'editar_oferta' oferta.id %}" class="btn btn-outline-primary">
                         <i class="bi bi-arrow-left me-2"></i>Tornar a l'oferta
                     </a>
                     {% endif %}

@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %}
 
 {% block title %}Les Meves Ofertes - Borsa de Treball{% endblock %}
@@ -189,14 +190,18 @@
 
                             <!-- Estadístiques -->
                             <div class="row text-center mb-3">
-                                <div class="col-6">
+                                <div class="col-4">
+                                    
+                                </div>
+
+                                 <div class="col-4">
                                     <div class="border-end">
-                                        <h6 class="text-primary mb-0">{{ oferta.candidatures_count }}</h6>
+                                         <h6 class="text-primary mb-0">{{ oferta.candidatures_count }}</h6>
                                         <small class="text-muted">Candidatures</small>
                                     </div>
                                 </div>
                                
-                                <div class="col-6">
+                                <div class="col-4">
                                     <h6 class="text-info mb-0">
                                         {% now "Y-m-d" as today %}
                                         {% if oferta.data_limit|date:"Y-m-d" >= today %}
@@ -233,7 +238,7 @@
                                     {% endif %}
                                 </div>
                                 <div>
-                                    {% if oferta.candidatures.count > 0 %}
+                                    {% if oferta.candidatures_count > 0 %}
                                     <a href="{% url 'llista_candidatures_oferta' oferta.id %}" class="btn btn-outline-primary btn-sm me-2 rounded-pill">
                                         <i class="bi bi-people"></i>
                                         <span class="d-none d-lg-inline ms-1">Candidatures</span>                                        

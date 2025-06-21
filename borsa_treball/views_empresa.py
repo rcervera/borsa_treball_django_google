@@ -1,27 +1,45 @@
 
+# Imports estàndard de Python
+import json
 import mimetypes
 import os
-from django.forms import ValidationError
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from .models import Candidatura, EstatCandidatura, Oferta, Empresa, Cicle, CapacitatClau,Funcio, Sector, Usuari, NivellIdioma, FamiliaProfessional
-
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Q, Count
-from django.utils import timezone
+import re
 from datetime import datetime, timedelta
-from django.http import Http404, HttpResponse, JsonResponse
-from django.views.decorators.http import require_http_methods
-from django.contrib import messages
-from django.contrib.auth.forms import PasswordChangeForm
-from django.core.validators import validate_email
-from django.contrib.auth import update_session_auth_hash
-from django.views.decorators.http import require_POST
-from django.db.models import Prefetch
 
-from django.views.decorators.csrf import csrf_exempt
+# Imports de Django - Core
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.validators import validate_email
+from django.db import transaction
+from django.db.models import Q, Count, Prefetch
+from django.http import Http404, HttpResponse, JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
 from django.utils.dateparse import parse_date
-import json
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods, require_POST
+
+# Imports locals
+from .models import (
+    Candidatura, 
+    EstatCandidatura, 
+    Oferta, 
+    Empresa, 
+    Cicle, 
+    CapacitatClau,
+    Funcio, 
+    Sector, 
+    Usuari, 
+    NivellIdioma, 
+    FamiliaProfessional, 
+    RegistreAuditoria
+)
+
+ 
 
 # --------------------------------------------------------------------------------------------
 # OFERTA
@@ -86,6 +104,27 @@ def afegir_oferta(request):
 #
 
 
+def validar_data(data_limit):
+    """Valida el camp data_limit amb múltiples formats acceptats"""
+    
+    if not data_limit or data_limit.strip() == "":
+        return "La data límit és obligatòria."
+    
+    # Formats acceptats
+    formats = ['%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y', '%Y/%m/%d']
+    
+    for format_str in formats:
+        try:
+            datetime.strptime(data_limit.strip(), format_str)
+            return None  # Data vàlida
+        except ValueError:
+            continue
+    
+    return "El format de la data no és vàlid. Utilitza DD/MM/YYYY, YYYY-MM-DD, DD-MM-YYYY o YYYY/MM/DD."
+
+
+
+@login_required
 @require_POST
 def crear_oferta_api(request):
     try:
@@ -100,23 +139,25 @@ def crear_oferta_api(request):
 
     errors = {}
 
+    # Validacions amb variables locals
     titol = data.get('titol', '').strip()
     if not titol:
         errors['titol'] = "El títol és obligatori."
 
     data_limit = data.get('data_limit')
-    if not data_limit:
-        errors['data_limit'] = "La data límit és obligatòria."
+    error_data = validar_data(data_limit)  
+    if error_data:
+        errors['data_limit'] = error_data
 
     descripcio = data.get('descripcio', '').strip()
     if not descripcio:
         errors['descripcio'] = "La descripció és obligatòria."
 
-    tipus_contracte = data.get('tipus_contracte')
+    tipus_contracte = data.get('tipus_contracte', '').strip()
     if not tipus_contracte:
         errors['tipus_contracte'] = "Tipus de contracte obligatori."
 
-    jornada = data.get('jornada')
+    jornada = data.get('jornada', '').strip()
     if not jornada:
         errors['jornada'] = "Jornada obligatòria."
 
@@ -124,8 +165,13 @@ def crear_oferta_api(request):
     if not lloc_treball:
         errors['lloc_treball'] = "Lloc de treball obligatori."
 
-    destinatari = data.get('destinatari', 'AMB')
-    experiencia = data.get('experiencia')
+    # Variables per camps opcionals
+    destinatari = data.get('destinatari', 'AMB').strip()
+    experiencia = data.get('experiencia', '').strip()
+    requisits = data.get('requisits', '').strip()
+    horari = data.get('horari', '').strip()
+    salari = data.get('salari', '').strip()
+    visible = data.get('visible', True)
 
     # Validació numero_vacants
     numero_vacants = data.get('numero_vacants')
@@ -154,55 +200,100 @@ def crear_oferta_api(request):
             except ValueError:
                 errors['hores'] = "El valor d'hores ha de ser un número enter."
 
+    # Validació cicles amb verificació d'existència
     cicles_ids = data.get('cicles', [])
     if not cicles_ids:
         errors['cicles'] = "Has de seleccionar almenys un cicle."
+    else:
+        try:
+            cicles_existents = Cicle.objects.filter(id__in=cicles_ids).count()
+            if cicles_existents != len(cicles_ids):
+                errors['cicles'] = "Alguns cicles seleccionats no existeixen."
+        except Exception as e:
+            errors['cicles'] = "Error validant els cicles seleccionats."
+
+    # Validació capacitats clau amb verificació d'existència
+    capacitats_ids = data.get('capacitats_clau', [])
+    if capacitats_ids:
+        try:
+            capacitats_existents = CapacitatClau.objects.filter(id__in=capacitats_ids).count()
+            if capacitats_existents != len(capacitats_ids):
+                errors['capacitats_clau'] = "Algunes capacitats seleccionades no existeixen."
+        except Exception as e:
+            errors['capacitats_clau'] = "Error validant les capacitats seleccionades."
 
     if errors:
         return JsonResponse({'success': False, 'errors': errors}, status=400)
 
-    empresa = Empresa.objects.filter(usuari=request.user).first()
-    if not empresa:
-        return JsonResponse({'success': False, 'errors': {'global': 'Usuari no vàlid o no és una empresa'}}, status=403)
+   
+    # Creació amb transacció
+    try:
+        with transaction.atomic():
+            # Crear oferta amb variables validades
+            oferta = Oferta.objects.create(
+                empresa=empresa,
+                titol=titol,
+                descripcio=descripcio,
+                data_limit=parse_date(data_limit) if data_limit and data_limit.strip() else None,
+                tipus_contracte=tipus_contracte,
+                jornada=jornada,
+                hores_setmanals=hores_valor,  
+                horari=horari,
+                salari=salari,
+                numero_vacants = vacants_valor,
+                requisits=requisits,
+                lloc_treball=lloc_treball,
+                contacte_nom=empresa.nom_comercial,
+                contacte_email=request.user.email,
+                contacte_telefon=empresa.telefon or '',
+                public_destinatari=destinatari,
+                experiencia=experiencia,
+                visible=visible,
+            )
 
-    oferta = Oferta.objects.create(
-        empresa=empresa,
-        titol=titol,
-        descripcio=descripcio,
-        data_limit=parse_date(data_limit),
-        tipus_contracte=tipus_contracte,
-        jornada=jornada,
-        hores_setmanals=hores_valor,
-        horari=data.get('horari', ''),
-        salari=data.get('salari', ''),
-        requisits='',
-        lloc_treball=lloc_treball,
-        contacte_nom=empresa.nom_comercial,
-        contacte_email=request.user.email,
-        contacte_telefon=empresa.telefon or '',
-        public_destinatari=destinatari,
-        experiencia=experiencia,
-        visible=data.get('visible', True),
-    )
+            # Validació del model abans de continuar
+            oferta.full_clean()
 
-    # Relacions many-to-many
-    oferta.cicles.set(Cicle.objects.filter(id__in=cicles_ids))
+            # Relacions many-to-many amb variables validades
+            oferta.cicles.set(cicles_ids)  
+            if capacitats_ids:
+                oferta.capacitats_clau.set(capacitats_ids)  
 
-    capacitats_ids = data.get('capacitats_clau', [])
-    if capacitats_ids:
-        oferta.capacitats_clau.set(CapacitatClau.objects.filter(id__in=capacitats_ids))
+            # Crear funcions
+            for ordre, desc in enumerate(data.get('funcions', []), start=1):
+                if desc.strip():
+                    Funcio.objects.create(oferta=oferta, descripcio=desc.strip(), ordre=ordre)
 
-    for ordre, desc in enumerate(data.get('funcions', []), start=1):
-        if desc.strip():
-            Funcio.objects.create(oferta=oferta, descripcio=desc.strip(), ordre=ordre)
+            # Crear idiomes
+            for idioma in data.get('idiomes', []):
+                nom = idioma.get('nom', '').strip()
+                nivell = idioma.get('nivell', '').strip()
+                if nom and nivell:
+                    NivellIdioma.objects.create(oferta=oferta, idioma=nom, nivell=nivell)
 
-    for idioma in data.get('idiomes', []):
-        nom = idioma.get('nom', '').strip()
-        nivell = idioma.get('nivell', '').strip()
-        if nom and nivell:
-            NivellIdioma.objects.create(oferta=oferta, idioma=nom, nivell=nivell)
+            # Log audit 
+            RegistreAuditoria.objects.create(
+                accio="Nova oferta",
+                model_afectat="Oferta",
+                descripcio=f"Oferta {oferta.titol} (Empresa: {oferta.empresa.nom_comercial} {oferta.empresa.cif}).",
+                usuari=request.user
+            )
+
+    except ValidationError as e:
+        return JsonResponse({
+            'success': False, 
+            'message': 'Error de validació del model',
+            'errors': e.message_dict if hasattr(e, 'message_dict') else {'general': str(e)}
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'success': False, 
+            'message': 'Error creant l\'oferta'
+        }, status=500)
 
     return JsonResponse({'success': True, 'message': 'Oferta creada correctament'})
+
+
 
 #
 # LLISTA OFERTES
@@ -351,9 +442,24 @@ def toggle_visibilitat_oferta(request, oferta_id):
             'error': 'No tens permisos per realitzar aquesta acció.'
         }, status=403)
     
-    oferta = get_object_or_404(Oferta, id=oferta_id, empresa=empresa)
     
     try:
+        oferta = Oferta.objects.get(id=oferta_id, empresa=empresa)
+    except Oferta.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Oferta no trobada'}, status=404)
+    
+    try:
+        # Verificar que l'oferta no té candidatures
+        nombre_candidatures = oferta.candidatures.count()
+        if nombre_candidatures > 0:
+            return JsonResponse({
+                'success': False,
+                'message': f'No es pot canviar l\'estat de l\'oferta perquè té {nombre_candidatures} candidatura{"s" if nombre_candidatures != 1 else ""} associada{"s" if nombre_candidatures != 1 else ""}.',
+                'error_type': 'candidatures_existents',
+                'candidatures_count': nombre_candidatures
+            }, status=400)
+        
+
         # Canviar la visibilitat
         oferta.visible = not oferta.visible
         oferta.save()
@@ -395,9 +501,23 @@ def esborrar_oferta(request, oferta_id):
         }, status=403)
     
     # Obtenir l'oferta i verificar que pertany a l'empresa de l'usuari
-    oferta = get_object_or_404(Oferta, id=oferta_id, empresa=empresa)
+    try:
+        oferta = Oferta.objects.get(id=oferta_id, empresa=empresa)
+    except Oferta.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Oferta no trobada'}, status=404)
     
     try:
+        # Verificar que l'oferta no té candidatures
+        nombre_candidatures = oferta.candidatures.count()
+        if nombre_candidatures > 0:
+            return JsonResponse({
+                'success': False,
+                'message': f'No es pot eliminar l\'oferta perquè té {nombre_candidatures} candidatura{"s" if nombre_candidatures != 1 else ""} associada{"s" if nombre_candidatures != 1 else ""}.',
+                'error_type': 'candidatures_existents',
+                'candidatures_count': nombre_candidatures
+            }, status=400)
+        
+
         # Guardar informació de l'oferta abans d'esborrar-la
         oferta_info = {
             'id': oferta.id,
@@ -432,11 +552,18 @@ def editar_oferta(request, oferta_id):
         messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
         return redirect('index')
 
-    oferta = get_object_or_404(Oferta, id=oferta_id, empresa=empresa)
+    # oferta = get_object_or_404(Oferta, id=oferta_id, empresa=empresa)
+    oferta = get_object_or_404(
+        Oferta.objects.annotate(
+            candidatures_count=Count('candidatures', filter=Q(candidatures__activa=True))
+        ),
+        id=oferta_id, 
+        empresa=empresa
+    )
 
     familias = FamiliaProfessional.objects.order_by('nom').prefetch_related(
         Prefetch(
-            'cicle_set',  # El 'related_name' per defecte si no l'has definit explícitament a ForeignKey
+            'cicle_set',  
             queryset=Cicle.objects.order_by('nom'),
             to_attr='cicles_de_la_familia' # Nom de l'atribut que contindrà els cicles per a cada família
         )
@@ -482,6 +609,7 @@ def editar_oferta(request, oferta_id):
         if capacitat.id not in capacitats_existents_ids
     ]
 
+    
     context = {
         'oferta': oferta,
         'cicles': Cicle.objects.all(),
@@ -509,7 +637,6 @@ def editar_oferta(request, oferta_id):
 
     return render(request, 'borsa_treball/editar_oferta_empresa.html', context)
 
-# EDITAR OFERTA:  API
 
 @require_http_methods(["PUT"])
 @login_required
@@ -529,53 +656,163 @@ def api_actualitzar_oferta(request, oferta_id):
     except json.JSONDecodeError:
         return JsonResponse({'success': False, 'message': 'Dades JSON no vàlides'}, status=400)
 
-    # Assignació bàsica de camps
-    oferta.titol = data.get("titol", "")
-    oferta.data_limit = data.get("data_limit") or None
-    oferta.numero_vacants = data.get("numero_vacants", 1)
-    oferta.descripcio = data.get("descripcio", "")
-    oferta.tipus_contracte = data.get("tipus_contracte", "")
-    oferta.jornada = data.get("jornada", "")
-    oferta.hores = data.get("hores") or None
-    oferta.horari = data.get("horari", "")
-    oferta.salari = data.get("salari", "")
-    oferta.lloc_treball = data.get("lloc_treball", "")
-    oferta.destinatari = data.get("destinatari", "")
-    oferta.experiencia = data.get("experiencia", "")
-    oferta.visible = data.get("visible", False)
+    # Validar camps
+    errors = {}
+    
+    # Validació títol
+    titol = data.get('titol', '').strip()
+    if not titol:
+        errors['titol'] = "El títol és obligatori."
 
-    oferta.save()
+    # Validació data límit
+    data_limit = data.get('data_limit')
+    error_data = validar_data(data_limit)  
+    if error_data:
+        errors['data_limit'] = error_data
 
-   
-    # Eliminar funcions antigues
-    oferta.funcions.all().delete()
-    # Afegir funcions noves
-    for descripcio in data.get("funcions", []):
-        Funcio.objects.create(oferta=oferta, descripcio=descripcio)
+    # Validació descripció
+    descripcio = data.get('descripcio', '').strip()
+    if not descripcio:
+        errors['descripcio'] = "La descripció és obligatòria."
 
+    # Validació tipus contracte
+    tipus_contracte = data.get('tipus_contracte', '').strip()
+    if not tipus_contracte:
+        errors['tipus_contracte'] = "Tipus de contracte obligatori."
 
-    oferta.cicles.set(data.get("cicles", []))
-    oferta.capacitats_clau.set(data.get("capacitats_clau", []))
+    # Validació jornada
+    jornada = data.get('jornada', '').strip()
+    if not jornada:
+        errors['jornada'] = "Jornada obligatòria."
 
-    oferta.idiomes.all().delete()
-    for idioma in data.get("idiomes", []):
-        oferta.idiomes.create(idioma=idioma.get("idioma", ""), nivell=idioma.get("nivell", ""))
+    # Validació lloc treball
+    lloc_treball = data.get('lloc_treball', '').strip()
+    if not lloc_treball:
+        errors['lloc_treball'] = "Lloc de treball obligatori."
 
+    
 
+    # Camps opcionals amb validació de format
+    destinatari = data.get('destinatari', 'AMB').strip()
+    experiencia = data.get('experiencia', '').strip()
+    requisits = data.get('requisits', '').strip()
+    horari = data.get('horari', '').strip()
+    salari = data.get('salari', '').strip()
+
+    # Validació numero_vacants
+    numero_vacants = data.get('numero_vacants')
+    vacants_valor = None
+    if numero_vacants is None or str(numero_vacants).strip() == '':
+        errors['numero_vacants'] = "Cal indicar el nombre de vacants."
+    else:
+        try:
+            vacants_valor = int(numero_vacants)
+            if vacants_valor <= 0:
+                errors['numero_vacants'] = "El nombre de vacants ha de ser positiu."
+        except ValueError:
+            errors['numero_vacants'] = "El valor ha de ser un número enter."
+
+    # Validació hores si jornada parcial
+    hores = data.get('hores')
+    hores_valor = None
+    if jornada == 'PA':
+        if hores is None or str(hores).strip() == '':
+            errors['hores'] = "Has d'indicar el nombre d'hores si la jornada és parcial."
+        else:
+            try:
+                hores_valor = int(hores)
+                if hores_valor <= 0:
+                    errors['hores'] = "El nombre d'hores ha de ser positiu."
+            except ValueError:
+                errors['hores'] = "El valor d'hores ha de ser un número enter."
+
+    
+    # Validació cicles amb verificació d'existència
+    cicles_ids = data.get('cicles', [])
+    if not cicles_ids:
+        errors['cicles'] = "Has de seleccionar almenys un cicle."
+    else:
+        try:
+            # Verificar que tots els cicles existeixen
+            cicles_existents = Cicle.objects.filter(id__in=cicles_ids).count()
+            if cicles_existents != len(cicles_ids):
+                errors['cicles'] = "Alguns cicles seleccionats no existeixen."
+        except Exception as e:
+            errors['cicles'] = "Error validant els cicles seleccionats."
+
+    capacitats_ids = data.get('capacitats_clau', [])
+    if capacitats_ids:
+        try:
+            capacitats_existents = CapacitatClau.objects.filter(id__in=capacitats_ids).count()
+            if capacitats_existents != len(capacitats_ids):
+                errors['capacitats_clau'] = "Algunes capacitats seleccionades no existeixen."
+        except Exception as e:
+            errors['capacitats_clau'] = "Error validant les capacitats seleccionades."
+
+    
+
+    if errors:
+        return JsonResponse({'success': False, 'errors': errors}, status=400)
+
+    # Actualització amb transacció
+    try:
+        with transaction.atomic():
+            # ASSIGNACIÓ VALORS VALIDATS
+            oferta.titol = titol
+            oferta.data_limit = data_limit if data_limit and data_limit.strip() else None
+            oferta.numero_vacants = vacants_valor  
+            oferta.descripcio = descripcio
+            oferta.tipus_contracte = tipus_contracte
+            oferta.jornada = jornada
+            oferta.hores = hores_valor  
+            oferta.horari = horari
+            oferta.salari = salari
+            oferta.requisits = requisits
+            oferta.lloc_treball = lloc_treball
+            oferta.public_destinatari = destinatari
+            oferta.experiencia = experiencia                     
+            oferta.numero_vacants = vacants_valor
+
+            # Validació del model abans de desar
+            oferta.full_clean()
+            oferta.save()
+
+            # Eliminar funcions antigues i afegir noves
+            oferta.funcions.all().delete()
+            for descripcio_funcio in data.get("funcions", []):
+                if descripcio_funcio.strip():  # Validar que no sigui buit
+                    Funcio.objects.create(oferta=oferta, descripcio=descripcio_funcio.strip())
+
+            # Actualitzar relacions many-to-many
+            oferta.cicles.set(cicles_ids)
+            oferta.capacitats_clau.set(capacitats_ids)
+
+            # Eliminar idiomes antics i afegir nous
+            oferta.idiomes.all().delete()
+            for idioma_data in data.get("idiomes", []):
+                idioma_nom = idioma_data.get("idioma", "").strip()
+                nivell = idioma_data.get("nivell", "").strip()
+                if idioma_nom and nivell:  # Validar que no siguin buits
+                    oferta.idiomes.create(idioma=idioma_nom, nivell=nivell)
+
+    except ValidationError as e:
+        return JsonResponse({
+            'success': False, 
+            'message': 'Error de validació de dades del model Oferta',
+            'errors': e.message_dict if hasattr(e, 'message_dict') else {'general': str(e)}
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'success': False, 
+            'message': 'Error actualitzant l\'oferta'
+        }, status=500)
+    
     return JsonResponse({'success': True, 'message': 'Oferta actualitzada correctament'})
 
 
-
-#
+# -----------------------------------------------------------------------------------------------------
 # EDITAR PERFIL 
-#
-
-
-from django.contrib.auth import update_session_auth_hash
-from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
-import re
-
+# -----------------------------------------------------------------------------------------------------
 
 @login_required
 def editar_perfil_empresa(request):
@@ -613,70 +850,19 @@ def api_canviar_contrasenya(request):
         # Important: actualitza el hash de sessió per evitar que l'usuari es desconnecti
         update_session_auth_hash(request, user)
         return JsonResponse({'success': True, 'message': "Contrasenya canviada correctament."})
-    else:
-        # Si el formulari no és vàlid, capturem els errors per camp.
-        # form.errors és un diccionari amb els errors.
-        # Per exemple: {'old_password': ['Contrasenya incorrecta.'], 'new_password1': ['Aquesta contrasenya és massa curta.']}
-        
-        # Convertim els errors del formulari a un format que el JS pugui processar fàcilment.
-        # El diccionari form.errors ja fa la feina, només cal assegurar-se que els valors són llistes de strings.
-        
-        # PasswordChangeForm té els camps: old_password, new_password1, new_password2
-        # Els errors per camp seran accessibles directament.
-        
-        # Si vols ser més explícit i retornar només els camps que et surten a la plantilla:
+    else:              
+       
         specific_errors = {}
         if 'old_password' in form.errors:
             specific_errors['old_password'] = form.errors['old_password']
         if 'new_password1' in form.errors:
             specific_errors['new_password1'] = form.errors['new_password1']
         if 'new_password2' in form.errors:
-            specific_errors['new_password2'] = form.errors['new_password2']
+            specific_errors['new_password2'] = form.errors['new_password2']        
         
-        # En comptes de specific_errors, pots enviar directament form.errors si el teu JS pot manejar-ho.
-        # Per simplicitat i compatibilitat amb el que ja tenies, specific_errors és més segur.
         return JsonResponse({'success': False, 'errors': specific_errors})
 
-
-
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from django.contrib import messages
-from django.contrib.auth import update_session_auth_hash
-from django.core.exceptions import ValidationError
-from django.core.validators import validate_email 
-import re 
-import json 
-
-# Importa els teus models
-from .models import Empresa, Usuari, Sector # Assegura't que Usuari i Sector estan correctament importats
-
-
-# --- Vista original (renderitza el template) ---
-@login_required
-def editar_perfil_empresa(request):
-    """
-    Vista per editar el perfil de l'empresa i l'usuari associat.
-    Aquesta vista només renderitza el template amb les dades inicials.
-    Els enviaments dels formularis es gestionaran per les vistes API.
-    """
-    try:
-        empresa = request.user.empresa
-    except Empresa.DoesNotExist:
-        messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
-        return redirect('index') 
-    
-    context = {
-        'empresa': empresa,
-        'user': request.user,
-        'sectors': Sector.objects.all().order_by('nom'),
-    }
-    return render(request, 'borsa_treball/editar_perfil_empresa.html', context)
-
-
-# --- NOVA VISTA API per la informació de l'Empresa (Validació manual) ---
+# API per modificar informació de l'Empresa
 @require_POST
 @login_required
 def api_editar_perfil_empresa(request):
@@ -690,8 +876,7 @@ def api_editar_perfil_empresa(request):
         return JsonResponse({'success': False, 'message': 'Empresa no trobada.'}, status=404)
 
     errors = {} # Diccionari per emmagatzemar errors per camp
-
-    # Neteja i validació dels camps de l'Empresa, basats EXACTAMENT en el teu MODEL DEFINITIU
+   
     nom_comercial = request.POST.get('nom_comercial', '').strip()
     if not nom_comercial:
         errors.setdefault('nom_comercial', []).append('El nom comercial és obligatori.')
@@ -778,7 +963,7 @@ def api_editar_perfil_empresa(request):
         return JsonResponse({'success': False, 'message': f'Error en guardar la informació de l\'empresa: {str(e)}'}, status=500)
 
 
-# --- NOVA VISTA API per la informació del Contacte (Usuari) (Validació manual) ---
+# API canviar la informació del Contacte (Usuari) 
 @require_POST
 @login_required
 def api_editar_perfil_usuari(request):
@@ -813,16 +998,7 @@ def api_editar_perfil_usuari(request):
         return JsonResponse({'success': False, 'message': f'Error en guardar la informació de contacte: {str(e)}'}, status=500)
 
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from django.contrib import messages
-from django.contrib.auth import update_session_auth_hash, logout # Importa logout
-from django.core.exceptions import ValidationError 
-from django.core.validators import validate_email 
-import re 
-import json 
+
 
 @require_POST # Assegura que només s'acceptin peticions POST
 @login_required
@@ -834,10 +1010,7 @@ def eliminar_perfil_empresa(request):
     try:
         # Obtenim l'objecte Usuari de la sessió actual
         user_to_delete = request.user 
-        # Obtenim l'objecte Empresa associat a aquest usuari (si existeix)
-        # No cal comprovar Empresa.DoesNotExist aquí, ja que eliminar Usuari
-        # hauria de fer cascada l'eliminació d'Empresa si el OneToOneField és correcte.
-        # Si hi ha AttributeError, vol dir que no és un usuari amb empresa.
+       
         empresa_associada = user_to_delete.empresa 
     except (Empresa.DoesNotExist, AttributeError):
         # Si no hi ha empresa associada o l'usuari no és de tipus empresa
@@ -845,7 +1018,7 @@ def eliminar_perfil_empresa(request):
         return redirect('index') # O una altra pàgina adequada (ex: home de l'app)
 
     try:
-        # PRIMER: Tancar la sessió de l'usuari. És crucial fer-ho abans d'eliminar el compte.
+        # PRIMER: Tancar la sessió de l'usuari, abans d'eliminar el compte.
         logout(request) 
 
         # Ara, eliminem l'objecte Usuari.
@@ -1012,7 +1185,7 @@ def descarregar_cv_candidatura(request, candidatura_id):
         
     except Exception as e:
         messages.error(request, f'Error en descarregar el CV: {str(e)}')
-        return redirect('candidatures_oferta', oferta_id=candidatura.oferta.id)
+        return redirect('llista_candidatures_oferta', oferta_id=candidatura.oferta.id)
     
 
 

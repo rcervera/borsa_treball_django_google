@@ -270,8 +270,8 @@
                                                     </optgroup>
                                                 {% endfor %}
                                             </select>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="afegirCicle()">
-                                                <i class="bi bi-plus-lg"></i> Afegir
+                                            <button class="btn btn-warning" type="button" onclick="afegirCicle()">
+                                                <i class="bi bi-plus-lg"></i>
                                             </button>
                                         </div>
                                         <small class="text-muted mt-2 d-block">Selecciona un cicle per afegir-lo.</small>
@@ -302,8 +302,8 @@
                                                 <option value="{{ capacitat.id }}" data-nom="{{ capacitat.nom }}" data-categoria="{{ capacitat.categoria }}">{{ capacitat.nom }} ({{ capacitat.categoria }})</option>
                                                 {% endfor %}
                                             </select>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="afegirCapacitat()">
-                                                <i class="bi bi-plus-lg"></i> Afegir
+                                            <button class="btn btn-warning" type="button" onclick="afegirCapacitat()">
+                                                <i class="bi bi-plus-lg"></i>
                                             </button>
                                         </div>
                                         <small class="text-muted mt-2 d-block">Selecciona una capacitat per afegir-la.</small>
@@ -332,8 +332,8 @@
                                            id="nova-funcio" 
                                            class="form-control" 
                                            placeholder="Descripció de la funció (Ex: Desenvolupar aplicacions web amb React)">
-                                    <button class="btn btn-outline-secondary" type="button" onclick="afegirFuncio()">
-                                        <i class="bi bi-plus-lg"></i> Afegir
+                                    <button class="btn btn-warning" type="button" onclick="afegirFuncio()">
+                                        <i class="bi bi-plus-lg"></i>
                                     </button>
                                 </div>
                                 <small class="text-muted mt-2 d-block">Prem Enter o fes clic a "Afegir" per afegir una funció</small>
@@ -353,7 +353,7 @@
                         <div class="card border-dashed">
                             <div class="card-body">
                                 <div class="row g-2 align-items-end">
-                                    <div class="col-md-5">
+                                    <div class="col-md-6">
                                         <label for="idioma_nom" class="form-label">Idioma</label>
                                         <input type="text" id="idioma_nom" list="llista_idiomes" class="form-control" placeholder="Ex: Català">
                                         <datalist id="llista_idiomes">
@@ -376,9 +376,9 @@
                                             <option value="Nadiu">
                                         </datalist>
                                     </div>
-                                    <div class="col-md-2 text-end">
-                                        <button type="button" class="btn btn-outline-secondary w-100" onclick="afegirIdioma()">
-                                            <i class="bi bi-plus-lg me-1"></i> Afegir
+                                    <div class="col-md-1 text-end">
+                                        <button type="button" class="btn btn-warning w-100" onclick="afegirIdioma()">
+                                            <i class="bi bi-plus-lg me-1"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -407,7 +407,7 @@
                                             name="requisits" 
                                             rows="4" 
                                             placeholder="Escriu altres requisits necessaris per al lloc de treball..."
-                                            required></textarea>
+                                    ></textarea>
                                 </div>
                                 <div  id="error-requisits" class="error-validacio form-text text-danger"></div>
                             </div> 
@@ -856,6 +856,7 @@ document.getElementById("ofertaForm").addEventListener("submit", async function(
         lloc_treball: formData.get("lloc_treball"),
         destinatari: formData.get("destinatari"),
         experiencia: formData.get("experiencia"),
+        requisits: formData.get("requisits"),
         visible: formData.get("visible") === "on",
         cicles: cicles_seleccionats.map(c => c.id), 
         capacitats_clau: capacitats_clau_seleccionades.map(c => c.id), 
