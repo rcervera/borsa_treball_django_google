@@ -8,9 +8,6 @@ from django.db.models import Q, Count
 from django.utils import timezone
 from .models import Oferta, Empresa, Cicle, Candidatura, Estudiant, EstatCandidatura
 
-
-
-
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -18,7 +15,7 @@ from django.utils import timezone
 from datetime import datetime
 from django.core.paginator import Paginator
 
-from .models import Oferta, Empresa, Cicle, Funcio, NivellIdioma, CapacitatClau # Make sure you import Cicle
+from .models import Oferta, Empresa, Cicle, Funcio, NivellIdioma, CapacitatClau 
 
 
 def llista_ofertes_tauler(request):
@@ -354,52 +351,6 @@ def api_esborrar_estudi_estudiant(request, estudi_id):
         print(f"Error esborrant estudi: {e}")
         return JsonResponse({'success': False, 'message': 'Error intern del servidor al eliminar l\'estudi.'}, status=500)
 
-# Assumed existing canviar_contrasenya_api or similar
-# from django.contrib.auth import update_session_auth_hash # Needed if changing password logs user out
-
-# @login_required
-# @require_POST
-# def canviar_contrasenya_api(request):
-#     try:
-#         data = json.loads(request.body)
-#     except json.JSONDecodeError:
-#         return JsonResponse({'success': False, 'message': 'Dades de petició no vàlides (JSON mal format).'}, status=400)
-
-#     user = request.user
-#     old_password = data.get('old_password')
-#     new_password1 = data.get('new_password1')
-#     new_password2 = data.get('new_password2')
-
-#     errors = {}
-
-#     if not user.check_password(old_password):
-#         errors['old_password'] = ['La contrasenya actual no és correcta.']
-
-#     if new_password1 != new_password2:
-#         errors['new_password2'] = ['Les noves contrasenyes no coincideixen.']
-
-#     try:
-#         validate_password(new_password1, user=user)
-#     except ValidationError as e:
-#         errors['new_password1'] = list(e.messages)
-
-#     if errors:
-#         return JsonResponse({'success': False, 'message': 'Si us plau, corregeix els errors.', 'errors': errors}, status=400)
-
-#     try:
-#         user.set_password(new_password1)
-#         user.save()
-#         update_session_auth_hash(request, user) # To keep the user logged in
-#         RegistreAuditoria.objects.create(
-#             accio="Canvi Contrasenya",
-#             model_afectat="Usuari",
-#             descripcio=f"Usuari {user.email} ha canviat la seva contrasenya.",
-#             usuari=user
-#         )
-#         return JsonResponse({'success': True, 'message': 'La contrasenya s\'ha canviat correctament.'})
-#     except Exception as e:
-#         print(f"Error canviant contrasenya: {e}")
-#         return JsonResponse({'success': False, 'message': 'Error intern del servidor al canviar la contrasenya.'}, status=500)
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -903,14 +854,6 @@ def editar_candidatura_api(request, candidatura_id):
             {'error': 'No pots editar aquesta candidatura, ja no està en procés.'},
             status=400
         )
-
-    # Get data from JSON body for non-file fields or from request.POST for form data
-    # For file uploads, request.FILES should be used.
-    # Assuming content-type is application/json for non-file fields or multipart/form-data for files.
-
-    # When handling file uploads with other fields, you typically use FormData on the client-side,
-    # which results in a 'multipart/form-data' content type. In this case, request.POST and request.FILES
-    # are directly populated by Django.
 
     carta_presentacio = request.POST.get('carta_presentacio', '').strip()
     cv_adjunt = request.FILES.get('cv_adjunt')

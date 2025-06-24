@@ -1,10 +1,13 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.urls import reverse
 from .models import (
     Usuari, Sector, Empresa, FamiliaProfessional, Estudiant, Cicle,
     EstudiEstudiant, CapacitatClau, Funcio, Oferta, Candidatura,
     Noticia, RegistreAuditoria, NivellIdioma
 )
+
+from django.utils.html import format_html 
 
 class UsuariAdmin(UserAdmin):
     model = Usuari
@@ -101,11 +104,20 @@ class OfertaAdmin(admin.ModelAdmin):
     date_hierarchy = 'data_publicacio'
     autocomplete_fields = ['empresa']
 
+    # Afegir les candidatures com a inline
+    inlines = [CandidaturaInline]
+    
+    def nombre_candidatures(self, obj):
+        """Mostra el nombre total de candidatures"""
+        return obj.candidatures.count()
+    
+    nombre_candidatures.short_description = "Candidatures"
+
 from django.contrib import admin
 from .models import Candidatura
 
 class CandidaturaAdmin(admin.ModelAdmin):
-    list_display = ('empresa_nom', 'estudiant_nom', 'data_candidatura', 'estat', 'activa') 
+    list_display = ('empresa_nom', 'estudiant_nom', 'data_candidatura', 'estat', 'activa',  'cv_disponible', ) 
     list_filter = ('estat', 'activa', 'oferta__empresa__nom_comercial') 
    
     search_fields = (
@@ -119,6 +131,66 @@ class CandidaturaAdmin(admin.ModelAdmin):
     list_per_page = 20  
     list_max_show_all = 200
 
+
+    readonly_fields = (
+        'data_candidatura', 
+        'data_canvi_estat', 
+        'descarregar_cv_admin',  # Nou camp
+       
+    )
+    
+    fieldsets = (
+        ('Informació Bàsica', {
+            'fields': ('oferta', 'estudiant', 'data_candidatura', 'estat', 'activa')
+        }),
+        ('Documents', {
+            'fields': (
+                'cv_adjunt', 
+                'descarregar_cv_admin',  # Enllaç protegit
+                'altres_adjunts', 
+                
+            )
+        }),
+        ('Detalls', {
+            'fields': ('carta_presentacio', 'notes_empresa', 'puntuacio', 'data_canvi_estat')
+        })
+    )
+
+    def cv_disponible(self, obj):
+        """Indica si hi ha CV a la llista"""
+        if obj.cv_adjunt:
+            cv_url = reverse('descarregar_cv_candidatura_admin', args=[obj.id])
+            return format_html(
+                '<a href="{}" target="_blank" style="color: green;">📄 Descarregar</a>',
+                cv_url
+            )
+        return format_html('<span style="color: red;">❌ Sense CV</span>')
+    cv_disponible.short_description = "CV"
+
+
+    def descarregar_cv_admin(self, obj):
+        """Versió més simple sense formatatge complex"""
+        if not obj or not obj.pk:
+            return "Desa primer la candidatura"
+        
+        if not obj.cv_adjunt:
+            return "No hi ha CV adjunt"
+        
+        try:
+            cv_url = reverse('descarregar_cv_candidatura_admin', args=[obj.id])
+            mida_kb = round(obj.cv_adjunt.size / 1024, 1) if obj.cv_adjunt.size else 0
+            
+            return format_html(
+                '<a href="{}" target="_blank" class="button default">📄 Descarregar CV</a><br>'
+                '<small style="color: #666;">Mida: {} KB</small>',
+                cv_url,
+                mida_kb
+            )
+        except Exception as e:
+            return format_html('Error: {}', str(e))
+
+    descarregar_cv_admin.short_description = "CV"
+
     def empresa_nom(self, obj):
         return obj.oferta.empresa.nom_comercial
     empresa_nom.short_description = "Empresa"
@@ -128,6 +200,50 @@ class CandidaturaAdmin(admin.ModelAdmin):
         return obj.estudiant.usuari.get_full_name()
     estudiant_nom.short_description = "Estudiant"
     estudiant_nom.admin_order_field = 'estudiant__usuari__nom'
+
+class CandidaturaInline(admin.TabularInline):
+    model = Candidatura
+    extra = 0  # No mostrar files buides per defecte
+    readonly_fields = ('data_candidatura', 'data_canvi_estat', 'temps_des_candidatura_display','cv_link_inline')
+    fields = (
+        'estudiant', 
+        'estat', 
+        'data_candidatura', 
+        'data_canvi_estat',
+        'puntuacio',
+        'cv_link_inline', 
+        'activa',
+        'temps_des_candidatura_display'
+    )
+    
+    def cv_link_inline(self, obj):
+        """Enllaç curt per l'inline"""
+        if obj.pk and obj.cv_adjunt:  # Només si l'objecte ja existeix
+            cv_url = reverse('descarregar_cv_candidatura', args=[obj.id])
+            return format_html(
+                '<a href="{}" target="_blank" title="Descarregar CV">📄</a>',
+                cv_url
+            )
+        return "-"
+    cv_link_inline.short_description = "CV"
+
+    
+    def temps_des_candidatura_display(self, obj):
+        """Mostra el temps transcorregut de forma llegible"""
+        if obj.pk:  # Només si l'objecte ja existeix
+            temps = obj.temps_des_candidatura
+            dies = temps.days
+            hores = temps.seconds // 3600
+            
+            if dies > 0:
+                return f"{dies} dies, {hores} hores"
+            elif hores > 0:
+                return f"{hores} hores"
+            else:
+                return "Menys d'1 hora"
+        return "-"
+    
+    temps_des_candidatura_display.short_description = "Temps des de candidatura"
 
 
 class NoticiaAdmin(admin.ModelAdmin):

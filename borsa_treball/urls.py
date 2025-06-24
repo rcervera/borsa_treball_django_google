@@ -8,8 +8,8 @@ urlpatterns = [
     path('landing', TemplateView.as_view(template_name='landing.html'), name='landing'),
     path('login/', views.login_view, name='login'),
     path('', views.index, name='index'),
-    path('registre/estudiant/', views.mostrar_registre_estudiant, name='registre_estudiant'),
-    #path('registre/empresa/', views.registre_empresa, name='registre_empresa'),
+
+    path('registre/estudiant/', views.mostrar_registre_estudiant, name='registre_estudiant'),   
     path('registre/empresa/', views.mostrar_registre_empresa, name='registre_empresa'),
     path('api/registre-empresa/', views.registre_empresa, name='registre_empresa_api'),
     path('api/registre-estudiant/', views.registre_estudiant, name='registre_estudiant_api'),
@@ -24,7 +24,7 @@ urlpatterns = [
     path('empresa/oferta/<int:oferta_id>/editar/', views_empresa.editar_oferta, name='editar_oferta'),
      # URLs per gestió del perfil
     path('empresa/perfil/editar', views_empresa.editar_perfil_empresa, name='editar_perfil_empresa'),
-    path('empresa/perfil/canviar-contrasenya/', views_empresa.api_canviar_contrasenya, name='canviar_contrasenya'),
+    #path('empresa/perfil/canviar-contrasenya/', views_empresa.api_canviar_contrasenya, name='canviar_contrasenya'),
 
      # URL API per actualitzar la informació de l'empresa
     path('api/perfil/empresa/editar/', views_empresa.api_editar_perfil_empresa, name='api_editar_perfil_empresa'),
@@ -33,7 +33,7 @@ urlpatterns = [
     path('api/perfil/usuari/editar/', views_empresa.api_editar_perfil_usuari, name='api_editar_perfil_usuari'),
 
     # URL API per canviar la contrasenya de l'usuari
-    path('api/canviar-contrasenya-empresa/', views_empresa.api_canviar_contrasenya, name='canviar_contrasenya_empresa'),
+    path('api/canviar-contrasenya/', views.api_canviar_contrasenya, name='canviar_contrasenya'),
 
     # URL per eliminar el perfil de l'empresa (si existeix aquesta funcionalitat)
     # Assegura't de tenir la vista 'eliminar_perfil_empresa' definida al teu views.py
@@ -68,4 +68,6 @@ urlpatterns = [
     path('candidatures/<int:candidatura_id>/carta/',views_empresa.veure_carta_presentacio, name='veure_carta_presentacio'),
     path('candidatures/<int:candidatura_id>/cv/', views_empresa.descarregar_cv_candidatura, name='descarregar_cv_candidatura'),
     path('candidatures/<int:candidatura_id>/canviar-estat/', views_empresa.canviar_estat_candidatura, name='canviar_estat_candidatura'),
+    path('administrador/candidatures/<int:candidatura_id>/cv/', views.descarregar_cv_candidatura_admin, name='descarregar_cv_candidatura_admin'),
 ]
+

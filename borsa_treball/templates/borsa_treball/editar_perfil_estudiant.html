@@ -2,32 +2,12 @@
 
 {% block title %}Editar Perfil - Estudiant{% endblock %}
 
-{% block page_title %}Perfil de l'Estudiant{% endblock %}
+{% block page_title %}Em meu perfil{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center mb-4">
     <div class="col-lg-10 col-md-11">
-        <div class="card shadow-lg border-0 mb-4">
-            <div class="card-body p-4">
-                <div class="text-center mb-4">
-                    <div class="mb-3">                        
-                        <i class="bi bi-person-fill text-primary" style="font-size: 2rem;"></i>                      
-                    </div>
-                    <h2 class="h4 text-dark mb-2">{{ estudiant.usuari.get_full_name }}</h2>
-                    <p class="text-muted">Gestiona la teva informació personal, contacte i els teus estudis.</p>
-                </div>
-            </div>
-        </div>
-
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
-                    <i class="bi bi-{% if message.tags == 'error' %}exclamation-triangle{% elif message.tags == 'success' %}check-circle{% else %}info-circle{% endif %} me-2"></i>
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
+       
 
         <div id="perfil-api-missatges"></div>
 
@@ -56,7 +36,7 @@
                         </div>
                         <div class="col-md-6">
                             <label for="user_email" class="form-label">
-                                <i class="bi bi-envelope me-2 text-muted"></i>Email de l'Usuari (No modificable)
+                                <i class="bi bi-envelope me-2 text-muted"></i>Email de l'Usuari 
                             </label>
                             <input type="email" class="form-control" id="email" name="email" value="{{ estudiant.usuari.email }}" required>
                             <div class="invalid-feedback" id="email_error"></div>
@@ -99,39 +79,42 @@
                 <div class="mb-5">
                         <h5 class="mb-4 text-primary"><i class="bi bi-mortarboard-fill me-2"></i>Els Meus Estudis</h5>
                  </div>
-                <div id="estudis-list" class="mb-4">
-                    {% if estudiant.estudis.all %}
-                        {% for estudi in estudiant.estudis.all %}
-                        <div class="card mb-2 bg-light border" id="estudi-{{ estudi.id }}">
-                            <div class="card-body py-2 px-3 d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-0 text-dark">{{ estudi.cicle.nom }}</h6>
-                                    <small class="text-muted">{{ estudi.any_inici }}{% if estudi.any_fi %}-{{ estudi.any_fi }}{% else %}-actualitat{% endif %}
-                                        {% if estudi.centre_estudis %}, {{ estudi.centre_estudis }}{% endif %}
-                                    </small>
-                                </div>
-                                <div>
-                                    <button type="button" class="btn btn-sm btn-outline-danger btn-delete-estudi" data-estudi-id="{{ estudi.id }}" title="Eliminar estudi">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                                               
-                        <div class="text-center text-muted py-3">
-                            <i class="bi bi-mortarboard" style="font-size: 2rem;"></i>
-                            <p class="mt-2 mb-0">No has afegit cap estudi</p>
-                            <small>Selecciona els teus estudis actuals o realitzats</small>
-                        </div>
-        
-                    {% endif %}
-                </div>
+                
 
                 <h6>Afegir Nou Estudi</h6>
                 <form id="addEstudiForm">
                     {% csrf_token %}
+
+                    <div id="estudis-list" class="mb-4">
+                        {% if estudiant.estudis.all %}
+                            {% for estudi in estudiant.estudis.all %}
+                            <div class="card mb-2 bg-light border" id="estudi-{{ estudi.id }}">
+                                <div class="card-body py-2 px-3 d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0 text-dark">{{ estudi.cicle.nom }}</h6>
+                                        <small class="text-muted">{{ estudi.any_inici }}{% if estudi.any_fi %}-{{ estudi.any_fi }}{% else %}-actualitat{% endif %}
+                                            {% if estudi.centre_estudis %}, {{ estudi.centre_estudis }}{% endif %}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn btn-sm btn-outline-danger btn-delete-estudi" data-estudi-id="{{ estudi.id }}" title="Eliminar estudi">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                                                
+                            <div class="text-center text-muted py-3">
+                                <i class="bi bi-mortarboard" style="font-size: 2rem;"></i>
+                                <p class="mt-2 mb-0">No has afegit cap estudi</p>
+                                <small>Selecciona els teus estudis actuals o realitzats</small>
+                            </div>
+            
+                        {% endif %}
+                    </div>
+
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label for="cicle" class="form-label">Cicle Formatiu</label>
@@ -277,20 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
+    
 
     // --- Handle Main Profile Form Submission ---
     const estudiantProfileForm = document.getElementById('estudiantProfileForm');
@@ -315,17 +285,17 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('{% url "api_actualitzar_perfil_estudiant" %}', { // <-- Define this URL in urls.py
             method: 'POST',
             headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(data),
         })
         .then(response => response.json())
         .then(result => {
-            if (result.success) {
-                showApiMessage('perfil-api-missatges', 'success', result.message);
-                // Optionally update UI elements like name/surname dynamically
-                document.querySelector('h2.h4').textContent = `${result.nom} ${result.cognoms}`;
+            if (result.success) {               
+                if (typeof window.showSuccessToast === 'function') {
+                            showSuccessToast(result.message);
+                }
             } else {
                 showApiMessage('perfil-api-missatges', 'danger', result.message || 'Hi ha hagut un error en guardar el perfil.');
                 if (result.errors) {
@@ -369,7 +339,7 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('{% url "api_afegir_estudi_estudiant" %}', { // <-- Define this URL in urls.py
             method: 'POST',
             headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(data),
@@ -377,7 +347,10 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(result => {
             if (result.success) {
-                showApiMessage('perfil-api-missatges', 'success', result.message);
+                //showApiMessage('perfil-api-missatges', 'success', result.message);
+                if (typeof window.showSuccessToast === 'function') {
+                            showSuccessToast(result.message);
+                }
                 // Dynamically add the new study to the list
                 const estudisList = document.getElementById('estudis-list');
                 const newEstudiCard = `
@@ -426,6 +399,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Handle Delete Study ---
     function attachDeleteEstudiListeners() {
         document.querySelectorAll('.btn-delete-estudi').forEach(button => {
+
+            if (button.hasAttribute('data-listener-attached')) {
+                    return; // Saltar si ja té listener
+            }
+        
+            // Marcar com a processat
+            button.setAttribute('data-listener-attached', 'true');
+
             button.onclick = null; // Remove previous listeners to prevent duplicates
             button.addEventListener('click', function() {
                 const estudiId = this.dataset.estudiId;
@@ -433,17 +414,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     const deleteBtn = this;
                     deleteBtn.disabled = true; // Disable button during request
 
+                    const form = button.closest('form');
+                    const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+                   
                     fetch(`/api/perfil/estudiant/estudis/${estudiId}/esborrar/`, { 
                         method: 'POST', // Or 'DELETE' if your API supports it and handles CSRF
                         headers: {
-                            'X-CSRFToken': getCookie('csrftoken'),
+                            'X-CSRFToken': csrfToken,
                             'Content-Type': 'application/json',
                         },
                     })
                     .then(response => response.json())
                     .then(result => {
                         if (result.success) {
-                            showApiMessage('perfil-api-missatges', 'success', result.message);
+                            // showApiMessage('perfil-api-missatges', 'success', result.message);
+                            if (typeof window.showSuccessToast === 'function') {
+                                 showSuccessToast(result.message);
+                            }
                             document.getElementById(`estudi-${estudiId}`).remove(); // Remove from DOM
                             // If no studies left, show the "no studies" alert
                             if (document.querySelectorAll('#estudis-list .card').length === 0) {
@@ -456,13 +443,19 @@ document.addEventListener('DOMContentLoaded', function() {
                             `;
                             }
                         } else {
-                            showApiMessage('perfil-api-missatges', 'danger', result.message || 'Error en eliminar l\'estudi.');
+                            //showApiMessage('perfil-api-missatges', 'danger', result.message || 'Error en eliminar l\'estudi.');
+                            if (typeof window.showErrorToast === 'function') {
+                                showErrorToast(result.message || 'Error en eliminar l\'estudi.');
+                            }
                             deleteBtn.disabled = false; // Re-enable button on error
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        showApiMessage('perfil-api-missatges', 'danger', 'Error de xarxa o del servidor.');
+                        //showApiMessage('perfil-api-missatges', 'danger', 'Error de xarxa o del servidor.');
+                         if (typeof window.showErrorToast === 'function') {
+                                showErrorToast('Error de xarxa o del servidor.');
+                        }
                         deleteBtn.disabled = false; // Re-enable button on error
                     });
                 }
@@ -496,7 +489,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const formData = new FormData(changePasswordForm);
 
                 try {
-                    const response = await fetch('{% url "canviar_contrasenya_empresa" %}', {
+                    const response = await fetch('{% url "canviar_contrasenya" %}', {
                         method: 'POST',
                         headers: {
                             'X-CSRFToken': formData.get('csrfmiddlewaretoken')

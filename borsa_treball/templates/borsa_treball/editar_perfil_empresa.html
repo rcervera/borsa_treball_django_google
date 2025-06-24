@@ -2,23 +2,12 @@
 
 {% block title %}Editar Perfil - Borsa de Treball{% endblock %}
 
-{% block page_title %}Perfil de l'Empresa{% endblock %}
+{% block page_title %}Editar perfil{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center mb-4">
     <div class="col-lg-10 col-md-11">
        
-
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
-                    <i class="bi bi-{% if message.tags == 'error' %}exclamation-triangle{% elif message.tags == 'success' %}check-circle{% else %}info-circle{% endif %} me-2"></i>
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-
         <div id="perfil-api-missatges"></div>
 
         {# PRIMERA CARD: Informació de l'Empresa #}
@@ -60,11 +49,11 @@
                             <div id="error-telefon" class="error-validacio form-text text-danger"></div>
                         </div>
                         <div class="col-md-6">
-                            <label for="email_contacte_empresa" class="form-label">
+                            <label for="email_contacte" class="form-label">
                                 <i class="bi bi-envelope me-2 text-muted"></i>Email de Contacte
                             </label>
-                            <input type="email" class="form-control" id="email_contacte_empresa" name="email_contacte" value="{{ empresa.email_contacte|default_if_none:'' }}">
-                            <div id="error-email_contacte_empresa" class="error-validacio form-text text-danger"></div>
+                            <input type="email" class="form-control" id="email_contacte" name="email_contacte" value="{{ empresa.email_contacte|default_if_none:'' }}">
+                            <div id="error-email_contacte" class="error-validacio form-text text-danger"></div>
                         </div>
                          <div class="col-md-6">
                             <label for="num_treballadors" class="form-label">
@@ -123,22 +112,22 @@
                         <label for="old_password" class="form-label">
                             <i class="bi bi-key me-2 text-muted"></i>Contrasenya Actual
                         </label>
-                        <input type="password" class="form-control" id="old_password" name="old_password" required>
-                        <div id="old_password_error" class="text-danger form-text"></div>
+                        <input type="password" class="form-control" id="old_password" name="old_password" required>                        
+                        <div id="error-old_password" class="text-danger form-text error-validacio"></div>
                     </div>
                     <div class="mb-3">
                         <label for="new_password1" class="form-label">
                             <i class="bi bi-key-fill me-2 text-muted"></i>Nova Contrasenya
                         </label>
-                        <input type="password" class="form-control" id="new_password1" name="new_password1" required>
-                        <div id="new_password1_error" class="text-danger form-text"></div>
+                        <input type="password" class="form-control" id="new_password1" name="new_password1" required>                       
+                        <div id="error-new_password1" class="text-danger form-text error-validacio"></div>
                     </div>
                     <div class="mb-3">
                         <label for="new_password2" class="form-label">
                             <i class="bi bi-key-fill me-2 text-muted"></i>Repeteix Nova Contrasenya
                         </label>
-                        <input type="password" class="form-control" id="new_password2" name="new_password2" required>
-                        <div id="new_password2_error" class="text-danger form-text"></div>
+                        <input type="password" class="form-control" id="new_password2" name="new_password2" required>                       
+                        <div id="error-new_password2" class="text-danger form-text error-validacio"></div>
                     </div>
                     <div class="d-flex justify-content-end">
                         <button type="button" class="btn btn-primary rounded-pill" id="changePasswordBtn">
@@ -167,14 +156,14 @@
                         </div>
                         <div class="col-md-6">
                             <label for="user_nom" class="form-label">
-                                <i class="bi bi-person me-2 text-muted"></i>Nom de l'Usuari
+                                <i class="bi bi-person me-2 text-muted"></i>Nom de l'Usuari *
                             </label>
                             <input type="text" class="form-control" id="user_nom" name="nom" value="{{ user.nom }}" required>
                             <div id="error-nom" class="error-validacio form-text text-danger"></div>
                         </div>
                         <div class="col-md-12">
                             <label for="user_cognoms" class="form-label">
-                                <i class="bi bi-person-vcard me-2 text-muted"></i>Cognoms de l'Usuari
+                                <i class="bi bi-person-vcard me-2 text-muted"></i>Cognoms de l'Usuari *
                             </label>
                             <input type="text" class="form-control" id="user_cognoms" name="cognoms" value="{{ user.cognoms }}" required>
                             <div id="error-cognoms" class="error-validacio form-text text-danger"></div>
@@ -241,10 +230,27 @@
             }
         }
 
+        
         function clearFormErrors(formElement) {
             formElement.querySelectorAll('.error-validacio').forEach(div => div.innerText = '');
             formElement.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
             formElement.classList.remove('was-validated');
+        }
+
+        function showFieldErrors(formElement, errors, prefix = 'error-') {
+            console.log(errors)
+            for (const field in errors) {
+                const errorMessages = errors[field];
+                const errorText = Array.isArray(errorMessages) ? errorMessages.join(' ') : errorMessages;
+
+                const input = formElement.querySelector(`[name="${field}"]`);
+                const errorDiv = document.getElementById(`${prefix}${field}`);
+                console.log(`${prefix}${field}`)
+                console.log(errorDiv)
+
+                if (input) input.classList.add('is-invalid');
+                if (errorDiv) errorDiv.textContent = errorText;
+            }
         }
 
         // --- Gestió del formulari de la informació de l'Empresa ---
@@ -273,7 +279,7 @@
                     const resultat = await response.json();
 
                     if (resultat.success) {
-                        // showApiMessage('perfil-api-missatges', 'success', resultat.message);
+                        
                         if (typeof window.showSuccessToast === 'function') {
                             showSuccessToast(resultat.message);
                         }
@@ -291,23 +297,19 @@
                             delete errors.__all__; // Eliminar-los per no processar-los com a camps
                         }
 
-                        for (const camp in errors) {
-                            // Canviem l'ID per a email_contacte_empresa ja que el model l'anomena email_contacte
-                            const targetId = (camp === 'email_contacte') ? 'email_contacte_empresa' : camp;
-                            const missatge = errors[camp];
-                            const errorText = Array.isArray(missatge) ? missatge.join(' ') : missatge;
-                            
-                            const input = empresaProfileForm.querySelector(`[name="${camp}"]`);
-                            const errorDiv = document.getElementById(`error-${targetId}`);
+                        showFieldErrors(empresaProfileForm, errors);
 
-                            if (input) input.classList.add('is-invalid');
-                            if (errorDiv) errorDiv.innerText = errorText;
-                        }
-                        showApiMessage('perfil-api-missatges', 'danger', 'Hi ha errors en el formulari de l\'empresa. Si us plau, revisa les dades.');
+                        
+                        
+                         if (typeof window.showErrorToast === 'function') {
+                                showErrorToast('Hi ha errors en el formulari de dades de l\'empresa. Revisa les dades.');
+                         }
                     }
                 } catch (error) {
-                    console.error('Error:', error);
-                    showApiMessage('perfil-api-missatges', 'danger', 'Hi ha hagut un error de connexió amb el servidor.');
+                    console.error('Error:', error);                    
+                     if (typeof window.showErrorToast === 'function') {
+                        showErrorToast('Hi ha hagut un error de connexió amb el servidor.');
+                    }
                 }
             });
         }
@@ -323,13 +325,6 @@
                 clearFormErrors(userProfileForm);
                 perfilApiMessages.innerHTML = '';
 
-                // Si vols que Bootstrap mostri els missatges d'error HTML5, pots afegir:
-                // if (!userProfileForm.checkValidity()) {
-                //    userProfileForm.classList.add('was-validated');
-                //    showApiMessage('perfil-api-missatges', 'danger', 'Revisa els camps de contacte amb errors.');
-                //    return;
-                // }
-
                 const formData = new FormData(userProfileForm);
 
                 try {
@@ -344,7 +339,7 @@
                     const resultat = await response.json();
 
                     if (resultat.success) {
-                        // showApiMessage('perfil-api-missatges', 'success', resultat.message);
+                        
                         if (typeof window.showSuccessToast === 'function') {
                                  showSuccessToast(resultat.message);
                         }
@@ -362,21 +357,17 @@
                             delete errors.__all__; // Eliminar-los per no processar-los com a camps
                         }
 
-                        for (const camp in errors) {
-                            const missatge = errors[camp];
-                            const errorText = Array.isArray(missatge) ? missatge.join(' ') : missatge;
-
-                            const input = userProfileForm.querySelector(`[name="${camp}"]`);
-                            const errorDiv = document.getElementById(`error-${camp}`);
-
-                            if (input) input.classList.add('is-invalid');
-                            if (errorDiv) errorDiv.innerText = errorText;
+                        showFieldErrors(userProfileForm, errors);                       
+                        
+                         if (typeof window.showErrorToast === 'function') {
+                                showErrorToast('Hi ha errors en el formulari de dades d\'usuari. Revisa les dades.');
                         }
-                        showApiMessage('perfil-api-missatges', 'danger', 'Hi ha errors en la informació de contacte. Si us plau, revisa les dades.');
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    showApiMessage('perfil-api-missatges', 'danger', 'Hi ha hagut un error de connexió amb el servidor en guardar el contacte.');
+                     if (typeof window.showErrorToast === 'function') {
+                        showErrorToast('Hi ha hagut un error de connexió amb el servidor en guardar el contacte.');
+                     }
                 }
             });
         }
@@ -389,23 +380,21 @@
         if (changePasswordBtn && changePasswordForm) {
             changePasswordBtn.addEventListener('click', async function(e) {
                 e.preventDefault();
-
-                document.getElementById('old_password_error').textContent = '';
-                document.getElementById('new_password1_error').textContent = '';
-                document.getElementById('new_password2_error').textContent = '';
-                changePasswordForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-                changePasswordForm.classList.remove('was-validated');
+                clearFormErrors(changePasswordForm);
 
                 if (!changePasswordForm.checkValidity()) {
                     changePasswordForm.classList.add('was-validated');
-                    showApiMessage('perfil-api-missatges', 'danger', 'Revisa els camps de contrasenya.');
+                    //showApiMessage('perfil-api-missatges', 'danger', 'Revisa els camps de contrasenya.');
+                    if (typeof window.showErrorToast === 'function') {
+                        showErrorToast('Hi ha errors en el formulari de canvi de contrasenya. Revisa les dades.');
+                    }
                     return;
                 }
 
                 const formData = new FormData(changePasswordForm);
 
                 try {
-                    const response = await fetch('{% url "canviar_contrasenya_empresa" %}', {
+                    const response = await fetch('{% url "canviar_contrasenya" %}', {
                         method: 'POST',
                         headers: {
                             'X-CSRFToken': formData.get('csrfmiddlewaretoken')
@@ -416,7 +405,7 @@
                     const data = await response.json();
 
                     if (data.success) {
-                        //showApiMessage('perfil-api-missatges', 'success', data.message);
+                        
                         if (typeof window.showSuccessToast === 'function') {
                             showSuccessToast(data.message);
                         }
@@ -430,27 +419,19 @@
                             errors = data.errors;
                         }
                         
-                        for (const field in errors) {
-                            const errorMessages = errors[field];
-                            const errorText = Array.isArray(errorMessages) ? errorMessages.join(' ') : errorMessages;
-
-                            const errorDiv = document.getElementById(`${field}_error`);
-                            if (errorDiv) {
-                                errorDiv.textContent = errorText;
-                                const input = changePasswordForm.querySelector(`[name="${field}"]`);
-                                if (input) input.classList.add('is-invalid');
-                            }
-                        }
+                        showFieldErrors(changePasswordForm, errors);                        
                         
-                        if (data.message && (!errors || Object.keys(errors).length === 0)) {
-                             showApiMessage('perfil-api-missatges', 'danger', data.message);
-                        } else if (!errors || Object.keys(errors).length === 0) {
-                            showApiMessage('perfil-api-missatges', 'danger', 'Hi ha hagut un error en el canvi de contrasenya. Si us plau, revisa les dades.');
+                        if (typeof window.showErrorToast === 'function') {
+                                    showErrorToast('Hi ha errors en el formulari de canvi de contrasenya. Revisa les dades.');
                         }
+
+                        
                     }
                 } catch (error) {
-                    console.error('Error:', error);
-                    showApiMessage('perfil-api-missatges', 'danger', 'Hi ha hagut un error de xarxa o del servidor.');
+                    console.error('Error:', error);                    
+                    if (typeof window.showErrorToast === 'function') {
+                                    showErrorToast('Hi ha hagut un error de xarxa o del servidor.');
+                    }
                 }
             });
         }

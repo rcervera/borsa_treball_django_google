@@ -1,17 +1,41 @@
-from django.shortcuts import render
-
-# Create your views here.
-
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from django.contrib import messages
-from .models import Cicle, Empresa, Estudiant, Noticia, Sector, Usuari, Oferta, Candidatura
-from django.db import transaction
-from django.core.exceptions import ValidationError
-from django.contrib.auth.password_validation import validate_password
+# Imports estàndard de Python
+import json
+import mimetypes
+import os
 import re
+from datetime import datetime
+
+# Imports de Django - Core
+from django.contrib import messages
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
+from django.db import transaction
+from django.http import Http404, HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, render, redirect
 from django.utils import timezone
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+
+# Imports locals
+from .models import (
+    Candidatura,
+    Cicle,
+    Empresa,
+    EstudiEstudiant,
+    Estudiant,
+    Noticia,
+    Oferta,
+    RegistreAuditoria,
+    Sector,
+    Usuari
+)
 
 #
 #  LOGIN
@@ -113,163 +137,6 @@ def index(request):
 #
 #  REGISTRE EMPRESA
 #
-def registre_empresa_antiga(request):
-    # Obtenir tots els sectors per al dropdown
-    sectors = Sector.objects.all()
-    
-    if request.method == 'POST':
-        # Obtenir dades del formulari       
-        email = request.POST.get('email', '').strip()
-        password1 = request.POST.get('password1', '')
-        password2 = request.POST.get('password2', '')
-        nom = request.POST.get('nom', '').strip()
-        cognoms = request.POST.get('cognoms', '').strip()
-        cif = request.POST.get('cif', '').strip().upper()
-        nom_comercial = request.POST.get('nom_comercial', '').strip()
-        rao_social = request.POST.get('rao_social', '').strip()
-        sector_id = request.POST.get('sector')
-        telefon = request.POST.get('telefon', '').strip()
-        
-        # Diccionari per guardar errors
-        errors = {}
-        
-        # Validacions bàsiques
-        
-        if not email:
-            errors['email'] = ['El correu electrònic és obligatori.']
-        elif Usuari.objects.filter(email=email).exists():
-            errors['email'] = ['Aquest correu electrònic ja està registrat.']
-            
-        if not password1:
-            errors['password1'] = ['La contrasenya és obligatòria.']
-        else:
-            # Validar contrasenya amb els validadors de Django
-            try:
-                validate_password(password1)
-            except ValidationError as e:
-                errors['password1'] = list(e.messages)
-                
-        if not password2:
-            errors['password2'] = ['Has de confirmar la contrasenya.']
-        elif password1 != password2:
-            errors['password2'] = ['Les contrasenyes no coincideixen.']
-            
-        if not nom:
-            errors['nom'] = ['El nom és obligatori.']
-        if not cognoms:
-            errors['cognoms'] = ['Els cognoms són obligatoris.']
-
-        # Validacions específiques d'empresa
-        if not cif:
-            errors['cif'] = ['El CIF/NIF és obligatori.']
-        else:
-            # Validar format CIF/NIF
-            cif_pattern = r'^[A-Z][0-9]{8}$|^[0-9]{8}[A-Z]$'
-            if not re.match(cif_pattern, cif):
-                errors['cif'] = ['Format de CIF/NIF no vàlid. Utilitza: A12345678 o 12345678A']
-            elif Empresa.objects.filter(cif=cif).exists():
-                errors['cif'] = ['Aquest CIF/NIF ja està registrat.']
-                
-        if not nom_comercial:
-            errors['nom_comercial'] = ['El nom comercial és obligatori.']
-        elif len(nom_comercial) < 2:
-            errors['nom_comercial'] = ['El nom comercial ha de tenir almenys 2 caràcters.']
-            
-        if not rao_social:
-            errors['rao_social'] = ['La raó social és obligatòria.']
-        elif len(rao_social) < 2:
-            errors['rao_social'] = ['La raó social ha de tenir almenys 2 caràcters.']
-            
-        if not sector_id:
-            errors['sector'] = ['Has de seleccionar un sector.']
-        else:
-            try:
-                sector = Sector.objects.get(id=sector_id)
-            except Sector.DoesNotExist:
-                errors['sector'] = ['El sector seleccionat no és vàlid.']
-
-        if not telefon:
-            errors['telefon'] = ['El telèfon és obligatori.']        
-          
-        
-        # Si no hi ha errors, crear l'usuari i empresa
-        if not errors:
-            try:
-                with transaction.atomic():
-                    # Crear usuari
-                    user = Usuari.objects.create_user(                       
-                        email=email,
-                        password=password1,
-                        tipus='EMP',
-                        nom=nom,
-                        cognoms=cognoms
-                    )
-                    
-                    # Crear perfil d'empresa
-                    empresa = Empresa.objects.create(
-                        usuari=user,
-                        cif=cif,
-                        nom_comercial=nom_comercial,
-                        rao_social=rao_social,
-                        sector=sector,
-                        telefon=telefon
-                    )
-                    
-                    # Autenticar i fer login
-                    user = authenticate(email=email, password=password1)
-                    if user:
-                        login(request, user)
-                        messages.success(request, f'Benvinguda {nom_comercial}! El compte de la vostra empresa s\'ha creat correctament.')
-                        return redirect('index')
-                    else:
-                        messages.error(request, 'Error en l\'autenticació. Si us plau, inicia sessió manualment.')
-                        return redirect('login')
-                        
-            except Exception as e:
-                messages.error(request, 'Hi ha hagut un error en crear el compte. Si us plau, torna-ho a intentar.')
-                errors['general'] = [str(e)]
-        
-        # Si hi ha errors, tornar al formulari amb els errors i dades
-        context = {
-            'sectors': sectors,
-            'errors': errors,
-            'form_data': {
-                'telefon': telefon,
-                'email': email,
-                'cif': cif,
-                'nom_comercial': nom_comercial,
-                'rao_social': rao_social,
-                'sector': sector_id,
-                'nom': nom,
-                'cognoms': cognoms
-            }
-        }
-        return render(request, 'registre_empresa.html', context)
-    
-    # GET request - mostrar formulari buit
-    context = {
-        'sectors': sectors,
-        'errors': {},
-        'form_data': {}
-    }
-    return render(request, 'borsa_treball/registre_empresa.html', context)
-
-
-# borsa_treball/views.py
-
-from django.shortcuts import render
-from django.http import JsonResponse # Importa JsonResponse
-from django.db import transaction # Importa transaction per a operacions atòmiques
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.password_validation import validate_password # Importa el validador de contrasenyes
-from django.core.exceptions import ValidationError
-from django.views.decorators.http import require_POST # Per assegurar-nos que només accepta POST
-import re
-import json # Per carregar dades JSON de la petició
-
-# Importa els teus models
-from .models import Usuari, Empresa, Sector, RegistreAuditoria # Assegura't que tots els models estiguin importats
-
 
 
 
@@ -308,9 +175,15 @@ def registre_empresa(request):
 
     if not email:
         errors['email'] = ['El correu electrònic és obligatori.']
-    elif Usuari.objects.filter(email=email).exists():
-        errors['email'] = ['Aquest correu electrònic ja està registrat.']
-        
+    else:
+        try:
+            validate_email(email)
+        except DjangoValidationError:
+            errors['email'] = ['El format del correu electrònic no és vàlid.']
+    
+        if Usuari.objects.filter(email=email).exists():
+            errors['email'] = ['Aquest correu electrònic ja està registrat.']
+            
     if not password1:
         errors['password1'] = ['La contrasenya és obligatòria.']
     else:
@@ -362,6 +235,9 @@ def registre_empresa(request):
 
     if not telefon:
         errors['telefon'] = ['El telèfon és obligatori.']
+    elif not re.match(r'^\+?[0-9]{7,15}$', telefon):
+        errors['telefon'] = ['Format de telèfon no vàlid.']
+
         
     # Si hi ha errors, retornar JsonResponse amb errors
     if errors:
@@ -390,7 +266,7 @@ def registre_empresa(request):
             )
                                     
 
-            # Registrar al log d'auditoria (opcional, si el teu model ho permet)
+            # Registrar al log d'auditoria 
             RegistreAuditoria.objects.create(
                 accio="Alta Empresa",
                 model_afectat="Empresa",               
@@ -398,12 +274,7 @@ def registre_empresa(request):
                 usuari=user # L'usuari que s'acaba de crear
             )
 
-            # L'autenticació i login es faran al client si el registre és exitós.
-            # En una API, NO autentiquem l'usuari directament al backend després d'un registre reeixit
-            # si l'objectiu és una aplicació SPA o que el client gestioni la sessió.
-            # Normalment es retornaria un token JWT o es donarien instruccions per fer login.
-            # Per simplicitat amb la teva estructura actual de Django, podríem retornar un missatge d'èxit.
-            
+           
             return JsonResponse({
                 'success': True,
                 'message': f'Benvinguda {nom_comercial}! El compte de la vostra empresa s\'ha creat correctament. Ara pots iniciar sessió.'
@@ -441,18 +312,6 @@ def mostrar_registre_estudiant(request):
     return render(request, 'borsa_treball/registre_estudiant.html', context)
 
 
-import json
-import re
-from datetime import datetime
-from django.db import transaction
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from django.core.exceptions import ValidationError
-from django.contrib.auth.password_validation import validate_password
-from django.utils import timezone 
-
-# Importa tots els models que necessites
-from .models import Usuari, Estudiant, Cicle, EstudiEstudiant, RegistreAuditoria 
 
 @require_POST
 def registre_estudiant(request):
@@ -488,8 +347,15 @@ def registre_estudiant(request):
 
     if not email:
         errors['email'] = ['El correu electrònic és obligatori.']
-    elif Usuari.objects.filter(email=email).exists():
-        errors['email'] = ['Aquest correu electrònic ja està registrat.']
+    else:
+        try:
+            validate_email(email)
+        except DjangoValidationError:
+            errors['email'] = ['El format del correu electrònic no és vàlid.']
+        
+        if 'email' not in errors and Usuari.objects.filter(email=email).exists():
+            errors['email'] = ['Aquest correu electrònic ja està registrat.']
+
         
     if not password1:
         errors['password1'] = ['La contrasenya és obligatòria.']
@@ -521,7 +387,9 @@ def registre_estudiant(request):
             
     if not telefon:
         errors['telefon'] = ['El telèfon és obligatori.']
-            
+    elif not re.match(r'^\+?\d{7,15}$', telefon):
+        errors['telefon'] = ['El número de telèfon no té un format vàlid.']
+
     # Validació i cerca de Cicle per ID
     cicle_obj = None
     if not cicle_id_str:
@@ -600,8 +468,7 @@ def registre_estudiant(request):
             # Registrar al log d'auditoria
             RegistreAuditoria.objects.create(
                 accio="Alta Estudiant",
-                model_afectat="Estudiant",
-                # objecte_id=estudiant.id, # Pots descomentar si el camp objecte_id és obligatori o útil
+                model_afectat="Estudiant",                
                 descripcio=f"Nou estudiant registrat: {nom} {cognoms} amb DNI {dni}. Estudis: {cicle_obj.nom} ({any_inici}-{any_fi or 'Actual'})",
                 usuari=user # L'usuari que s'acaba de crear
             )
@@ -619,3 +486,75 @@ def registre_estudiant(request):
             'message': 'Hi ha hagut un error intern en crear el compte. Si us plau, torna-ho a intentar.',
             'errors': {'general': [f'Error intern: {e}']} 
         }, status=500) # 500 Internal Server Error
+    
+
+@login_required
+@staff_member_required
+def descarregar_cv_candidatura_admin(request, candidatura_id):
+    """
+    Vista per descarregar el CV d'una candidatura.
+    """
+       
+    # Obtenir la candidatura i verificar permisos
+    candidatura = get_object_or_404(Candidatura, id=candidatura_id)
+    
+    if not candidatura.cv_adjunt:
+        raise Http404("CV no trobat")
+    
+    try:
+        # Obtenir el fitxer
+        file_path = candidatura.cv_adjunt.path
+        
+        if not os.path.exists(file_path):
+            raise Http404("Fitxer no trobat")
+        
+        # Determinar el tipus MIME
+        content_type, _ = mimetypes.guess_type(file_path)
+        if content_type is None:
+            content_type = 'application/octet-stream'
+        
+        # Crear la resposta
+        with open(file_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type=content_type)
+            
+        # Nom del fitxer per la descàrrega
+        filename = f"CV_{candidatura.estudiant.usuari.get_full_name()}_{candidatura.oferta.titol}.pdf"
+        filename = filename.replace(' ', '_').replace(',', '')
+        
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+        
+    except Exception as e:
+        messages.error(request, f'Error en descarregar el CV: {str(e)}')
+        return redirect('llista_candidatures_oferta', oferta_id=candidatura.oferta.id)
+    
+
+@require_POST
+@login_required
+def api_canviar_contrasenya(request):
+    """
+    Vista API per canviar la contrasenya de l'usuari.
+    Retorna JsonResponse amb 'success' i 'message' o 'errors'.
+    """
+    # El PasswordChangeForm necessita l'usuari actual i les dades del POST.
+    form = PasswordChangeForm(user=request.user, data=request.POST)
+
+    if form.is_valid():
+        user = form.save()
+        # Important: actualitza el hash de sessió per evitar que l'usuari es desconnecti
+        update_session_auth_hash(request, user)
+        return JsonResponse({'success': True, 'message': "Contrasenya canviada correctament."})
+    else:              
+       
+        specific_errors = {}
+        if 'old_password' in form.errors:
+            specific_errors['old_password'] = form.errors['old_password']
+        if 'new_password1' in form.errors:
+            specific_errors['new_password1'] = form.errors['new_password1']
+        if 'new_password2' in form.errors:
+            specific_errors['new_password2'] = form.errors['new_password2']        
+        
+        return JsonResponse({'success': False, 'errors': specific_errors})
+
+
+    

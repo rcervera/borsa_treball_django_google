@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import PasswordChangeForm
+
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.validators import validate_email
@@ -96,6 +96,7 @@ def afegir_oferta(request):
     'JORNADA': Oferta.JORNADA,
     'PUBLIC_DESTINATARI': Oferta.PUBLIC_DESTINATARI,
     'EXPERIENCIA': Oferta.EXPERIENCIA,
+    'current_page' : 'llista_ofertes'
     }
     return render(request, 'borsa_treball/afegir_oferta_empresa.html', context)
 
@@ -420,6 +421,7 @@ def llista_ofertes(request):
         'status_choices': status_choices,
         'order_choices': order_choices,
         'total_results': paginator.count,
+        'current_page' : 'llista_ofertes'
     }
     
     return render(request, 'borsa_treball/llista_ofertes_empresa.html', context)
@@ -633,6 +635,7 @@ def editar_oferta(request, oferta_id):
         'idiomes_existents': idiomes,
         'TIPUS_CONTRACTE': Oferta.TIPUS_CONTRACTE,
         'JORNADA': Oferta.JORNADA,
+        'current_page' : 'llista_ofertes'
     }
 
     return render(request, 'borsa_treball/editar_oferta_empresa.html', context)
@@ -825,42 +828,17 @@ def editar_perfil_empresa(request):
         empresa = request.user.empresa
     except Empresa.DoesNotExist:
         messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
-        return redirect('index') # O la teva pàgina d'inici de sessió si és més apropiat
+        return redirect('index') 
     
     context = {
         'empresa': empresa,
         'user': request.user,
         'sectors': Sector.objects.all().order_by('nom'),
+        'current_page' : 'editar_perfil'
     }
     return render(request, 'borsa_treball/editar_perfil_empresa.html', context)
 
 
-@require_POST
-@login_required
-def api_canviar_contrasenya(request):
-    """
-    Vista API per canviar la contrasenya de l'usuari.
-    Retorna JsonResponse amb 'success' i 'message' o 'errors'.
-    """
-    # El PasswordChangeForm necessita l'usuari actual i les dades del POST.
-    form = PasswordChangeForm(user=request.user, data=request.POST)
-
-    if form.is_valid():
-        user = form.save()
-        # Important: actualitza el hash de sessió per evitar que l'usuari es desconnecti
-        update_session_auth_hash(request, user)
-        return JsonResponse({'success': True, 'message': "Contrasenya canviada correctament."})
-    else:              
-       
-        specific_errors = {}
-        if 'old_password' in form.errors:
-            specific_errors['old_password'] = form.errors['old_password']
-        if 'new_password1' in form.errors:
-            specific_errors['new_password1'] = form.errors['new_password1']
-        if 'new_password2' in form.errors:
-            specific_errors['new_password2'] = form.errors['new_password2']        
-        
-        return JsonResponse({'success': False, 'errors': specific_errors})
 
 # API per modificar informació de l'Empresa
 @require_POST
@@ -898,12 +876,12 @@ def api_editar_perfil_empresa(request):
             errors.setdefault('cif', []).append('Aquest CIF ja està registrat per una altra empresa.')
 
     telefon = request.POST.get('telefon', '').strip()
-    # Telefon no és obligatori segons el teu model (blank=True, null=True, max_length=15)
+    # Telefon no és obligatori 
     if telefon and not re.match(r'^\+?[0-9\s\-\(\)]{1,15}$', telefon):
         errors.setdefault('telefon', []).append('El telèfon no té un format vàlid (pot incloure "+" al principi, números, espais, guions i parèntesis; màxim 15 caràcters).')
 
     email_contacte = request.POST.get('email_contacte', '').strip()
-    # Email de contacte no és obligatori segons el teu model (blank=True, null=True)
+    # Email de contacte no és obligatori
     if email_contacte:
         try:
             validate_email(email_contacte)
@@ -912,7 +890,7 @@ def api_editar_perfil_empresa(request):
 
     num_treballadors_str = request.POST.get('num_treballadors', '').strip()
     num_treballadors = None 
-    # num_treballadors no és obligatori segons el teu model (blank=True, null=True)
+    # num_treballadors no és obligatori 
     if num_treballadors_str:
         try:
             num_treballadors = int(num_treballadors_str)
@@ -923,7 +901,7 @@ def api_editar_perfil_empresa(request):
 
     sector_id = request.POST.get('sector', '')
     sector_obj = None
-    # Sector no és obligatori segons el teu model (null=True)
+    # Sector no és obligatori 
     if sector_id:
         try:
             sector_obj = Sector.objects.get(id=sector_id)
@@ -931,15 +909,15 @@ def api_editar_perfil_empresa(request):
             errors.setdefault('sector', []).append('El sector seleccionat no és vàlid.')
     
     web = request.POST.get('web', '').strip()
-    # Web no és obligatori segons el teu model (blank=True, null=True)
+    # Web no és obligatori 
     if web and not web.startswith(('http://', 'https://')):
         web = 'https://' + web
-    # Validació de format d'URL bàsica (més exhaustiva amb Django forms)
+    # Validació de format d'URL bàsica
     if web and not re.match(r'^https?://[^\s/$.?#].[^\s]*$', web):
         errors.setdefault('web', []).append('La pàgina web no té un format vàlid.')
     
     descripcio = request.POST.get('descripcio', '').strip()
-    # Descripcio no és obligatori segons el teu model (blank=True, null=True)
+    # Descripcio no és obligatori 
 
 
     if errors:
@@ -1015,8 +993,8 @@ def eliminar_perfil_empresa(request):
     except (Empresa.DoesNotExist, AttributeError):
         # Si no hi ha empresa associada o l'usuari no és de tipus empresa
         messages.error(request, 'No s\'ha trobat un perfil d\'empresa vàlid associat al teu usuari.')
-        return redirect('index') # O una altra pàgina adequada (ex: home de l'app)
-
+        return redirect('index')
+    
     try:
         # PRIMER: Tancar la sessió de l'usuari, abans d'eliminar el compte.
         logout(request) 

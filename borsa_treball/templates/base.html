@@ -69,11 +69,11 @@
             
             {% elif user.tipus == 'EMP' %}
               
-                <a class="nav-link" href="{% url 'llista_ofertes_empresa' %}">
+                <a class="nav-link {% if current_page == 'llista_ofertes' %}active{% endif %}" href="{% url 'llista_ofertes_empresa' %}">
                     <i class="bi bi-list-ul"></i>Les meves ofertes
                 </a>
                
-                <a class="nav-link" href="{% url 'editar_perfil_empresa' %}">
+                <a class="nav-link {% if current_page == 'editar_perfil' %}active{% endif %}" href="{% url 'editar_perfil_empresa' %}">
                     <i class="bi bi-person me-2"></i>Editar Perfil
                 </a>
                 
@@ -105,7 +105,7 @@
             </div>
            <form action="{% url 'logout' %}" method="post" class="mt-3">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-sm w-100">
+                <button type="submit" class="btn btn-primary w-100 rounded-pill">
                     <i class="bi bi-box-arrow-right"></i> Tancar sessió
                 </button>
             </form>

@@ -443,3 +443,24 @@ class RegistreAuditoria(models.Model):
         verbose_name = "Registre d'auditoria"
         verbose_name_plural = "Registres d'auditoria"
         ordering = ['-data']
+
+
+
+class Missatge(models.Model):
+    remitent = models.ForeignKey(
+        Usuari,
+        related_name='missatges_enviats',
+        on_delete=models.CASCADE
+    )
+    destinatari = models.ForeignKey(
+        Usuari,
+        related_name='missatges_rebuts',
+        on_delete=models.CASCADE
+    )
+    assumpte = models.CharField(max_length=255)
+    contingut = models.TextField()
+    llegit = models.BooleanField(default=False)
+    creat_el = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"De {self.remitent.username} a {self.destinatari.username}: {self.assumpte}"
