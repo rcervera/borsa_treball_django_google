@@ -3,6 +3,9 @@ from django.db import models
 from django.core.exceptions import ValidationError 
 from django.utils import timezone
 from datetime import datetime
+import os
+import time  
+import uuid
 
 class UsuariManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -322,6 +325,23 @@ class EstatCandidatura(models.TextChoices):
     ENTREVISTA = 'EN', 'Entrevista programada'
     CONTRATADA = 'CO', 'Contractada'
 
+def candidatura_cv_upload_to(instance, filename):
+    return f'private/candidatures/{instance.estudiant.id}/{filename}'
+
+
+def curriculum_upload_path(instance, filename):
+    """
+    Genera una ruta única y organizada para cada currículum
+    Formato: curriculaums/YYYY/MM/uuid.ext
+    """
+    ext = os.path.splitext(filename)[1].lower()  # Normaliza extensión a minúsculas
+    unique_id = uuid.uuid4()  # Genera un UUID único
+    return os.path.join(
+        'curriculums',
+        time.strftime("%Y"),
+        time.strftime("%m"),
+        f"{unique_id}{ext}"
+    )
 
 class Candidatura(models.Model):
     oferta = models.ForeignKey(
@@ -352,13 +372,13 @@ class Candidatura(models.Model):
         verbose_name='Carta de presentació'
     )
     cv_adjunt = models.FileField(
-        upload_to='candidatures/cv/',
+        upload_to=curriculum_upload_path,
         blank=True,
         null=True,
         verbose_name='CV adjunt'
     )
     altres_adjunts = models.FileField(
-        upload_to='candidatures/adjunts/',
+        upload_to='private/candidatures/adjunts/',
         blank=True,
         null=True,
         verbose_name='Altres documents'

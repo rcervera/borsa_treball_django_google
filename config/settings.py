@@ -30,7 +30,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.128.144','localhost','127.0.0.1']
 
 
 # Application definition
@@ -81,10 +81,15 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'borsa_treball',
+        'USER': 'borsatreball',
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
@@ -132,6 +137,13 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+MEDIA_URL = '/media/'  # Solo para desarrollo
+MEDIA_ROOT = os.path.join(BASE_DIR, 'private/uploads/')
+
+# Configuración para archivos privados
+PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, 'private/')
+PRIVATE_MEDIA_URL = '/protected/'  # URL que usará Apache
 
 # Configuració opcional de django-bootstrap5
 BOOTSTRAP5 = {
