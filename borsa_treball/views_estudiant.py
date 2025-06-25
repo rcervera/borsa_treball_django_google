@@ -737,9 +737,9 @@ def descarregar_cv_candidatura(request, candidatura_id):
     try:
         estudiant = request.user.estudiant
     except Estudiant.DoesNotExist:
-        return HttpResponse('sense permisos')
+        #return HttpResponse('sense permisos')
         #messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
-        #return redirect('index')
+        return redirect('index')
     
     # Obtenir la candidatura i verificar permisos
     candidatura = get_object_or_404(Candidatura, id=candidatura_id)
@@ -771,9 +771,9 @@ def descarregar_cv_candidatura(request, candidatura_id):
         return response
         
     except Exception as e:
-        return HttpResponse(f'Error en descarregar el CV: {str(e)}')
+        #return HttpResponse(f'Error en descarregar el CV: {str(e)}')
         #messages.error(request, f'Error en descarregar el CV: {str(e)}')
-        #return redirect('candidatures_oferta', oferta_id=candidatura.oferta.id)
+        return redirect('candidatures_oferta', oferta_id=candidatura.oferta.id)
 
 
 @login_required

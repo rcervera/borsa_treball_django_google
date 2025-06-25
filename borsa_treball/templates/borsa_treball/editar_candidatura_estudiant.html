@@ -40,6 +40,7 @@
                     
                     <form method="post" enctype="multipart/form-data" id="formEditarCandidatura">
                         {% csrf_token %}
+                     
                         
                         <div class="mb-4">
                              <label for="carta_presentacio" class="form-label fw-bold">
@@ -70,7 +71,7 @@
                                                 <strong>Fitxer actual:</strong><br>
                                                 <small>{{ candidatura.cv_adjunt.name|slice:"15:" }}</small>
                                             </div>
-                                            <a href="{% url 'descarregar_cv_candidatura' candidatura.id %}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <a href="{% url 'descarregar_cv_candidatura_estudiant' candidatura.id %}" target="_blank" class="btn btn-sm btn-outline-primary">
                                                 <i class="bi bi-eye"></i>
                                             </a>
                                         </div>
