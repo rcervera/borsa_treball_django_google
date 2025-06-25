@@ -352,7 +352,7 @@ class Candidatura(models.Model):
         verbose_name='Carta de presentació'
     )
     cv_adjunt = models.FileField(
-        upload_to='candidatures/cv/',
+        upload_to='private/candidatures/cv/',
         blank=True,
         null=True,
         verbose_name='CV adjunt'

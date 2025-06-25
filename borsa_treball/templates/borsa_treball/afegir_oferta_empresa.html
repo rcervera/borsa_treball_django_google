@@ -16,16 +16,7 @@
                     <p class="text-muted">Publica una nova oferta per trobar el millor talent</p>
                 </div>
 
-                <!-- Messages -->
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-
+                
                 <!-- Alertes API -->
                 <div id="api-missatges"></div>
 
