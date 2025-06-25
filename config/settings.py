@@ -138,12 +138,12 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-MEDIA_URL = '/media/'  # Solo para desarrollo
+MEDIA_URL = '/media/'  # només desenvolupament
 MEDIA_ROOT = os.path.join(BASE_DIR, 'private/uploads/')
 
-# Configuración para archivos privados
+# Configuració per arxius privats
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, 'private/')
-PRIVATE_MEDIA_URL = '/protected/'  # URL que usará Apache
+PRIVATE_MEDIA_URL = '/protected/'  
 
 # Configuració opcional de django-bootstrap5
 BOOTSTRAP5 = {
