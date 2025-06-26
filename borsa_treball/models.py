@@ -116,7 +116,7 @@ class Estudiant(models.Model):
 
 class Cicle(models.Model):
     familia = models.ForeignKey(FamiliaProfessional, on_delete=models.CASCADE)
-    codi = models.CharField(max_length=5)
+    codi = models.CharField(max_length=10)
     nom = models.CharField(max_length=150)
     NIVELLS = [
         ('GM', 'Grau Mitjà'),
