@@ -328,16 +328,17 @@ def llista_ofertes(request):
             Q(lloc_treball__icontains=search_query)
         )
     
-    estat_map = {
-        'activa': 'AC',
-        'caducada': 'CD',
-        'oculta': 'OC',
-        'revisio': 'RV',
-    }
-
-    estat_valor = estat_map.get(status_filter)
-    if estat_valor:
-        ofertes = ofertes.filter(estat=estat_valor)
+    if status_filter:
+        if status_filter == 'activa':
+            ofertes = ofertes.filter(estat='AC',data_limit__gte=today)
+        elif status_filter == 'caducada':
+            ofertes = ofertes.filter(data_limit__lt=today)
+        elif status_filter == 'oculta':
+            ofertes = ofertes.filter(estat='OC')
+        elif status_filter == 'revisio':
+            ofertes = ofertes.filter(estat='RV')
+        elif status_filter == 'totes':
+            pass  # No s'aplica cap filtre
 
     
     if type_filter:
@@ -371,7 +372,7 @@ def llista_ofertes(request):
         'caducades': empresa.ofertes.filter(data_limit__lt=today).count(),
         'ocultes': empresa.ofertes.filter(estat='OC').count(),
         'revisio': empresa.ofertes.filter(estat='RV').count(),
-        'total_candidatures_actives': Candidatura.objects.filter(oferta__empresa=empresa, activa=True).count(),
+        'total_candidatures_actives': Candidatura.objects.filter(oferta__empresa=empresa, estat='AC').count(),
     }
     
     items_per_page = request.GET.get('per_page', 6)
