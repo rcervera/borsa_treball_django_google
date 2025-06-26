@@ -1164,11 +1164,12 @@ document.getElementById("ofertaForm").addEventListener("submit", async function(
                 const estatDiv = document.getElementById(`estat-oferta`);
                 if (estatDiv) {
                     estatDiv.innerHTML = data.visible
-                        ? `<span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle me-1"></i>Visible</span>`
+                        ? `<span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle me-1"></i>En revisió</span>`
                         : `<span class="badge bg-secondary-subtle text-secondary"><i class="bi bi-eye-slash me-1"></i>Oculta</span>`;
                 }
 
                 showToast(data.message, 'success');
+
 
             } else {
                 showToast(data.error || 'Error en canviar la visibilitat', 'error');
