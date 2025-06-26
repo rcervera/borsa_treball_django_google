@@ -122,15 +122,33 @@ class Command(BaseCommand):
 
         # Cicles Formatius
         cicles = [
-            {'codi': 'ADG31', 'familia': 'ADG', 'nom': 'Gestió Administrativa', 'grau': 'GM', 'durada': 2000},
-            {'codi': 'ADG21', 'familia': 'ADG', 'nom': 'Administració i Finances', 'grau': 'GS', 'durada': 2000},
-            {'codi': 'COM31', 'familia': 'COM', 'nom': 'Activitats Comercials', 'grau': 'GM', 'durada': 2000},
-            {'codi': 'COM21', 'familia': 'COM', 'nom': 'Màrqueting i Publicitat', 'grau': 'GS', 'durada': 2000},
-            {'codi': 'IFC11', 'familia': 'IFC', 'nom': 'Sistemes Microinformàtics i Xarxes', 'grau': 'GM', 'durada': 2000},
-            {'codi': 'IFC21', 'familia': 'IFC', 'nom': 'Administració de Sistemes Informàtics en Xarxa', 'grau': 'GS', 'durada': 2000},
-            {'codi': 'IFC22', 'familia': 'IFC', 'nom': 'Desenvolupament d\'Aplicacions Multiplataforma', 'grau': 'GS', 'durada': 2000},
-            {'codi': 'SSC31', 'familia': 'SSC', 'nom': 'Atenció a Persones en Situació de Dependència', 'grau': 'GM', 'durada': 2000},
+            # Grau Mitjà (GM)
+            {'codi': 'CFPM AG10', 'familia': 'ADG', 'nom': 'gestió administrativa', 'grau': 'GM', 'durada': 2000},
+            {'codi': 'CFPM AG11', 'familia': 'ADG', 'nom': 'gestió administrativa (en l’àmbit jurídic)', 'grau': 'GM', 'durada': 2000},
+            {'codi': 'CFPM CM10', 'familia': 'COM', 'nom': 'activitats comercials', 'grau': 'GM', 'durada': 2000},
+            {'codi': 'CFPM SC10', 'familia': 'SSC', 'nom': 'atenció a persones en situació de dependència', 'grau': 'GM', 'durada': 2000},
+            {'codi': 'CFPM IC10', 'familia': 'IFC', 'nom': 'sistemes microinformàtics i xarxes', 'grau': 'GM', 'durada': 2000},
+
+            # Grau Superior (GS)
+            {'codi': 'CFPS AGB0', 'familia': 'ADG', 'nom': 'administració i finances', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS AGA0', 'familia': 'ADG', 'nom': 'assistència a la direcció', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS CMA0', 'familia': 'COM', 'nom': 'gestió de vendes i espais comercials', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS CMD0', 'familia': 'COM', 'nom': 'màrqueting i publicitat', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS CMC0', 'familia': 'COM', 'nom': 'gestió del transport i logística', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS CMB0', 'familia': 'COM', 'nom': 'comerç internacional', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS SCB0', 'familia': 'SSC', 'nom': 'educació infantil', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS SCC0', 'familia': 'SSC', 'nom': 'integració social', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS SCA0', 'familia': 'SSC', 'nom': 'animació sociocultural i turística', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS ICA1', 'familia': 'IFC', 'nom': 'administració de sistemes informàtics en xarxa. perfil professional ciberseguretat', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS ICA0', 'familia': 'IFC', 'nom': 'administració de sistemes informàtics en xarxa', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS ICB0', 'familia': 'IFC', 'nom': 'desenvolupament d\'aplicacions multiplataforma', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS ICC0', 'familia': 'IFC', 'nom': 'desenvolupament d\'aplicacions web', 'grau': 'GS', 'durada': 2000},
+
+            # Cursos d'Especialització
+            {'codi': 'CEFP IC01', 'familia': 'IFC', 'nom': 'curs d\'especialització en ciberseguretat en tecnologies de la informació', 'grau': 'GS', 'durada': 600},
+            {'codi': 'CEFP IC03', 'familia': 'IFC', 'nom': 'curs d\'especialització en intel·ligència artificial i big data', 'grau': 'GS', 'durada': 600},
         ]
+
 
         for cicle in cicles:
             familia = FamiliaProfessional.objects.get(codi=cicle['familia'])
@@ -272,7 +290,7 @@ class Command(BaseCommand):
         ]
 
         for i in range(10):
-            email = f'estudiant{i+1}@{fake.domain_name()}'
+            email = f'estudiant{i+1}@estudiant.com'
 
             # Generar DNI únic
             dni_base = f'{fake.random_number(digits=8)}B'
@@ -375,8 +393,7 @@ class Command(BaseCommand):
                     contacte_nom=fake.name(),
                     contacte_email=fake.email(),
                     contacte_telefon=fake.phone_number()[:15],
-                    visible=True,
-                    activa=True,
+                   
                 )
 
                 # Assignar cicles i capacitats

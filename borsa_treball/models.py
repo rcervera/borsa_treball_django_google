@@ -237,6 +237,13 @@ class NivellIdioma(models.Model):
         return f"{self.idioma or '-'} ({self.nivell or '-'})"
     
 
+class EstatOferta(models.TextChoices):
+    OCULT = 'OC', 'Ocult'  # No és visible per estudiants
+    REVISIO = 'RV', 'En revisió'  # L'empresa l'ha creada, però està pendent d'activació
+    ACTIU = 'AC', 'Actiu'  # Publicada pel responsable de la borsa i visible
+    TANCAT = 'TC', 'Tancat'  # Vacant coberta o oferta finalitzada
+
+
 
 class Oferta(models.Model):
     TIPUS_CONTRACTE = [
@@ -264,6 +271,13 @@ class Oferta(models.Model):
         ('5A', '> 5 anys'),
     ]
 
+    estat = models.CharField(
+        max_length=2, 
+        choices=EstatOferta.choices,
+        default=EstatOferta.REVISIO,
+        verbose_name="Estat de l'oferta",
+        help_text="Controla la visibilitat i disponibilitat de l'oferta"
+    )
 
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='ofertes')
     
