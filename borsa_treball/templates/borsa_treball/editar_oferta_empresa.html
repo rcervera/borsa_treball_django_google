@@ -60,32 +60,32 @@
                     <p class="text-muted">Pots modificar les dades de l'oferta de treball</p>
 
                      <div class="mb-2">
-                                    {% now "Y-m-d" as today %}
-
-                                    {% if not oferta.activa %}
-                                        <span class="badge bg-secondary-subtle text-danger">
-                                            <i class="bi bi bi-lightbulb-off me-1"></i>Pendent aprovar
-                                        </span>
-                                    {% endif %}
-                                    <span  id="estat-oferta">
-                                        {% if not oferta.visible %}
-                                            <span class="badge bg-secondary-subtle text-secondary">
-                                                <i class="bi bi-eye-slash me-1"></i>Oculta
-                                            </span>
-                                        {% else %}
-                                            <span class="badge bg-success-subtle text-success">
-                                                <i class="bi bi-check-circle me-1"></i>Visible
-                                            </span>
-                                        {% endif %}   
-                                        </span>
-
-                                    {% if oferta.data_limit|date:"Y-m-d" >= today %}
-                                      
-                                    {% else %}
+                                    {% if oferta.es_caducada %}
                                         <span class="badge bg-danger-subtle text-danger">
                                             <i class="bi bi-x-circle me-1"></i>Caducada
                                         </span>
                                     {% endif %}
+
+                                    <span  id="estat-oferta">
+                                        {% if oferta.estat == 'RV' %}
+                                                <span class="badge bg-secondary-subtle text-danger">
+                                                    <i class="bi bi-lightbulb-off me-1"></i>En revisió
+                                                </span>
+                                        {% elif oferta.estat == 'OC' %}
+                                                <span class="badge bg-secondary-subtle text-secondary">
+                                                    <i class="bi bi-eye-slash me-1"></i>Oculta
+                                                </span>
+                                        {% elif oferta.estat == 'AC' %}
+                                                <span class="badge bg-success-subtle text-success">
+                                                    <i class="bi bi-check-circle me-1"></i>Activa
+                                                </span>
+                                        {% elif oferta.estat == 'TC' %}
+                                                <span class="badge bg-warning-subtle text-warning">
+                                                    <i class="bi bi-lock-fill me-1"></i>Tancada
+                                                </span>
+                                        {% endif %}
+                                    </span>                        
+                                   
                     </div>
 
                    
