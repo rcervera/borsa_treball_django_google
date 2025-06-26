@@ -401,6 +401,7 @@ def llista_ofertes(request):
         ('activa', 'Actives'),
         ('caducada', 'Caducades'),
         ('oculta', 'Ocultes'),
+        ('revisio', 'En revisió'),
     ]
     
     order_choices = [
