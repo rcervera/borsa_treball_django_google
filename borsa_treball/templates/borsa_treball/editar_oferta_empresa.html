@@ -18,30 +18,32 @@
                             <i class="bi bi-gear me-2"></i>Accions
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
+
                             {% if oferta.candidatures_count > 0 %}
                                 <!-- Si hi ha candidatures: només mostrar opció de veure candidatures -->
                                 <li><a class="dropdown-item" href="{% url 'llista_candidatures_oferta' oferta.id %}">
                                     <i class="bi bi-people me-2"></i>Veure candidatures ({{ oferta.candidatures_count }})
                                 </a></li>
-                            {% else %}
-                                <!-- Si NO hi ha candidatures: mostrar totes les opcions de gestió -->
+                            {% else %}                                
                                 <li><span class="dropdown-item-text text-muted">
                                     <i class="bi bi-people me-2"></i>Cap candidatura
                                 </span></li>
                                 <li><hr class="dropdown-divider"></li>
-                                
-                                <!-- Opció de canviar visibilitat -->
+                            {% endif %}                            
+                            
+                            <!-- Opció de canviar estat -->
                                  
-                                {% if oferta.visible %}
+                            {% if oferta.estat == 'RV'  %}
                                 <li><a class="dropdown-item" href="#" onclick="toggleVisibilitat('{{ oferta.id }}',this)">
                                     <i class="bi bi-eye-slash me-2"></i>Ocultar l'oferta
                                 </a></li>
-                                {% else %}
+                            {% elif oferta.estat == 'OC' %}
                                 <li><a class="dropdown-item" href="#" onclick="toggleVisibilitat('{{ oferta.id }}',this)">
                                     <i class="bi bi-eye me-2"></i>Fer visible l'oferta
                                 </a></li>
-                                {% endif %}
-                                
+                            {% endif %}
+                             
+                             {% if oferta.estat == 'RV' or oferta.estat == 'OC' %}
                                 <!-- Opció d'eliminar -->
                                 <li><a class="dropdown-item text-danger" href="#" onclick="confirmarEliminacio('{{ oferta.id }}')">
                                     <i class="bi bi-trash me-2"></i>Eliminar oferta
@@ -100,14 +102,14 @@
                             <p class="mb-2">
                                 Pots eliminar i canviar l'estat de l'oferta mentre no hi hagi cap candidatura en procés.
                             </p>
-                            {% if not oferta.activa %}
+                            {% if oferta.estat == 'RV' %}
                             <p class="mb-2">
                                 L'oferta està pendent de validació per part del responsable de la borsa de treball.
                             </p>
                             {% endif %}
-                            {% if not oferta.visible %}
+                            {% if oferta.estat == 'OC' or oferta.estat == 'RV' %}
                             <p class="mb-0">
-                                Mentre l'oferta estigui oculta els estudiants no poden presentar-hi candidatura.
+                                Mentre l'oferta estigui oculta on en revisió els estudiants no poden presentar-hi candidatura.
                             </p>
                             {% endif %}
                             <p class="mb-0">
@@ -117,16 +119,7 @@
                     </div>
                 </div>
 
-                <!-- Messages -->
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-
+               
                 <!-- Alertes API -->
                 <div id="api-missatges"></div>
 
