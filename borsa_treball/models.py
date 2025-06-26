@@ -238,10 +238,10 @@ class NivellIdioma(models.Model):
     
 
 class EstatOferta(models.TextChoices):
-    OCULT = 'OC', 'Ocult'  # No és visible per estudiants
+    OCULT = 'OC', 'Oculta'  # No és visible per estudiants
     REVISIO = 'RV', 'En revisió'  # L'empresa l'ha creada, però està pendent d'activació
-    ACTIU = 'AC', 'Actiu'  # Publicada pel responsable de la borsa i visible
-    TANCAT = 'TC', 'Tancat'  # Vacant coberta o oferta finalitzada
+    ACTIU = 'AC', 'Activa'  # Publicada pel responsable de la borsa i visible
+    TANCAT = 'TC', 'Tancada'  # Vacant coberta o oferta finalitzada
 
 
 

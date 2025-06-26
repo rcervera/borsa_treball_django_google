@@ -172,6 +172,7 @@ def crear_oferta_api(request):
     requisits = data.get('requisits', '').strip()
     horari = data.get('horari', '').strip()
     salari = data.get('salari', '').strip()
+    
     visible = data.get('visible', True)
 
     # Validació numero_vacants
@@ -231,6 +232,9 @@ def crear_oferta_api(request):
     try:
         with transaction.atomic():
             # Crear oferta amb variables validades
+
+            estat_valor = 'RV' if visible else 'OC'  # 'En revisió' si visible, 'Oculta' si no
+
             oferta = Oferta.objects.create(
                 empresa=empresa,
                 titol=titol,
@@ -249,7 +253,7 @@ def crear_oferta_api(request):
                 contacte_telefon=empresa.telefon or '',
                 public_destinatari=destinatari,
                 experiencia=experiencia,
-                visible=visible,
+                estat=estat_valor,
             )
 
             # Validació del model abans de continuar
@@ -324,16 +328,17 @@ def llista_ofertes(request):
             Q(lloc_treball__icontains=search_query)
         )
     
-    if status_filter:
-        
-        if status_filter == 'activa':
-            ofertes = ofertes.filter(data_limit__gte=today, visible=True)
-        elif status_filter == 'caducada':
-            ofertes = ofertes.filter(data_limit__lt=today)
-        elif status_filter == 'oculta':
-            ofertes = ofertes.filter(visible=False)
-        elif status_filter == 'totes':
-            pass
+    estat_map = {
+        'activa': 'AC',
+        'caducada': 'CD',
+        'oculta': 'OC',
+        'revisio': 'RV',
+    }
+
+    estat_valor = estat_map.get(status_filter)
+    if estat_valor:
+        ofertes = ofertes.filter(estat=estat_valor)
+
     
     if type_filter:
         ofertes = ofertes.filter(tipus_contracte=type_filter)
@@ -362,9 +367,10 @@ def llista_ofertes(request):
     
     stats = {
         'total': empresa.ofertes.count(),
-        'actives': empresa.ofertes.filter(data_limit__gte=today, visible=True).count(),
+        'actives': empresa.ofertes.filter(data_limit__gte=today, estat='AC').count(),
         'caducades': empresa.ofertes.filter(data_limit__lt=today).count(),
-        'ocultes': empresa.ofertes.filter(visible=False).count(),
+        'ocultes': empresa.ofertes.filter(estat='OC').count(),
+        'revisio': empresa.ofertes.filter(estat='RV').count(),
         'total_candidatures_actives': Candidatura.objects.filter(oferta__empresa=empresa, activa=True).count(),
     }
     
@@ -434,7 +440,7 @@ def llista_ofertes(request):
 @require_http_methods(["POST"])
 def toggle_visibilitat_oferta(request, oferta_id):
     """
-    Vista per canviar la visibilitat d'una oferta (visible/oculta).
+    Vista per canviar l'estat de l'oferta: OC a RV
     """
     try:
         empresa = request.user.empresa
@@ -451,34 +457,34 @@ def toggle_visibilitat_oferta(request, oferta_id):
         return JsonResponse({'success': False, 'message': 'Oferta no trobada'}, status=404)
     
     try:
-        # Verificar que l'oferta no té candidatures
-        nombre_candidatures = oferta.candidatures.count()
-        if nombre_candidatures > 0:
+       
+        if oferta.estat == 'AC':
             return JsonResponse({
                 'success': False,
-                'message': f'No es pot canviar l\'estat de l\'oferta perquè té {nombre_candidatures} candidatura{"s" if nombre_candidatures != 1 else ""} associada{"s" if nombre_candidatures != 1 else ""}.',
-                'error_type': 'candidatures_existents',
-                'candidatures_count': nombre_candidatures
-            }, status=400)
-        
+                'message': "No es pot modificar l'estat perquè l'oferta està activa.",
+                'error_type': 'oferta_activa',                
+            }, status=400)            
+        else:
+            if oferta.estat == 'OC':
+                oferta.estat = 'RV'
+            else:
+                oferta.estat = 'OC'
 
-        # Canviar la visibilitat
-        oferta.visible = not oferta.visible
         oferta.save()
         
-        status_text = "visible" if oferta.visible else "oculta"
+        status_text = "en revisió" if oferta.estat == 'RV' else "oculta"
         
         return JsonResponse({
             'success': True,
             'message': f'L\'oferta "{oferta.titol}" ara és {status_text}.',
-            'visible': oferta.visible,
+            'estat': oferta.estat,
             'oferta_id': oferta.id
         })
         
     except Exception as e:
         return JsonResponse({
             'success': False,
-            'error': f'Error en canviar la visibilitat: {str(e)}'
+            'error': f'Error en canviar l\'estat de l\'oferta: {str(e)}'
         }, status=500)
 
 
@@ -509,15 +515,12 @@ def esborrar_oferta(request, oferta_id):
         return JsonResponse({'success': False, 'message': 'Oferta no trobada'}, status=404)
     
     try:
-        # Verificar que l'oferta no té candidatures
-        nombre_candidatures = oferta.candidatures.count()
-        if nombre_candidatures > 0:
+        if oferta.estat == 'AC':
             return JsonResponse({
                 'success': False,
-                'message': f'No es pot eliminar l\'oferta perquè té {nombre_candidatures} candidatura{"s" if nombre_candidatures != 1 else ""} associada{"s" if nombre_candidatures != 1 else ""}.',
-                'error_type': 'candidatures_existents',
-                'candidatures_count': nombre_candidatures
-            }, status=400)
+                'message': "No es pot esborrar l'oferta perquè aquesta està activa.",
+                'error_type': 'oferta_activa',                
+            }, status=400)   
         
 
         # Guardar informació de l'oferta abans d'esborrar-la
@@ -811,6 +814,7 @@ def api_actualitzar_oferta(request, oferta_id):
         }, status=500)
     
     return JsonResponse({'success': True, 'message': 'Oferta actualitzada correctament'})
+
 
 
 # -----------------------------------------------------------------------------------------------------
