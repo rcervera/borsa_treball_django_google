@@ -313,18 +313,21 @@
                                 </div>
                                 <div  id="error-jornada" class="error-validacio form-text text-danger"></div>
                             </div>
-                           {% if oferta.jornada == "PA" %}
-                                 <div class="col-md-3 mb-3" id="div_hores">   
+                            {% if oferta.jornada == "PA" %}
+                                <div class="col-md-3 mb-3" id="div_hores">   
                             {% else %}    
                                 <div class="col-md-3 mb-3" id="div_hores" style="display: none;"> 
                             {% endif %}                       
+
                                 <label for="hores" class="form-label">
-                                    <i class="bi  bi-clock text-muted me-2"></i> Nombre d'hores
+                                    <i class="bi bi-clock text-muted me-2"></i> Nombre d'hores
                                 </label> 
+
                                 <input type="number" 
-                                       value="{{ oferta.hores_setmanals }}"
-                                       name="hores" id="hores" class="form-control" min="1" placeholder="Ex: 20">
-                                <div  id="error-hores" class="error-validacio form-text text-danger"></div>
+                                    value="{{ oferta.hores_setmanals|default_if_none:'' }}"
+                                    name="hores" id="hores" class="form-control" min="1" placeholder="Ex: 20">
+
+                                <div id="error-hores" class="error-validacio form-text text-danger"></div>
                             </div>
                             
                             
