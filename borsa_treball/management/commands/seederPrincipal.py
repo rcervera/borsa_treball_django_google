@@ -478,7 +478,8 @@ class Command(BaseCommand):
                     oferta=oferta,
                     estudiant=estudiant,
                     estat=estat,
-                    carta_presentacio=carta,
+                    carta_presentacio=c
+                    arta,
                 )
                 
                 if estat in ['PR', 'EN', 'CO', 'RJ']:

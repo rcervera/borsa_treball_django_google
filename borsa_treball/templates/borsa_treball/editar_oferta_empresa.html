@@ -28,26 +28,28 @@
                                 <li><span class="dropdown-item-text text-muted">
                                     <i class="bi bi-people me-2"></i>Cap candidatura
                                 </span></li>
-                                <li><hr class="dropdown-divider"></li>
+                                
                             {% endif %}                            
                             
                             <!-- Opció de canviar estat -->
-                                 
-                            {% if oferta.estat == 'RV'  %}
-                                <li><a class="dropdown-item" href="#" onclick="toggleVisibilitat('{{ oferta.id }}',this)">
-                                    <i class="bi bi-eye-slash me-2"></i>Ocultar l'oferta
-                                </a></li>
-                            {% elif oferta.estat == 'OC' %}
-                                <li><a class="dropdown-item" href="#" onclick="toggleVisibilitat('{{ oferta.id }}',this)">
-                                    <i class="bi bi-eye me-2"></i>Fer visible l'oferta
-                                </a></li>
-                            {% endif %}
+                            {% if oferta.estat == 'RV' or oferta.estat == 'OC' %}
+                                <li><hr class="dropdown-divider"></li>
+
+                                {% if oferta.estat == 'RV'  %}
+                                    <li><a class="dropdown-item" href="#" onclick="toggleVisibilitat('{{ oferta.id }}',this)">
+                                        <i class="bi bi-eye-slash me-2"></i>Ocultar l'oferta
+                                    </a></li>
+                                {% elif oferta.estat == 'OC' %}
+                                    <li><a class="dropdown-item" href="#" onclick="toggleVisibilitat('{{ oferta.id }}',this)">
+                                        <i class="bi bi-eye me-2"></i>Fer visible l'oferta
+                                    </a></li>
+                                {% endif %}                             
                              
-                             {% if oferta.estat == 'RV' or oferta.estat == 'OC' %}
                                 <!-- Opció d'eliminar -->
                                 <li><a class="dropdown-item text-danger" href="#" onclick="confirmarEliminacio('{{ oferta.id }}')">
                                     <i class="bi bi-trash me-2"></i>Eliminar oferta
                                 </a></li>
+
                             {% endif %}
                         </ul>
                     </div>
@@ -99,22 +101,28 @@
                             <i class="bi bi-question-circle"></i>
                         </div>
                         <div class="alert-content">
-                            <p class="mb-2">
-                                Pots eliminar i canviar l'estat de l'oferta mentre no hi hagi cap candidatura en procés.
-                            </p>
+                            {% if oferta.estat == 'AC' %}
+                                <p class="mb-2">
+                                    No es pot eliminar i canviar l'estat de l'oferta quan aquesta estigui activa.
+                                </p>
+                            {% endif %}
+
                             {% if oferta.estat == 'RV' %}
                             <p class="mb-2">
                                 L'oferta està pendent de validació per part del responsable de la borsa de treball.
                             </p>
                             {% endif %}
+
                             {% if oferta.estat == 'OC' or oferta.estat == 'RV' %}
                             <p class="mb-0">
                                 Mentre l'oferta estigui oculta on en revisió els estudiants no poden presentar-hi candidatura.
                             </p>
                             {% endif %}
+                             {% if oferta.estat == 'AC' %}
                             <p class="mb-0">
                                 Pot haver-hi candidatures pendents de revisió per part del responsable de la borsa.
                             </p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

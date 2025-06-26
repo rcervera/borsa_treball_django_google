@@ -208,6 +208,17 @@ class CapacitatClau(models.Model):
         verbose_name_plural = "Capacitats Clau"
 
 
+class CapacitatOferta(models.Model):
+    oferta = models.ForeignKey('Oferta', on_delete=models.CASCADE, related_name='capacitats')
+    nom = models.CharField(max_length=100, help_text="Nom de la capacitat clau (lliure o suggerida)")
+  
+    class Meta:       
+        verbose_name = "Capacitat clau de l'oferta"
+        verbose_name_plural = "Capacitats clau de l'oferta"
+
+    def __str__(self):
+        return f"Capacitat {self.nom}"
+
 
 class Funcio(models.Model):
     """Funció específica requerida en una oferta (text lliure)"""

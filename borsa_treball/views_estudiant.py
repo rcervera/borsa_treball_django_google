@@ -20,15 +20,13 @@ from .models import Oferta, Empresa, Cicle, Funcio, NivellIdioma, CapacitatClau
 
 def llista_ofertes_tauler(request):
     """
-    Vista pública per llistar ofertes de feina actives i visibles.
+    Vista pública per llistar ofertes de feina actives i no caducades.
     Calcula els dies restants per a cada oferta.
     Permet filtrar per Cicle (estudis).
     """
-    # Filtrem les ofertes que són visibles, actives i futures
-   
+    # Filtrem les ofertes que són actives i futures (no caducades)   
     ofertes_queryset = Oferta.objects.filter(
-        visible=True,
-        activa=True,
+        estat='AC',        
         data_limit__gte=timezone.now().date()
     ).order_by('-data_publicacio', 'data_limit')
 
@@ -85,27 +83,11 @@ def detall_oferta_tauler(request, oferta_id):
     # Calcular estadístiques
     today = timezone.now().date()
     dies_restants = (oferta.data_limit - today).days if oferta.data_limit > today else 0
-    
-    # Estat de l'oferta
-    if not oferta.visible:
-        estat = 'oculta'
-        estat_class = 'secondary'
-        estat_icon = 'eye-slash'
-    elif oferta.data_limit < today:
-        estat = 'caducada'
-        estat_class = 'danger'
-        estat_icon = 'x-circle'
-    else:
-        estat = 'activa'
-        estat_class = 'success'
-        estat_icon = 'check-circle'
+       
     
     context = {
         'oferta': oferta,
-        'dies_restants': dies_restants,
-        'estat': estat,
-        'estat_class': estat_class,
-        'estat_icon': estat_icon,
+        'dies_restants': dies_restants,       
         'today': today,
     }
     
@@ -371,9 +353,9 @@ def llista_ofertes_estudiants_auth(request):
         messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
         return redirect('index')
     
-    # Obtenir ofertes visibles i no caducades
+    # Obtenir ofertes actives i no caducades
     ofertes = Oferta.objects.filter(
-        visible=True,
+        estat='AC',
         data_limit__gte=timezone.now().date()
     ).select_related('empresa').prefetch_related('cicles', 'candidatures')
     
@@ -443,12 +425,12 @@ def llista_ofertes_estudiants_auth(request):
     
     # Dades per filtres
     empreses = Empresa.objects.filter(
-        ofertes__visible=True,
+        ofertes__estat='AC',
         ofertes__data_limit__gte=timezone.now().date()
     ).distinct().order_by('nom_comercial')
     
     cicles = Cicle.objects.filter(
-        ofertes__visible=True,
+        ofertes__estat='AC',
         ofertes__data_limit__gte=timezone.now().date()
     ).distinct().order_by('nom')
     
@@ -490,11 +472,11 @@ def detall_oferta_estudiant(request, oferta_id):
         messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
         return redirect('index')
     
-    # Obtenir l'oferta visible i no caducada
+    # Obtenir l'oferta activa i no caducada
     oferta = get_object_or_404(
         Oferta,
         id=oferta_id,
-        visible=True,
+        estat='AC',
         data_limit__gte=timezone.now().date()
     )
     
@@ -529,7 +511,7 @@ def afegir_candidatura(request, oferta_id):
         return redirect('index') 
     
     # Obtenir l'oferta
-    oferta = get_object_or_404(Oferta, pk=oferta_id, visible=True)
+    oferta = get_object_or_404(Oferta, pk=oferta_id, estat='AC')
     
     # Verificar si ja existeix candidatura
     if Candidatura.objects.filter(oferta=oferta, estudiant=estudiant).exists():
