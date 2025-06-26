@@ -227,25 +227,25 @@
                                         <span class="badge bg-danger-subtle text-danger">
                                             <i class="bi bi-x-circle me-1"></i>Caducada
                                         </span>
-                                    {% else %}
-                                        {% if oferta.estat == 'RV' %}
+                                    {% endif %}
+                                    {% if oferta.estat == 'RV' %}
                                             <span class="badge bg-secondary-subtle text-danger">
                                                 <i class="bi bi-lightbulb-off me-1"></i>En revisió
                                             </span>
-                                        {% elif oferta.estat == 'OC' %}
+                                    {% elif oferta.estat == 'OC' %}
                                             <span class="badge bg-secondary-subtle text-secondary">
                                                 <i class="bi bi-eye-slash me-1"></i>Oculta
                                             </span>
-                                        {% elif oferta.estat == 'ACT' %}
+                                    {% elif oferta.estat == 'ACT' %}
                                             <span class="badge bg-success-subtle text-success">
                                                 <i class="bi bi-check-circle me-1"></i>Activa
                                             </span>
-                                        {% elif oferta.estat == 'TC' %}
+                                    {% elif oferta.estat == 'TC' %}
                                             <span class="badge bg-warning-subtle text-warning">
                                                 <i class="bi bi-lock-fill me-1"></i>Tancada
                                             </span>
-                                        {% endif %}
                                     {% endif %}
+                                   
 
                                 </div>
                                 <div>
