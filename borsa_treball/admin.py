@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.urls import reverse
 from .models import (
-    Usuari, Sector, Empresa, FamiliaProfessional, Estudiant, Cicle,
+    CapacitatOferta, Usuari, Sector, Empresa, FamiliaProfessional, Estudiant, Cicle,
     EstudiEstudiant, CapacitatClau, Funcio, Oferta, Candidatura,
     Noticia, RegistreAuditoria, NivellIdioma
 )
@@ -66,6 +66,10 @@ class FuncioInline(admin.TabularInline):
     extra = 1
     ordering = ('ordre',)
 
+class CapacitatOfertaInline(admin.TabularInline): 
+    model = CapacitatOferta
+    extra = 1  # Quantes files buides apareixen per defecte
+
 class OfertaInline(admin.TabularInline):
     model = Oferta
     extra = 0
@@ -100,7 +104,7 @@ class OfertaAdmin(admin.ModelAdmin):
     search_fields = ('titol', 'empresa__nom_comercial', 'descripcio')
     list_filter = ('tipus_contracte', 'jornada', 'activa', 'visible', 'data_publicacio')
     filter_horizontal = ('cicles', 'capacitats_clau')
-    inlines = [FuncioInline, NivellIdiomaInline]
+    inlines = [FuncioInline, NivellIdiomaInline, CapacitatOfertaInline]
     date_hierarchy = 'data_publicacio'
     autocomplete_fields = ['empresa']
 
