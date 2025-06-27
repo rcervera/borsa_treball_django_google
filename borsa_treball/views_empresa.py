@@ -266,10 +266,12 @@ def crear_oferta_api(request):
             if capacitats_ids:
                 oferta.capacitats_clau.set(capacitats_ids)  
 
-            capacitats_lliures = request.POST.getlist('capacitatsLliures')
-            for nom in capacitats_lliures:
+
+            
+            for nom in capacitats:
                 if nom.strip():
                     CapacitatOferta.objects.create(oferta=oferta, nom=nom.strip())
+                    
 
             # Crear funcions
             for ordre, desc in enumerate(data.get('funcions', []), start=1):
