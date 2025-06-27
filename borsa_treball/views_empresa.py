@@ -806,6 +806,17 @@ def api_actualitzar_oferta(request, oferta_id):
             oferta.cicles.set(cicles_ids)
             oferta.capacitats_clau.set(capacitats_ids)
 
+            # Esborra les antigues capacitats lliures (del model CapacitatOferta)
+            oferta.capacitats.all().delete()
+
+            # Afegeix les noves
+            capacitats = data.get("capacitats_lliures", [])
+            for nom in capacitats:
+                if nom.strip():
+                    CapacitatOferta.objects.create(oferta=oferta, nom=nom.strip())
+                      
+              
+
             # Eliminar idiomes antics i afegir nous
             oferta.idiomes.all().delete()
             for idioma_data in data.get("idiomes", []):

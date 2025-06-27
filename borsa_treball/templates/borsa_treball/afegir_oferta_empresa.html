@@ -15,17 +15,7 @@
                     <h2 class="h4 text-dark mb-2">Nova Oferta de Treball</h2>
                     <p class="text-muted">Publica una nova oferta per trobar el millor talent</p>
                 </div>
-
-                <!-- Messages -->
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-
+               
                 <!-- Alertes API -->
                 <div id="api-missatges"></div>
 
@@ -283,14 +273,8 @@
                         </div>
                     </div>
                             
-                    
+                    <!-- Capacitats LLIURES (text) -->
                     <div class="mb-5">
-                        <h5 class="text-primary mb-4">
-                            <i class="bi bi-gear me-2"></i>Capacitats
-                        </h5>     
-                        
-                        <!-- Capacitats LLIURES (text) -->
-                        <div class="mb-5">
                             <h5 class="text-primary mb-4">
                                 <i class="bi bi-stars me-2"></i> Capacitats clau (lliures)
                             </h5>
@@ -314,35 +298,11 @@
                                     <small class="text-muted">Pots escriure lliurement o seleccionar una capacitat suggerida.</small>
                                 </div>
                             </div>
-                        </div>
-
-
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                
-                                <div id="capacitats-container" class="mb-3">
-                                </div>
-                                <div class="card border-dashed">
-                                    <div class="card-body">
-                                        <div class="input-group">
-                                            
-                                            <select id="select-capacitat" class="form-select">
-                                                <option value="">Selecciona una capacitat</option>
-                                                {% for capacitat in capacitats %}
-                                                <option value="{{ capacitat.id }}" data-nom="{{ capacitat.nom }}" data-categoria="{{ capacitat.categoria }}">{{ capacitat.nom }} ({{ capacitat.categoria }})</option>
-                                                {% endfor %}
-                                            </select>
-                                            <button class="btn btn-warning" type="button" onclick="afegirCapacitat()">
-                                                <i class="bi bi-plus-lg"></i>
-                                            </button>
-                                        </div>
-                                        <small class="text-muted mt-2 d-block">Selecciona una capacitat per afegir-la.</small>
-                                        <div  id="error-capacitats" class="error-validacio form-text text-danger"></div>
-                                    </div>
-                                </div>
-                            </div>                            
-                        </div>
                     </div>
+
+
+                    
+                    
 
                     <!-- Secció 4: Funcions del càrrec -->
                     <div class="mb-5">
@@ -899,6 +859,7 @@ document.addEventListener('DOMContentLoaded', function() {
     inicialitzarCicles(); //
     renderitzarIdiomes();
     renderitzarFuncions();
+    renderitzarCapacitatsLliures();
 
     // Afegir funció amb Enter
     document.getElementById('nova-funcio').addEventListener('keypress', function(e) {

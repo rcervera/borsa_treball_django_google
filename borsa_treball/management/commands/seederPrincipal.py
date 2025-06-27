@@ -4,6 +4,7 @@ from django.db import transaction
 from faker import Faker
 import random
 from datetime import datetime, timedelta, date
+from django.utils.timezone import now
 from borsa_treball.models import (
     CapacitatOferta, Usuari, FamiliaProfessional, Cicle, Sector, CapacitatClau, 
     Estudiant, EstudiEstudiant, Empresa, Oferta, 
@@ -179,18 +180,16 @@ class Command(BaseCommand):
 
         # Capacitats Clau
         capacitats = [
-            {'nom': 'Treball en equip', 'categoria': 'Transversal'},
-            {'nom': 'Comunicació efectiva', 'categoria': 'Transversal'},
-            {'nom': 'Resolució de problemes', 'categoria': 'Transversal'},
-            {'nom': 'Adaptabilitat', 'categoria': 'Transversal'},
-            {'nom': 'Planificació i organització', 'categoria': 'Transversal'},
-            {'nom': 'Programació Python', 'categoria': 'Tècnica'},
-            {'nom': 'Administració de xarxes', 'categoria': 'Tècnica'},
-            {'nom': 'Gestió de bases de dades', 'categoria': 'Tècnica'},
-            {'nom': 'Màrqueting digital', 'categoria': 'Tècnica'},
-            {'nom': 'Atenció al client', 'categoria': 'Tècnica'},
-            {'nom': 'Comptabilitat', 'categoria': 'Tècnica'},
-            {'nom': 'Gestió documental', 'categoria': 'Tècnica'},
+            {'nom': 'Capacitat per comunicar-se', 'categoria': 'Professional'},
+            {'nom': 'Iniciativa pròpia', 'categoria': 'Professional'},
+            {'nom': 'Capacitat de treballar en equip i cooperació', 'categoria': 'Professional'},
+            {'nom': 'Disponibilitat d\'aprenentatge', 'categoria': 'Professional'},
+            {'nom': 'Disposició per a la responsabilitat', 'categoria': 'Professional'},
+            {'nom': 'Productivitat i compromís', 'categoria': 'Professional'},
+            {'nom': 'Empatia', 'categoria': 'Professional'},
+            {'nom': 'Resolució de conflictes', 'categoria': 'Professional'},
+            {'nom': 'Capacitat de lideratge', 'categoria': 'Professional'},
+            {'nom': 'Treballar en un entorn internacional', 'categoria': 'Professional'},
         ]
 
         for capacitat in capacitats:
@@ -541,7 +540,7 @@ class Command(BaseCommand):
                 descripcio=noticia['descripcio'],
                 cos=fake.text(max_nb_chars=1000),
                 destinatari=noticia['destinatari'],
-                data_publicacio=fake.date_time_this_year(),
+                data_publicacio=now(),
                 visible=True
             )
         
