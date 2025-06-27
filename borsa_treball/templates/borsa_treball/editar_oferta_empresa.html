@@ -406,10 +406,38 @@
                         </div>
                     </div>
                             
+                    <!-- Capacitats LLIURES (text) -->
+                    <div class="mb-5">
+                            <h5 class="text-primary mb-4">
+                                <i class="bi bi-stars me-2"></i> Capacitats clau (lliures)
+                            </h5>
+
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <div id="capacitatsLliures-container" class="mb-3"></div>
+
+                                    <div class="input-group mb-2">
+                                        <input type="text" id="nova-capacitat-lliure" class="form-control" placeholder="Escriu una capacitat clau" list="datalist-capacitats">
+                                        <datalist id="datalist-capacitats">
+                                            {% for capacitat in capacitats %}
+                                                <option value="{{ capacitat.nom }}"></option>
+                                            {% endfor %}
+                                        </datalist>
+                                        <button type="button" class="btn btn-success" onclick="afegirCapacitatLliure()">
+                                            <i class="bi bi-plus-circle"></i>
+                                        </button>
+                                    </div>
+
+                                    <small class="text-muted">Pots escriure lliurement o seleccionar una capacitat suggerida.</small>
+                                </div>
+                            </div>
+                    </div>
+
                     <div class="mb-5">
                         <h5 class="text-primary mb-4">
                             <i class="bi bi-gear me-2"></i>Capacitats
-                        </h5>      
+                        </h5>  
+                            
                         <div class="row">
                             <div class="col-md-12 mb-3">
                                 
@@ -943,12 +971,58 @@ function renderitzarCiclesSeleccionats() {
 }
 
 
+/////////////////////////////////////////////////////
+// CAPACITATS LLIURES
 
+let capacitats_lliures = {{ capacitats_lliures_existents|safe }} || []; // Array de strings
 
-function guardarEsborrany() {
-    // Implementar funcionalitat d'esborrany
-    alert('Funcionalitat d\'esborrany per implementar');
+function renderitzarCapacitatsLliures() {
+    const container = document.getElementById('capacitatsLliures-container');
+    container.innerHTML = '';
+
+    if (capacitats_lliures.length === 0) {
+        container.innerHTML = `
+            <div class="text-center text-muted py-3">
+                <i class="bi bi-stars" style="font-size: 2rem;"></i>
+                <p class="mt-2 mb-0">No has afegit cap capacitat clau lliure</p>
+                <small>Pots escriure o seleccionar una capacitat i afegir-la</small>
+            </div>
+        `;
+        return;
+    }
+
+    capacitats_lliures.forEach((capacitat, index) => {
+        const div = document.createElement('div');
+        div.className = 'funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start';
+        div.innerHTML = `
+            <div class="flex-grow-1">
+                <strong class="text-primary">${index + 1}.</strong> ${capacitat}
+                <input type="hidden" name="capacitats_lliures" value="${capacitat}">
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="eliminarCapacitatLliure(${index})" title="Eliminar capacitat">
+                <i class="bi bi-trash"></i>
+            </button>
+        `;
+        container.appendChild(div);
+    });
 }
+
+function afegirCapacitatLliure() {
+    const input = document.getElementById('nova-capacitat-lliure');
+    const valor = input.value.trim();
+    if (valor && !capacitats_lliures.includes(valor)) {
+        capacitats_lliures.push(valor);
+        input.value = '';
+        input.focus();
+        renderitzarCapacitatsLliures();
+    }
+}
+
+function eliminarCapacitatLliure(index) {
+    capacitats_lliures.splice(index, 1);
+    renderitzarCapacitatsLliures();
+}
+
 
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {
@@ -956,7 +1030,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     funcions = {{ funcions_existents|safe }};
     idiomes = {{ idiomes_existents|safe }};
-
+   
     
     capacitats_clau_seleccionades = {{ capacitats_existents|safe }};
     cicles_seleccionats = {{ cicles_existents|safe }};
@@ -968,6 +1042,7 @@ document.addEventListener('DOMContentLoaded', function() {
     inicialitzarCicles(); //
     renderitzarIdiomes();
     renderitzarFuncions();
+     renderitzarCapacitatsLliures();
 
    
 
@@ -1070,7 +1145,8 @@ document.getElementById("ofertaForm").addEventListener("submit", async function(
         cicles: cicles_seleccionats.map(c => c.id), 
         capacitats_clau: capacitats_clau_seleccionades.map(c => c.id), 
         funcions: funcions, 
-        idiomes: idiomes    
+        idiomes: idiomes,
+        capacitats_lliures: capacitats_lliures    
     };
 
     try {

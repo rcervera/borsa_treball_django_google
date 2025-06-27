@@ -101,7 +101,7 @@ class NivellIdiomaInline(admin.TabularInline):
 
 class OfertaAdmin(admin.ModelAdmin):
     list_display = (
-        'titol', 'empresa', 'estat_colored', 'jornada', 'tipus_contracte',
+        'titol', 'empresa', 'estat_colored',
         'data_publicacio', 'data_limit', 'descripcio_curta'
     )
     search_fields = ('titol', 'empresa__nom_comercial', 'descripcio')
