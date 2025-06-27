@@ -610,6 +610,7 @@ function renderitzarIdiomes() {
 
 // CAPACITATS CLAU
 // Capacitats clau
+/*
 let capacitats_clau_seleccionades = [];
 let totes_les_capacitats = []; // Per emmagatzemar les capacitats originals
 
@@ -705,7 +706,7 @@ function renderitzarCapacitatsSeleccionades() {
         container.appendChild(div);
     });
 }
-
+*/
 
 // CICLES FORMATIUS
 let cicles_seleccionats = [];
@@ -855,7 +856,7 @@ function guardarEsborrany() {
 document.addEventListener('DOMContentLoaded', function() {
 
     // Inicialitzar les capacitats clau
-    inicialitzarCapacitats();
+    //inicialitzarCapacitats();
     inicialitzarCicles(); //
     renderitzarIdiomes();
     renderitzarFuncions();
@@ -902,7 +903,7 @@ document.getElementById("ofertaForm").addEventListener("submit", async function(
         requisits: formData.get("requisits"),
         visible: formData.get("visible") === "on",
         cicles: cicles_seleccionats.map(c => c.id), 
-        capacitats_clau: capacitats_clau_seleccionades.map(c => c.id), 
+        //capacitats_clau: capacitats_clau_seleccionades.map(c => c.id), 
         funcions: funcions, 
         capacitatsLliures: capacitatsLliures,
         idiomes: idiomes    
