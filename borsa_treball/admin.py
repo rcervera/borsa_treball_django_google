@@ -104,12 +104,14 @@ class OfertaAdmin(admin.ModelAdmin):
     search_fields = ('titol', 'empresa__nom_comercial', 'descripcio')
     list_filter = ('tipus_contracte', 'jornada', 'activa', 'visible', 'data_publicacio')
     filter_horizontal = ('cicles', 'capacitats_clau')
-    inlines = [FuncioInline, NivellIdiomaInline, CapacitatOfertaInline]
+    inlines = [FuncioInline, NivellIdiomaInline]
     date_hierarchy = 'data_publicacio'
     autocomplete_fields = ['empresa']
 
     # Afegir les candidatures com a inline
     inlines = [CandidaturaInline]
+
+    inlines = [CapacitatOfertaInline]
     
     def nombre_candidatures(self, obj):
         """Mostra el nombre total de candidatures"""
