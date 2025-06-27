@@ -625,6 +625,7 @@ def editar_oferta(request, oferta_id):
         if capacitat.id not in capacitats_existents_ids
     ]
 
+    capacitats_lliures = list(oferta.capacitats.values_list('nom', flat=True))
     
     context = {
         'oferta': oferta,
@@ -637,6 +638,7 @@ def editar_oferta(request, oferta_id):
         'EXPERIENCIA': Oferta.EXPERIENCIA,
         'data_limit_formatted': oferta.data_limit.strftime('%Y-%m-%d') if oferta.data_limit else '',
         'funcions_existents': funcions,
+        'capacitats_lliures_existents': capacitats_lliures,
         'capacitats_existents':  capacitats_existents,
         'cicles_existents': [
             {
