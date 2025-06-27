@@ -100,7 +100,10 @@ class NivellIdiomaInline(admin.TabularInline):
     extra = 1
 
 class OfertaAdmin(admin.ModelAdmin):
-    list_display = ('titol', 'empresa', 'tipus_contracte', 'jornada', 'data_publicacio', 'data_limit', 'estat')
+    list_display = (
+        'titol', 'empresa', 'estat_colored', 'jornada', 'tipus_contracte',
+        'data_publicacio', 'data_limit', 'descripcio_curta'
+    )
     search_fields = ('titol', 'empresa__nom_comercial', 'descripcio')
     list_filter = ('tipus_contracte', 'jornada', 'estat', 'data_publicacio')
     filter_horizontal = ('cicles', 'capacitats_clau')
@@ -114,8 +117,30 @@ class OfertaAdmin(admin.ModelAdmin):
     date_hierarchy = 'data_publicacio'
     autocomplete_fields = ['empresa']
 
+    def estat_colored(self, obj):
+        colors = {
+            'AC': 'green',
+            'RV': 'orange',
+            'OC': 'gray',
+            'TC': 'red',
+        }
+        color = colors.get(obj.estat, 'black')
+        label = obj.get_estat_display()
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">{}</span>', color, label
+        )
     
+    estat_colored.short_description = "Estat"
+    estat_colored.admin_order_field = 'estat'  # permet ordenar per estat real
     
+    def descripcio_curta(self, obj):
+        if not obj.descripcio:
+            return "-"
+        return obj.descripcio[:80] + "..." if len(obj.descripcio) > 80 else obj.descripcio
+
+    descripcio_curta.short_description = "Descripció"
+
+
     def nombre_candidatures(self, obj):
         """Mostra el nombre total de candidatures"""
         return obj.candidatures.count()
