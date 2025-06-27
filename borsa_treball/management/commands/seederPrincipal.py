@@ -5,7 +5,7 @@ from faker import Faker
 import random
 from datetime import datetime, timedelta, date
 from borsa_treball.models import (
-    Usuari, FamiliaProfessional, Cicle, Sector, CapacitatClau, 
+    CapacitatOferta, Usuari, FamiliaProfessional, Cicle, Sector, CapacitatClau, 
     Estudiant, EstudiEstudiant, Empresa, Oferta, 
     Funcio, Candidatura, Noticia, RegistreAuditoria,NivellIdioma
 )
@@ -207,7 +207,7 @@ class Command(BaseCommand):
     def crear_admin(self):
         """Crea l'usuari administrador"""
         admin, created = Usuari.objects.get_or_create(
-            email='admin@vidalbarraquer.cat',
+            email='rcerver4@xtec.cat',
             defaults={
                 'nom': 'Admin',
                 'cognoms': 'Sistema',
@@ -402,6 +402,18 @@ class Command(BaseCommand):
 
                 capacitats_oferta = random.sample(capacitats, random.randint(2, 5))
                 oferta.capacitats_clau.set(capacitats_oferta)
+
+                capacitats_lliures_posibles = [  # 🆕 Capacitats text lliure
+                    'Adaptabilitat', 'Treball en equip', 'Iniciativa',
+                    'Comunicació eficaç', 'Pensament crític', 'Autonomia',
+                    'Resolució de problemes', 'Creativitat', 'Responsabilitat',
+                    'Atenció al detall'
+                ]
+
+                 # 🆕 Capacitats lliures
+                capacitats_text = random.sample(capacitats_lliures_posibles, random.randint(1, 3))
+                for nom in capacitats_text:
+                    CapacitatOferta.objects.create(oferta=oferta, nom=nom)
 
                 # Crear funcions
                 funcions_text = [

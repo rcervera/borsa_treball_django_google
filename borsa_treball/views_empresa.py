@@ -25,7 +25,8 @@ from django.views.decorators.http import require_http_methods, require_POST
 
 # Imports locals
 from .models import (
-    Candidatura, 
+    Candidatura,
+    CapacitatOferta, 
     EstatCandidatura, 
     Oferta, 
     Empresa, 
@@ -227,6 +228,7 @@ def crear_oferta_api(request):
     if errors:
         return JsonResponse({'success': False, 'errors': errors}, status=400)
 
+    capacitats = data.get('capacitatsLliures', [])
    
     # Creació amb transacció
     try:
@@ -263,6 +265,11 @@ def crear_oferta_api(request):
             oferta.cicles.set(cicles_ids)  
             if capacitats_ids:
                 oferta.capacitats_clau.set(capacitats_ids)  
+
+            capacitats_lliures = request.POST.getlist('capacitatsLliures')
+            for nom in capacitats_lliures:
+                if nom.strip():
+                    CapacitatOferta.objects.create(oferta=oferta, nom=nom.strip())
 
             # Crear funcions
             for ordre, desc in enumerate(data.get('funcions', []), start=1):
