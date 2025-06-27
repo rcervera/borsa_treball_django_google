@@ -382,7 +382,7 @@
             </div>
 
             <!-- Idiomes i destinataris compactes -->
-            {% if oferta.idiomes.exists or oferta.cicles.exists or oferta.capacitats_clau.exists %}
+            {% if oferta.idiomes.exists or oferta.cicles.exists or oferta.capacitats.exists %}
             <div class="modern-card compact-section">
                 <div class="card-body">
                     <h5 class="section-title">
@@ -423,16 +423,17 @@
                     </div>
                     {% endif %}
 
-                    {% if oferta.capacitats_clau.exists %}
+                    {% if oferta.capacitats.exists %}
                     <div>
                         <h6 class="text-dark mb-2"><i class="bi bi-stars me-2"></i>Capacitats Clau</h6>
                         <div class="d-flex flex-wrap gap-2">
-                            {% for capacitat in oferta.capacitats_clau.all %}
-                            <span class="modern-badge">{{ capacitat.nom }}</span>
+                            {% for capacitat in oferta.capacitats.all %}
+                                <span class="modern-badge">{{ capacitat.nom }}</span>
                             {% endfor %}
                         </div>
                     </div>
                     {% endif %}
+
                 </div>
             </div>
             {% endif %}
