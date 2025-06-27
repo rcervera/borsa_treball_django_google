@@ -100,9 +100,9 @@ class NivellIdiomaInline(admin.TabularInline):
     extra = 1
 
 class OfertaAdmin(admin.ModelAdmin):
-    list_display = ('titol', 'empresa', 'tipus_contracte', 'jornada', 'data_publicacio', 'data_limit', 'activa', 'visible')
+    list_display = ('titol', 'empresa', 'tipus_contracte', 'jornada', 'data_publicacio', 'data_limit', 'estat')
     search_fields = ('titol', 'empresa__nom_comercial', 'descripcio')
-    list_filter = ('tipus_contracte', 'jornada', 'activa', 'visible', 'data_publicacio')
+    list_filter = ('tipus_contracte', 'jornada', 'estat', 'data_publicacio')
     filter_horizontal = ('cicles', 'capacitats_clau')
     inlines = [
         FuncioInline,
@@ -110,7 +110,7 @@ class OfertaAdmin(admin.ModelAdmin):
         CapacitatOfertaInline,
         CandidaturaInline
     ]
-    
+
     date_hierarchy = 'data_publicacio'
     autocomplete_fields = ['empresa']
 
