@@ -393,7 +393,7 @@ class Command(BaseCommand):
                     contacte_nom=fake.name(),
                     contacte_email=fake.email(),
                     contacte_telefon=fake.phone_number()[:15],
-                   
+                    estat=random.choice(['OC','RV','AC']);
                 )
 
                 # Assignar cicles i capacitats
