@@ -215,15 +215,7 @@ def crear_oferta_api(request):
         except Exception as e:
             errors['cicles'] = "Error validant els cicles seleccionats."
 
-    # Validació capacitats clau amb verificació d'existència
-    capacitats_ids = data.get('capacitats_clau', [])
-    if capacitats_ids:
-        try:
-            capacitats_existents = CapacitatClau.objects.filter(id__in=capacitats_ids).count()
-            if capacitats_existents != len(capacitats_ids):
-                errors['capacitats_clau'] = "Algunes capacitats seleccionades no existeixen."
-        except Exception as e:
-            errors['capacitats_clau'] = "Error validant les capacitats seleccionades."
+    
 
     if errors:
         return JsonResponse({'success': False, 'errors': errors}, status=400)
@@ -262,9 +254,10 @@ def crear_oferta_api(request):
             oferta.full_clean()
 
             # Relacions many-to-many amb variables validades
-            oferta.cicles.set(cicles_ids)  
-            if capacitats_ids:
-                oferta.capacitats_clau.set(capacitats_ids)  
+            oferta.cicles.set(cicles_ids) 
+             
+            #if capacitats_ids:
+            #    oferta.capacitats_clau.set(capacitats_ids)  
 
 
             
@@ -759,15 +752,7 @@ def api_actualitzar_oferta(request, oferta_id):
         except Exception as e:
             errors['cicles'] = "Error validant els cicles seleccionats."
 
-    capacitats_ids = data.get('capacitats_clau', [])
-    if capacitats_ids:
-        try:
-            capacitats_existents = CapacitatClau.objects.filter(id__in=capacitats_ids).count()
-            if capacitats_existents != len(capacitats_ids):
-                errors['capacitats_clau'] = "Algunes capacitats seleccionades no existeixen."
-        except Exception as e:
-            errors['capacitats_clau'] = "Error validant les capacitats seleccionades."
-
+    
     
 
     if errors:
@@ -804,7 +789,8 @@ def api_actualitzar_oferta(request, oferta_id):
 
             # Actualitzar relacions many-to-many
             oferta.cicles.set(cicles_ids)
-            oferta.capacitats_clau.set(capacitats_ids)
+            
+            # oferta.capacitats_clau.set(capacitats_ids)
 
             # Esborra les antigues capacitats lliures (del model CapacitatOferta)
             oferta.capacitats.all().delete()

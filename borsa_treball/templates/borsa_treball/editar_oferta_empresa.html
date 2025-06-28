@@ -433,37 +433,7 @@
                             </div>
                     </div>
 
-                    <div class="mb-5">
-                        <h5 class="text-primary mb-4">
-                            <i class="bi bi-gear me-2"></i>Capacitats
-                        </h5>  
-                            
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                
-                                <div id="capacitats-container" class="mb-3">
-                                </div>
-                                <div class="card border-dashed">
-                                    <div class="card-body">
-                                        <div class="input-group">
-                                            
-                                            <select id="select-capacitat" class="form-select">
-                                                <option value="">Selecciona una capacitat</option>
-                                                {% for capacitat in capacitats %}
-                                                <option value="{{ capacitat.id }}" data-nom="{{ capacitat.nom }}" data-categoria="{{ capacitat.categoria }}">{{ capacitat.nom }} ({{ capacitat.categoria }})</option>
-                                                {% endfor %}
-                                            </select>
-                                            <button class="btn btn-warning" type="button" onclick="afegirCapacitat()">
-                                                <i class="bi bi-plus-lg"></i>
-                                            </button>
-                                        </div>
-                                        <small class="text-muted mt-2 d-block">Selecciona una capacitat per afegir-la.</small>
-                                        <div  id="error-capacitats" class="error-validacio form-text text-danger"></div>
-                                    </div>
-                                </div>
-                            </div>                            
-                        </div>
-                    </div>
+                   
 
                     <!-- Secció 4: Funcions del càrrec -->
                     <div class="mb-5">
@@ -734,103 +704,6 @@ function renderitzarIdiomes() {
 }
 
 
-// CAPACITATS CLAU
-// Capacitats clau
-let capacitats_clau_seleccionades = [];
-let totes_les_capacitats = []; // Per emmagatzemar les capacitats originals
-
-function inicialitzarCapacitats() {
-    const select = document.getElementById('select-capacitat');
-    // Buidar per evitar duplicats si es crida més d'una vegada
-    totes_les_capacitats = []; 
-    for (let i = 0; i < select.options.length; i++) {
-        const option = select.options[i];
-        if (option.value) { // Ignorar l'opció "Selecciona una capacitat"
-            totes_les_capacitats.push({
-                id: option.value,
-                nom: option.dataset.nom,
-                categoria: option.dataset.categoria
-            });
-        }
-    }
-    renderitzarCapacitatsDisponibles();
-    renderitzarCapacitatsSeleccionades(); // Assegurar que el contenidor de seleccionades es renderitza buit a l'inici
-}
-
-function afegirCapacitat() {
-    const select = document.getElementById('select-capacitat');
-    const selectedOption = select.options[select.selectedIndex];
-
-    if (selectedOption && selectedOption.value) {
-        const id = selectedOption.value;
-        const nom = selectedOption.dataset.nom;
-        const categoria = selectedOption.dataset.categoria;
-
-        capacitats_clau_seleccionades.push({ id, nom, categoria });
-        
-        // Eliminar la capacitat seleccionada de la llista de disponibles
-        totes_les_capacitats = totes_les_capacitats.filter(c => c.id !== id);
-
-        renderitzarCapacitatsDisponibles();
-        renderitzarCapacitatsSeleccionades();
-    }
-}
-
-function eliminarCapacitat(index) {
-    const capacitatEliminada = capacitats_clau_seleccionades.splice(index, 1)[0];
-    
-    // Tornar la capacitat eliminada a la llista de disponibles (ordenant per nom)
-    totes_les_capacitats.push(capacitatEliminada);
-    totes_les_capacitats.sort((a, b) => a.nom.localeCompare(b.nom));
-
-    renderitzarCapacitatsDisponibles();
-    renderitzarCapacitatsSeleccionades();
-}
-
-function renderitzarCapacitatsDisponibles() {
-    const select = document.getElementById('select-capacitat');
-    select.innerHTML = '<option value="">Selecciona una capacitat</option>'; // Restablir el select
-
-    totes_les_capacitats.forEach(capacitat => {
-        const option = document.createElement('option');
-        option.value = capacitat.id;
-        option.dataset.nom = capacitat.nom;
-        option.dataset.categoria = capacitat.categoria;
-        option.textContent = `${capacitat.nom} (${capacitat.categoria})`;
-        select.appendChild(option);
-    });
-}
-
-function renderitzarCapacitatsSeleccionades() {
-    const container = document.getElementById('capacitats-container');
-    container.innerHTML = '';
-
-    if (capacitats_clau_seleccionades.length === 0) {
-        container.innerHTML = `
-            <div class="text-center text-muted py-3">
-                <i class="bi bi-gear" style="font-size: 2rem;"></i>
-                <p class="mt-2 mb-0">No has afegit cap capacitat clau</p>
-                <small>Selecciona les capacitats necessàries per a l'oferta</small>
-            </div>
-        `;
-        return;
-    }
-
-    capacitats_clau_seleccionades.forEach((capacitat, index) => {
-        const div = document.createElement('div');
-        div.className = 'funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start';
-        div.innerHTML = `
-            <div class="flex-grow-1">
-                <strong class="text-primary">${index + 1}.</strong> ${capacitat.nom} — <em>${capacitat.categoria}</em>
-                <input type="hidden" name="capacitats_clau" value="${capacitat.id}">
-            </div>
-            <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="eliminarCapacitat(${index})" title="Eliminar capacitat">
-                <i class="bi bi-trash"></i>
-            </button>
-        `;
-        container.appendChild(div);
-    });
-}
 
 
 // CICLES FORMATIUS
@@ -1032,13 +905,13 @@ document.addEventListener('DOMContentLoaded', function() {
     idiomes = {{ idiomes_existents|safe }};
    
     
-    capacitats_clau_seleccionades = {{ capacitats_existents|safe }};
+    // cacitats_clau_seleccionades = {{ capacitats_existents|safe }};
     cicles_seleccionats = {{ cicles_existents|safe }};
     cicles_seleccionats.forEach(c => c.id = c.id.toString());
-    capacitats_clau_seleccionades.forEach(c => c.id = c.id.toString());
+    // capacitats_clau_seleccionades.forEach(c => c.id = c.id.toString());
 
     // Inicialitzar les capacitats clau
-    inicialitzarCapacitats();
+    //inicialitzarCapacitats();
     inicialitzarCicles(); //
     renderitzarIdiomes();
     renderitzarFuncions();
@@ -1143,7 +1016,7 @@ document.getElementById("ofertaForm").addEventListener("submit", async function(
         requisits: formData.get("requisits"),
         visible: formData.get("visible") === "on",
         cicles: cicles_seleccionats.map(c => c.id), 
-        capacitats_clau: capacitats_clau_seleccionades.map(c => c.id), 
+        // capacitats_clau: capacitats_clau_seleccionades.map(c => c.id), 
         funcions: funcions, 
         idiomes: idiomes,
         capacitats_lliures: capacitats_lliures    
