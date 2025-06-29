@@ -294,7 +294,120 @@
 
         }   
 
-        // PROVA ON ESTA CODI
+        // CANVI ESTAT
+        function toggleVisibilitat(ofertaId, el) {
+            // Mostrar loading
+            //const button = event.target.closest('a');
+            const button = el.closest('a');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Processant...';
+            button.classList.add('disabled');
+            
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; 
+            //   
+            fetch("{% url 'toggle_visibilitat_oferta' oferta.id %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualitzar el botó
+                    const nouText = data.visible
+                        ? '<i class="bi bi-eye-slash me-2"></i>Ocultar l\'oferta'
+                        : '<i class="bi bi-eye me-2"></i>Fer visible l\'oferta';
+                    button.innerHTML = nouText;
+                    button.classList.remove('disabled');
+
+                    // Actualitzar estat del div
+                    const estatDiv = document.getElementById(`estat-oferta`);
+                    if (estatDiv) {
+                        estatDiv.innerHTML = data.estat == 'RV'
+                            ? `<span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle me-1"></i>En revisió</span>`
+                            : `<span class="badge bg-secondary-subtle text-secondary"><i class="bi bi-eye-slash me-1"></i>Oculta</span>`;
+                    }
+
+                    showToast(data.message, 'success');
+
+
+                } else {
+                    showToast(data.error || 'Error en canviar la visibilitat', 'error');
+                    button.innerHTML = originalText;
+                    button.classList.remove('disabled');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error de connexió', 'error');
+                button.innerHTML = originalText;
+                button.classList.remove('disabled');
+            });
+        }
+
+
+    
+
+    function confirmarEliminacio(ofertaId) {
+        ofertaToDelete = ofertaId;
+        const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        modal.show();
+    }
+
+    document.getElementById('confirmDelete').addEventListener('click', function() {
+        if (ofertaToDelete) {
+            // Mostrar loading
+            const button = this;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Eliminant...';
+            button.disabled = true;
+            
+            // Fer la crida AJAX per eliminar
+           
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;   
+            fetch("{% url 'esborrar_oferta' oferta.id %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Redirigir a la llista d'ofertes
+                    if (typeof window.showSuccessToast === 'function') {
+                        showSuccessToast('Oferta esborrada!');
+                    }
+                    
+                    setTimeout(() => {
+                                window.location.href = "{% url 'llista_ofertes_empresa' %}";
+                    }, 2000); 
+                   
+                } else {
+                    //alert(data.error || 'Error en eliminar l\'oferta');
+                    if (typeof window.showErrorToast === 'function') {
+                        showErrorToast('Error en eliminar l\'oferta.');
+                    }
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }
+                ofertaToDelete = null;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                
+                if (typeof window.showErrorToast === 'function') {
+                        showErrorToast('Error de connexió.');
+                }
+                button.innerHTML = originalText;
+                button.disabled = false;
+            });
+        }
+    });
+
         
         
     });

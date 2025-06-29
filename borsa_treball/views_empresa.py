@@ -274,7 +274,7 @@ def crear_oferta_api(request):
 
             # Crear idiomes
             for idioma in data.get('idiomes', []):
-                nom = idioma.get('nom', '').strip()
+                nom = idioma.get('idioma', '').strip()
                 nivell = idioma.get('nivell', '').strip()
                 if nom and nivell:
                     NivellIdioma.objects.create(oferta=oferta, idioma=nom, nivell=nivell)

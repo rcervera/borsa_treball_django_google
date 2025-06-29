@@ -15,7 +15,7 @@ const IdiomesManager = (function () {
         const nivell = document.getElementById('idioma_nivell').value.trim();
 
         if (nom && nivell) {
-            idiomes.push({ nom, nivell });
+            idiomes.push({ "idioma": nom, "nivell": nivell });
             document.getElementById('idioma_nom').value = '';
             document.getElementById('idioma_nivell').value = '';
             renderitzarIdiomes();
@@ -47,8 +47,8 @@ const IdiomesManager = (function () {
             div.className = 'idioma-item p-3 mb-2 rounded d-flex justify-content-between align-items-start';
             div.innerHTML = `
                 <div class="flex-grow-1">
-                    <strong class="text-primary">${index + 1}.</strong> ${idioma.nom} — <em>${idioma.nivell}</em>
-                    <input type="hidden" name="idiomes_nom" value="${idioma.nom}">
+                    <strong class="text-primary">${index + 1}.</strong> ${idioma.idioma} — <em>${idioma.nivell}</em>
+                    <input type="hidden" name="idiomes_nom" value="${idioma.idioma}">
                     <input type="hidden" name="idiomes_nivell" value="${idioma.nivell}">
                 </div>
                 <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="IdiomesManager.eliminarIdioma(${index})" title="Eliminar idioma">
