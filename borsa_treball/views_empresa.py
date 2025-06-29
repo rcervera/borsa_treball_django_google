@@ -622,6 +622,7 @@ def editar_oferta(request, oferta_id):
     capacitats_lliures = list(oferta.capacitats.values_list('nom', flat=True))
     
     context = {
+        'mode': 'editar',
         'oferta': oferta,
         'cicles': Cicle.objects.all(),
         'cicles_agrupats_per_familia': cicles_agrupats_per_familia,
@@ -648,7 +649,7 @@ def editar_oferta(request, oferta_id):
         'current_page' : 'llista_ofertes'
     }
 
-    return render(request, 'borsa_treball/editar_oferta_empresa.html', context)
+    return render(request, 'borsa_treball/formulari_oferta_empresa.html', context)
 
 
 @require_http_methods(["PUT"])

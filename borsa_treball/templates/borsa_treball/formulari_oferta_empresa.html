@@ -154,144 +154,144 @@
     /////////////////////////////////////////////////////////////////////////////////////////////////
 
     
-    document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
 
-        CapacitatsManager.inicialitzarCapacitats({{ capacitats_lliures_existents|default:"[]"|safe }});
-        FuncionsManager.inicialitzarFuncions({{ funcions_existents|default:"[]"|safe }});
-        IdiomesManager.inicialitzarIdiomes({{ idiomes_existents|default:"[]"|safe }});
-        CiclesManager.inicialitzarCicles({{ cicles_existents|default:"[]"|safe }});
-
-
-        //funcions = {{ funcions_existents|default:"[]"|safe }};
-        //idiomes = {{ idiomes_existents|default:"[]"|safe }};
-        //capacitatsLliures = {{ capacitats_lliures_existents|default:"[]"|safe }};
-
-        // cicles_seleccionats = {{ cicles_existents|default:"[]"|safe }};
-        // cicles_seleccionats.forEach(c => c.id = c.id.toString());
-
-        //inicialitzarCicles(); 
-        //renderitzarIdiomes();
-        // renderitzarFuncions();
-        // renderitzarCapacitatsLliures();
-
-        // Afegir funció amb Enter
-        document.getElementById('nova-funcio').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                afegirFuncio();
-            }
-        });
-        
-        document.getElementById("jornada").addEventListener("change", function () {
-            const divHores = document.getElementById("div_hores");
-            if (this.value === "PA") {
-                divHores.style.display = "block";
-            } else {
-                divHores.style.display = "none";
-                document.getElementById("hores").value = '';
-            }
-        });
+            CapacitatsManager.inicialitzarCapacitats({{ capacitats_lliures_existents|default:"[]"|safe }});
+            FuncionsManager.inicialitzarFuncions({{ funcions_existents|default:"[]"|safe }});
+            IdiomesManager.inicialitzarIdiomes({{ idiomes_existents|default:"[]"|safe }});
+            CiclesManager.inicialitzarCicles({{ cicles_existents|default:"[]"|safe }});
 
 
-    document.getElementById("ofertaForm").addEventListener("submit", async function(e) {
-        e.preventDefault();
+            //funcions = {{ funcions_existents|default:"[]"|safe }};
+            //idiomes = {{ idiomes_existents|default:"[]"|safe }};
+            //capacitatsLliures = {{ capacitats_lliures_existents|default:"[]"|safe }};
 
-        const form = e.target;
-        const formData = new FormData(form);
+            // cicles_seleccionats = {{ cicles_existents|default:"[]"|safe }};
+            // cicles_seleccionats.forEach(c => c.id = c.id.toString());
 
-        // Construir objecte de dades per a l'API
-        const data = {
-            titol: formData.get("titol"),
-            data_limit: formData.get("data_limit"),
-            numero_vacants: formData.get("numero_vacants"),
-            descripcio: formData.get("descripcio"),
-            tipus_contracte: formData.get("tipus_contracte"),
-            jornada: formData.get("jornada"),
-            hores: formData.get("hores"),
-            horari: formData.get("horari"),
-            salari: formData.get("salari"),
-            lloc_treball: formData.get("lloc_treball"),
-            destinatari: formData.get("destinatari"),
-            experiencia: formData.get("experiencia"),
-            requisits: formData.get("requisits"),
-            visible: formData.get("visible") === "on",
-            cicles: cicles_seleccionats.map(c => c.id), 
-            //capacitats_clau: capacitats_clau_seleccionades.map(c => c.id), 
-            funcions: funcions, 
-            capacitatsLliures: capacitatsLliures,
-            idiomes: idiomes    
-        };
+            //inicialitzarCicles(); 
+            //renderitzarIdiomes();
+            // renderitzarFuncions();
+            // renderitzarCapacitatsLliures();
 
-        try {
-            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-            const resposta = await fetch("/api/empresa/oferta/nova", {
-                method: "POST",
-                headers: { "Content-Type": "application/json",
-                        'X-CSRFToken': csrftoken,
-                },
-                body: JSON.stringify(data)
+            // Afegir funció amb Enter
+            document.getElementById('nova-funcio').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    afegirFuncio();
+                }
+            });
+            
+            document.getElementById("jornada").addEventListener("change", function () {
+                const divHores = document.getElementById("div_hores");
+                if (this.value === "PA") {
+                    divHores.style.display = "block";
+                } else {
+                    divHores.style.display = "none";
+                    document.getElementById("hores").value = '';
+                }
             });
 
-            const resultat = await resposta.json();
 
-            const cont = document.getElementById("api-missatges");
-            cont.innerHTML = "";
+        document.getElementById("ofertaForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
 
-            // Esborra errors anteriors
-            form.querySelectorAll('.error-validacio').forEach(div => div.innerText = '');
-            form.querySelectorAll('.invalid-feedback').forEach(div => div.innerText = '');
-            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+            const form = e.target;
+            const formData = new FormData(form);
 
-            if (resultat.success) {
-                
-                //cont.innerHTML = `<div class="alert alert-success">${resultat.message}</div>`;
-                if (typeof window.showSuccessToast === 'function') {
-                            showSuccessToast('Oferta registrada correctament!');
-                }
+            // Construir objecte de dades per a l'API
+            const data = {
+                titol: formData.get("titol"),
+                data_limit: formData.get("data_limit"),
+                numero_vacants: formData.get("numero_vacants"),
+                descripcio: formData.get("descripcio"),
+                tipus_contracte: formData.get("tipus_contracte"),
+                jornada: formData.get("jornada"),
+                hores: formData.get("hores"),
+                horari: formData.get("horari"),
+                salari: formData.get("salari"),
+                lloc_treball: formData.get("lloc_treball"),
+                destinatari: formData.get("destinatari"),
+                experiencia: formData.get("experiencia"),
+                requisits: formData.get("requisits"),
+                visible: formData.get("visible") === "on",
+                cicles: cicles_seleccionats.map(c => c.id), 
+                //capacitats_clau: capacitats_clau_seleccionades.map(c => c.id), 
+                funcions: funcions, 
+                capacitatsLliures: capacitatsLliures,
+                idiomes: idiomes    
+            };
+
+            try {
+                const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                const resposta = await fetch("/api/empresa/oferta/nova", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json",
+                            'X-CSRFToken': csrftoken,
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const resultat = await resposta.json();
+
+                const cont = document.getElementById("api-missatges");
+                cont.innerHTML = "";
+
+                // Esborra errors anteriors
+                form.querySelectorAll('.error-validacio').forEach(div => div.innerText = '');
+                form.querySelectorAll('.invalid-feedback').forEach(div => div.innerText = '');
+                form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+                if (resultat.success) {
+                    
+                    //cont.innerHTML = `<div class="alert alert-success">${resultat.message}</div>`;
+                    if (typeof window.showSuccessToast === 'function') {
+                                showSuccessToast('Oferta registrada correctament!');
+                    }
+                            
+                    setTimeout(() => {
+                                window.location.href = "{% url 'llista_ofertes_empresa' %}";
+                    }, 2000);     
                         
-                setTimeout(() => {
-                            window.location.href = "{% url 'llista_ofertes_empresa' %}";
-                }, 2000);     
+
+
+                } else {
+                    const errors = resultat.errors;
+                    for (const camp in errors) {
+                        const missatge = errors[camp];
+                        const input = form.querySelector(`[name="${camp}"]`);
+                        const errorDiv = document.getElementById(`error-${camp}`);
                     
 
+                        if (input) input.classList.add('is-invalid');
+                        if (errorDiv) errorDiv.innerText = missatge;
+                    }
 
-            } else {
-                const errors = resultat.errors;
-                for (const camp in errors) {
-                    const missatge = errors[camp];
-                    const input = form.querySelector(`[name="${camp}"]`);
-                    const errorDiv = document.getElementById(`error-${camp}`);
-                
+                    if (typeof window.showErrorToast === 'function') {
+                                showErrorToast('Hi ha errors en el formulari. Revisa les dades.');
+                    }
 
-                    if (input) input.classList.add('is-invalid');
-                    if (errorDiv) errorDiv.innerText = missatge;
+                    // cont.innerHTML = `<div class="alert alert-danger">Hi ha errors en el formulari.</div>`;
                 }
 
-                if (typeof window.showErrorToast === 'function') {
-                            showErrorToast('Hi ha errors en el formulari. Revisa les dades.');
-                }
-
-                // cont.innerHTML = `<div class="alert alert-danger">Hi ha errors en el formulari.</div>`;
+            } catch (error) {
+                document.getElementById("api-missatges").innerHTML = `<div class="alert alert-danger">Error de connexió amb el servidor.</div>`;
             }
+        });
 
-        } catch (error) {
-            document.getElementById("api-missatges").innerHTML = `<div class="alert alert-danger">Error de connexió amb el servidor.</div>`;
+        
+            
+        // Establir data mínima com avui
+        const dataLimit = document.getElementById('data_limit');
+        if (dataLimit) {
+            const avui = new Date().toISOString().split('T')[0];
+                dataLimit.min = avui;
+
         }
-    });
-
-    
+            
         
-    // Establir data mínima com avui
-    const dataLimit = document.getElementById('data_limit');
-    if (dataLimit) {
-        const avui = new Date().toISOString().split('T')[0];
-            dataLimit.min = avui;
-
-    }
         
-    
-    
-    });
+        });
 
 </script>
 
