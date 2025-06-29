@@ -1,13 +1,13 @@
     <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate id="ofertaForm">
     {% csrf_token %}
 
-    {% include 'partials/_formulari_seccio_informacio_basica.html' %}
-    {% include 'partials/_formulari_seccio_condicions_laborals.html' %}
-    {% include 'partials/_formulari_seccio_estudis.html' %}
-    {% include 'partials/_formulari_seccio_capacitats.html' %}
-    {% include 'partials/_formulari_seccio_funcions.html' %}
-    {% include 'partials/_formulari_seccio_idiomes.html' %}
-    {% include 'partials/_formulari_seccio_altres.html' %}
+    {% include 'borsa_treball/partials/_formulari_seccio_informacio_basica.html' %}
+    {% include 'borsa_treball/partials/_formulari_seccio_condicions_laborals.html' %}
+    {% include 'borsa_treball/partials/_formulari_seccio_estudis.html' %}
+    {% include 'borsa_treball/partials/_formulari_seccio_capacitats.html' %}
+    {% include 'borsa_treball/partials/_formulari_seccio_funcions.html' %}
+    {% include 'borsa_treball/partials/_formulari_seccio_idiomes.html' %}
+    {% include 'borsa_treball/partials/_formulari_seccio_altres.html' %}
 
     {% if mode != "editar" %}
     <div class="mb-5">
