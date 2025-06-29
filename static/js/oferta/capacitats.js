@@ -1,6 +1,11 @@
 const CapacitatsManager = (function () {
     let capacitatsLliures = [];
 
+    function getCapacitats() {
+         return [...capacitatsLliures];
+    }
+
+
     function inicialitzarCapacitats(dadesInici = []) {
         capacitatsLliures = Array.isArray(dadesInici) ? dadesInici : [];
         renderitzarCapacitats();
@@ -56,6 +61,7 @@ const CapacitatsManager = (function () {
     return {
         inicialitzarCapacitats,
         afegirCapacitatLliure,
-        eliminarCapacitat
+        eliminarCapacitat,
+        getCapacitats
     };
 })();

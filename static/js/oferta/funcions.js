@@ -1,6 +1,11 @@
 const FuncionsManager = (function () {
     let funcions = [];
 
+
+    function getFuncions() {
+         return [...funcions];
+    }
+
     function inicialitzarFuncions(dadesInici = []) {
         funcions = Array.isArray(dadesInici) ? dadesInici : [];
         renderitzarFuncions();
@@ -56,6 +61,7 @@ const FuncionsManager = (function () {
     return {
         inicialitzarFuncions,
         afegirFuncio,
-        eliminarFuncio
+        eliminarFuncio,
+        getFuncions
     };
 })();

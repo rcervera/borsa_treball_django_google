@@ -1,6 +1,10 @@
 const IdiomesManager = (function () {
     let idiomes = [];
 
+    function getIdiomes() {
+         return [...idiomes];
+    }
+
     function inicialitzarIdiomes(dadesInici = []) {
         idiomes = Array.isArray(dadesInici) ? dadesInici : [];
         renderitzarIdiomes();
@@ -58,6 +62,7 @@ const IdiomesManager = (function () {
     return {
         inicialitzarIdiomes,
         afegirIdioma,
-        eliminarIdioma
+        eliminarIdioma,
+        getIdiomes
     };
 })();

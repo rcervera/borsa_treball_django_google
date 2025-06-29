@@ -176,7 +176,7 @@
             document.getElementById('nova-funcio').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
-                    afegirFuncio();
+                    FuncionsManager.afegirFuncio();
                 }
             });
             
@@ -213,11 +213,15 @@
                 experiencia: formData.get("experiencia"),
                 requisits: formData.get("requisits"),
                 visible: formData.get("visible") === "on",
-                cicles: cicles_seleccionats.map(c => c.id), 
+                //cicles: cicles_seleccionats.map(c => c.id), 
                 //capacitats_clau: capacitats_clau_seleccionades.map(c => c.id), 
-                funcions: funcions, 
-                capacitatsLliures: capacitatsLliures,
-                idiomes: idiomes    
+                //funcions: funcions, 
+                //capacitatsLliures: capacitatsLliures,
+                // idiomes: idiomes   
+                cicles: CiclesManager.getSeleccionats().map(c => c.id),
+                funcions: FuncionsManager.getFuncions(),
+                capacitatsLliures: CapacitatsManager.getCapacitats(),
+                idiomes: IdiomesManager.getIdiomes() 
             };
 
             try {

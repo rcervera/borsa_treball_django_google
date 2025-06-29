@@ -125,9 +125,14 @@ const CiclesManager = (function () {
         });
     }
 
+    function getSeleccionats() {
+         return [...ciclesSeleccionats];
+    }
+
     return {
         inicialitzarCicles,
         afegirCicle,
-        eliminarCicle
+        eliminarCicle,
+        getSeleccionats
     };
 })();
