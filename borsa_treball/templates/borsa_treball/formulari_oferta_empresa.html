@@ -68,7 +68,7 @@
                         <div class="alert-content">
                             {% if oferta.estat == 'AC' %}<p class="mb-2">No es pot eliminar ni canviar l'estat de l'oferta quan està activa.</p>{% endif %}
                             {% if oferta.estat == 'RV' %}<p class="mb-2">L'oferta està pendent de validació.</p>{% endif %}
-                            {% if oferta.estat in ('OC', 'RV') %}<p class="mb-0">Estudiants no poden presentar candidatures mentre estigui oculta o en revisió.</p>{% endif %}
+                            {% if oferta.estat == 'RV' or oferta.estat == 'OC' %}<p class="mb-0">Estudiants no poden presentar candidatures mentre estigui oculta o en revisió.</p>{% endif %}
                             {% if oferta.estat == 'AC' %}<p class="mb-0">Hi pot haver candidatures pendents de revisió.</p>{% endif %}
                         </div>
                     </div>
