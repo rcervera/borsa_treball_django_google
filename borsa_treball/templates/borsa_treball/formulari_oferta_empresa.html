@@ -131,6 +131,8 @@
 
 {% block extra_js %}
 
+<script src="{% static 'js/oferta/capacitats.js' %}"></script>
+
 <script>
     const ofertaId = "{{ oferta.id|default:'' }}";
     let ofertaToDelete = null;
@@ -452,6 +454,10 @@
 
     
     document.addEventListener('DOMContentLoaded', function() {
+
+        CapacitatsManager.inicialitzarCapacitats({{ capacitats_lliures_existents|default:"[]"|safe }});
+
+
         funcions = {{ funcions_existents|default:"[]"|safe }};
         idiomes = {{ idiomes_existents|default:"[]"|safe }};
         capacitatsLliures = {{ capacitats_lliures_existents|default:"[]"|safe }};
@@ -576,6 +582,7 @@
     if (dataLimit) {
         const avui = new Date().toISOString().split('T')[0];
             dataLimit.min = avui;
+
     }
         
     
@@ -583,6 +590,7 @@
     });
 
 </script>
+
 {% endblock %}
 
 {% endif %}
