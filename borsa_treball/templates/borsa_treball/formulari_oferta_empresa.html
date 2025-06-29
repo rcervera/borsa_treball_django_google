@@ -132,6 +132,10 @@
 
 {% block extra_js %}
 
+
+<script src="{% static 'js/oferta/cicles.js' %}"></script>
+<script src="{% static 'js/oferta/idiomes.js' %}"></script>
+<script src="{% static 'js/oferta/funcions.js' %}"></script>
 <script src="{% static 'js/oferta/capacitats.js' %}"></script>
 
 <script>
@@ -144,311 +148,7 @@
        
     {% endif %}
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    // GESTIO CAPACITATS
-    /////////////////////////////////////////////////////////////////////////////////////////////////
-
-    let capacitatsLliures = [];
-
-    function afegirCapacitatLliure() {
-        const input = document.getElementById('nova-capacitat-lliure');
-        const nom = input.value.trim();
-
-        if (nom && !capacitatsLliures.includes(nom)) {
-            capacitatsLliures.push(nom);
-            renderitzarCapacitatsLliures();
-            input.value = '';
-            input.focus();
-        }
-    }
-
-    function eliminarCapacitatLliure(index) {
-        capacitatsLliures.splice(index, 1);
-        renderitzarCapacitatsLliures();
-    }
-
-    function renderitzarCapacitatsLliures() {
-        const container = document.getElementById('capacitatsLliures-container');
-        container.innerHTML = '';
-
-        if (capacitatsLliures.length === 0) {
-            container.innerHTML = `
-                <div class="text-center text-muted py-3">
-                    <i class="bi bi-stars" style="font-size: 2rem;"></i>
-                    <p class="mt-2 mb-0">No has afegit cap capacitat lliure</p>
-                </div>
-            `;
-            return;
-        }
-
-        capacitatsLliures.forEach((nom, index) => {
-            const div = document.createElement('div');
-            div.className = 'capacitat-item p-3 mb-2 rounded d-flex justify-content-between align-items-start bg-light border';
-
-            div.innerHTML = `
-                <div class="flex-grow-1">
-                    <strong class="text-success">${index + 1}.</strong> ${nom}
-                    <input type="hidden" name="capacitats_lliures[]" value="${nom}">
-                </div>
-                <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="eliminarCapacitatLliure(${index})" title="Eliminar">
-                    <i class="bi bi-trash"></i>
-                </button>
-            `;
-
-            container.appendChild(div);
-        });
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    // GESTIO FUNCIONS
-    /////////////////////////////////////////////////////////////////////////////////////////////////
-
-    let funcions = [];
-
-    function afegirFuncio() {
-        const input = document.getElementById('nova-funcio');
-        const descripcio = input.value.trim();
-        
-        if (descripcio) {
-            funcions.push(descripcio);
-            renderitzarFuncions();
-            input.value = '';
-            input.focus();
-        }
-    }
-
-    function eliminarFuncio(index) {
-        funcions.splice(index, 1);
-        renderitzarFuncions();
-    }
-
-    function renderitzarFuncions() {
-        const container = document.getElementById('funcions-container');
-        container.innerHTML = '';
-        
-        if (funcions.length === 0) {
-            container.innerHTML = `
-                <div class="text-center text-muted py-3">
-                    <i class="bi bi-list-task" style="font-size: 2rem;"></i>
-                    <p class="mt-2 mb-0">Encara no has afegit cap funció</p>
-                    <small>Afegeix les funcions principals del càrrec</small>
-                </div>
-            `;
-            return;
-        }
-        
-        funcions.forEach((funcio, index) => {
-            const div = document.createElement('div');
-            div.className = 'funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start';
-            
-            div.innerHTML = `
-                <div class="flex-grow-1">
-                    <strong class="text-primary">${index + 1}.</strong> ${funcio}
-                    <input type="hidden" name="funcions" value="${funcio}">
-                </div>
-                <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="eliminarFuncio(${index})" title="Eliminar funció">
-                    <i class="bi bi-trash"></i>
-                </button>
-            `;
-            
-            container.appendChild(div);
-        });
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    // GESTIO IDIOMES
-    /////////////////////////////////////////////////////////////////////////////////////////////////
-
-    let idiomes = [];
-
-    function afegirIdioma() {
-        const nom = document.getElementById('idioma_nom').value.trim();
-        const nivell = document.getElementById('idioma_nivell').value.trim();
-
-        if (nom && nivell) {
-            idiomes.push({ nom, nivell });
-            renderitzarIdiomes();
-            document.getElementById('idioma_nom').value = '';
-            document.getElementById('idioma_nivell').value = '';
-        }
-    }
-
-    function eliminarIdioma(index) {
-        idiomes.splice(index, 1);
-        renderitzarIdiomes();
-    }
-
-    function renderitzarIdiomes() {
-        const container = document.getElementById('idiomes-container');
-        container.innerHTML = '';
-
-        if (idiomes.length === 0) {
-            container.innerHTML = `
-                <div class="text-center text-muted py-3">
-                    <i class="bi bi-translate" style="font-size: 2rem;"></i>
-                    <p class="mt-2 mb-0">No has afegit cap idioma</p>
-                    <small>Afegeix idiomes i nivells requerits</small>
-                </div>
-            `;
-            return;
-        }
-
-        idiomes.forEach((idioma, index) => {
-            const div = document.createElement('div');
-            div.className = 'funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start';
-            div.innerHTML = `
-                <div class="flex-grow-1">
-                    <strong class="text-primary">${index + 1}.</strong> ${idioma.nom} — <em>${idioma.nivell}</em>
-                    <input type="hidden" name="idiomes_nom" value="${idioma.nom}">
-                    <input type="hidden" name="idiomes_nivell" value="${idioma.nivell}">
-                </div>
-                <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="eliminarIdioma(${index})" title="Eliminar idioma">
-                    <i class="bi bi-trash"></i>
-                </button>
-            `;
-            container.appendChild(div);
-        });
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    // GESTIO ESTUDIS
-    /////////////////////////////////////////////////////////////////////////////////////////////////
-
-    let cicles_seleccionats = [];
-    // Aquesta variable global emmagatzemarà tots els cicles originals per referència
-    // La inicialitzarem des del DOM en `inicialitzarCicles()`
-    let tots_els_cicles_disponibles = {}; // Objecte per emmagatzemar cicles agrupats per família
-
-    function inicialitzarCicles() {
-        const select = document.getElementById('select-cicle');
-        tots_els_cicles_disponibles = {}; // Netejar per evitar duplicats
-
-        // Iterar sobre els optgroups i les opcions per reconstruir la estructura
-        Array.from(select.children).forEach(node => {
-            if (node.tagName === 'OPTGROUP') {
-                const familiaNom = node.label;
-                tots_els_cicles_disponibles[familiaNom] = tots_els_cicles_disponibles[familiaNom] || [];
-                Array.from(node.children).forEach(option => {
-                    if (option.value) {
-                        tots_els_cicles_disponibles[familiaNom].push({
-                            id: option.value,
-                            nom: option.dataset.nom,
-                            grau: option.dataset.grau,
-                            familia: option.dataset.familia // Es podria treure si ja està a la clau de l'objecte
-                        });
-                    }
-                });
-            } else if (node.tagName === 'OPTION' && node.value) { // Per si hi ha opcions fora d'optgroup
-                const familiaNom = node.dataset.familia || 'Altres'; // Assignar una família per defecte
-                tots_els_cicles_disponibles[familiaNom] = tots_els_cicles_disponibles[familiaNom] || [];
-                tots_els_cicles_disponibles[familiaNom].push({
-                    id: node.value,
-                    nom: node.dataset.nom,
-                    grau: node.dataset.grau,
-                    familia: node.dataset.familia
-                });
-            }
-        });
-
-        renderitzarCiclesDisponibles();
-        renderitzarCiclesSeleccionats(); // Assegurar que el contenidor de seleccionades es renderitza buit a l'inici
-    }
-
-    function afegirCicle() {
-        const select = document.getElementById('select-cicle');
-        const selectedOption = select.options[select.selectedIndex];
-
-        if (selectedOption && selectedOption.value) {
-            const id = selectedOption.value;
-            const nom = selectedOption.dataset.nom;
-            const grau = selectedOption.dataset.grau;
-            const familia = selectedOption.dataset.familia;
-
-            cicles_seleccionats.push({ id, nom, grau, familia });
-            
-            // Eliminar el cicle seleccionat de la llista de disponibles
-            for (const familiaNom in tots_els_cicles_disponibles) {
-                tots_els_cicles_disponibles[familiaNom] = tots_els_cicles_disponibles[familiaNom].filter(c => c.id !== id);
-            }
-
-            renderitzarCiclesDisponibles();
-            renderitzarCiclesSeleccionats();
-        }
-    }
-
-    function eliminarCicle(index) {
-        const cicleEliminat = cicles_seleccionats.splice(index, 1)[0];
-        
-        // Tornar el cicle eliminat a la llista de disponibles
-        const familiaDelCicle = cicleEliminat.familia || 'Altres';
-        tots_els_cicles_disponibles[familiaDelCicle] = tots_els_cicles_disponibles[familiaDelCicle] || [];
-        tots_els_cicles_disponibles[familiaDelCicle].push(cicleEliminat);
-        
-        // Ordenar els cicles dins de la seva família per mantenir l'ordre alfabètic
-        tots_els_cicles_disponibles[familiaDelCicle].sort((a, b) => a.nom.localeCompare(b.nom));
-
-        renderitzarCiclesDisponibles();
-        renderitzarCiclesSeleccionats();
-    }
-
-    function renderitzarCiclesDisponibles() {
-        const select = document.getElementById('select-cicle');
-        select.innerHTML = '<option value="">Selecciona un cicle</option>'; // Restablir el select
-
-        // Ordenar famílies per nom per una visualització consistent
-        const familiesOrdenades = Object.keys(tots_els_cicles_disponibles).sort();
-
-        familiesOrdenades.forEach(familiaNom => {
-            const ciclesFamilia = tots_els_cicles_disponibles[familiaNom];
-            if (ciclesFamilia.length > 0) { // Només crear optgroup si hi ha cicles
-                const optgroup = document.createElement('optgroup');
-                optgroup.label = familiaNom;
-
-                ciclesFamilia.forEach(cicle => {
-                    const option = document.createElement('option');
-                    option.value = cicle.id;
-                    option.dataset.nom = cicle.nom;
-                    option.dataset.grau = cicle.grau;
-                    option.dataset.familia = cicle.familia;
-                    option.textContent = `${cicle.nom} (${cicle.grau})`;
-                    optgroup.appendChild(option);
-                });
-                select.appendChild(optgroup);
-            }
-        });
-    }
-
-    function renderitzarCiclesSeleccionats() {
-        const container = document.getElementById('cicles-container');
-        container.innerHTML = '';
-
-        if (cicles_seleccionats.length === 0) {
-            container.innerHTML = `
-                <div class="text-center text-muted py-3">
-                    <i class="bi bi-mortarboard" style="font-size: 2rem;"></i>
-                    <p class="mt-2 mb-0">No has afegit cap estudi</p>
-                    <small>Selecciona els cicles als quals va dirigida l'oferta</small>
-                </div>
-            `;
-            return;
-        }
-
-        cicles_seleccionats.forEach((cicle, index) => {
-            const div = document.createElement('div');
-            div.className = 'funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start';
-            div.innerHTML = `
-                <div class="flex-grow-1">
-                    <strong class="text-primary">${index + 1}.</strong> ${cicle.nom} — <em>${cicle.grau} (${cicle.familia})</em>
-                    <input type="hidden" name="cicles" value="${cicle.id}">
-                </div>
-                <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="eliminarCicle(${index})" title="Eliminar cicle">
-                    <i class="bi bi-trash"></i>
-                </button>
-            `;
-            container.appendChild(div);
-        });
-    }
-
+    
     ///////////////////////////////////////////////////////////////////////////////////////////////////
     // GESTIO EVENTS 
     /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -457,19 +157,22 @@
     document.addEventListener('DOMContentLoaded', function() {
 
         CapacitatsManager.inicialitzarCapacitats({{ capacitats_lliures_existents|default:"[]"|safe }});
+        FuncionsManager.inicialitzarFuncions({{ funcions_existents|default:"[]"|safe }});
+        IdiomesManager.inicialitzarIdiomes({{ idiomes_existents|default:"[]"|safe }});
+        CiclesManager.inicialitzarCicles({{ cicles_existents|default:"[]"|safe }});
 
 
-        funcions = {{ funcions_existents|default:"[]"|safe }};
-        idiomes = {{ idiomes_existents|default:"[]"|safe }};
-        capacitatsLliures = {{ capacitats_lliures_existents|default:"[]"|safe }};
+        //funcions = {{ funcions_existents|default:"[]"|safe }};
+        //idiomes = {{ idiomes_existents|default:"[]"|safe }};
+        //capacitatsLliures = {{ capacitats_lliures_existents|default:"[]"|safe }};
 
-        cicles_seleccionats = {{ cicles_existents|default:"[]"|safe }};
-        cicles_seleccionats.forEach(c => c.id = c.id.toString());
+        // cicles_seleccionats = {{ cicles_existents|default:"[]"|safe }};
+        // cicles_seleccionats.forEach(c => c.id = c.id.toString());
 
-        inicialitzarCicles(); 
-        renderitzarIdiomes();
-        renderitzarFuncions();
-        renderitzarCapacitatsLliures();
+        //inicialitzarCicles(); 
+        //renderitzarIdiomes();
+        // renderitzarFuncions();
+        // renderitzarCapacitatsLliures();
 
         // Afegir funció amb Enter
         document.getElementById('nova-funcio').addEventListener('keypress', function(e) {

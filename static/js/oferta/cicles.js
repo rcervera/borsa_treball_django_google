@@ -2,10 +2,15 @@ const CiclesManager = (function () {
     let ciclesSeleccionats = [];
     let totsElsCiclesDisponibles = {};
 
-    function inicialitzarCicles() {
+    function inicialitzarCicles(seleccionats = []) {
+        ciclesSeleccionats = Array.isArray(seleccionats) ? seleccionats : [];
+
+        ciclesSeleccionats.forEach(c => c.id = c.id.toString());
+
         const select = document.getElementById('select-cicle');
         totsElsCiclesDisponibles = {};
 
+        // Carrega tots els cicles disponibles del DOM
         Array.from(select.children).forEach(node => {
             if (node.tagName === 'OPTGROUP') {
                 const familiaNom = node.label;
@@ -20,6 +25,14 @@ const CiclesManager = (function () {
                         });
                     }
                 });
+            }
+        });
+
+        // Elimina els seleccionats de les opcions disponibles
+        ciclesSeleccionats.forEach(sel => {
+            const familia = sel.familia;
+            if (totsElsCiclesDisponibles[familia]) {
+                totsElsCiclesDisponibles[familia] = totsElsCiclesDisponibles[familia].filter(c => c.id !== sel.id);
             }
         });
 
@@ -39,8 +52,8 @@ const CiclesManager = (function () {
 
             ciclesSeleccionats.push({ id, nom, grau, familia });
 
-            for (const familiaNom in totsElsCiclesDisponibles) {
-                totsElsCiclesDisponibles[familiaNom] = totsElsCiclesDisponibles[familiaNom].filter(c => c.id !== id);
+            if (totsElsCiclesDisponibles[familia]) {
+                totsElsCiclesDisponibles[familia] = totsElsCiclesDisponibles[familia].filter(c => c.id !== id);
             }
 
             renderitzarCiclesDisponibles();
@@ -61,6 +74,7 @@ const CiclesManager = (function () {
 
     function renderitzarCiclesDisponibles() {
         const select = document.getElementById('select-cicle');
+        if (!select) return;
         select.innerHTML = '<option value="">Selecciona un cicle</option>';
         const families = Object.keys(totsElsCiclesDisponibles).sort();
 
