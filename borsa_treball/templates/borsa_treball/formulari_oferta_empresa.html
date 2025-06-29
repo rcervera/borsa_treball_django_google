@@ -173,7 +173,7 @@
             .then(data => {
                 if (data.success) {
                     // Actualitzar el botó
-                    const nouText = data.visible
+                    const nouText = data.estat=='RV'
                         ? '<i class="bi bi-eye-slash me-2"></i>Ocultar l\'oferta'
                         : '<i class="bi bi-eye me-2"></i>Fer visible l\'oferta';
                     button.innerHTML = nouText;
