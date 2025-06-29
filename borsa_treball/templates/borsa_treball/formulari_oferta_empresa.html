@@ -129,6 +129,7 @@
     </div>
 </div>
 
+{% block extra_js %}
 
 <script>
     const ofertaId = "{{ oferta.id|default:'' }}";
@@ -582,5 +583,7 @@
     });
 
 </script>
+{% endblock %}
+
 {% endif %}
 {% endblock %}
