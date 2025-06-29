@@ -1,0 +1,27 @@
+    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate id="ofertaForm">
+    {% csrf_token %}
+
+    {% include 'partials/_formulari_seccio_informacio_basica.html' %}
+    {% include 'partials/_formulari_seccio_condicions_laborals.html' %}
+    {% include 'partials/_formulari_seccio_estudis.html' %}
+    {% include 'partials/_formulari_seccio_capacitats.html' %}
+    {% include 'partials/_formulari_seccio_funcions.html' %}
+    {% include 'partials/_formulari_seccio_idiomes.html' %}
+    {% include 'partials/_formulari_seccio_altres.html' %}
+
+    {% if mode != "editar" %}
+    <div class="mb-5">
+        <h5 class="text-primary mb-4">
+            <i class="bi bi-gear me-2"></i>Configuració
+        </h5>
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="visible" name="visible" {% if oferta.visible %}checked{% endif %}>
+            <label class="form-check-label" for="visible">
+                <strong>Oferta visible</strong>
+                <br>
+                <small class="text-muted">Si està activat, l'oferta podrà ser validada pel responsable de la borsa.</small>
+            </label>
+        </div>
+    </div>
+    {% endif %}
+</form>

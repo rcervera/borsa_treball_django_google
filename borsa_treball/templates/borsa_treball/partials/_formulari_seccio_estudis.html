@@ -1,0 +1,40 @@
+<div class="mb-5">
+    <h5 class="text-primary mb-4">
+        <i class="bi bi-mortarboard me-2"></i>Estudis
+    </h5>
+
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <div id="cicles-container" class="mb-3">
+                <!-- Es renderitza amb JavaScript -->
+            </div>
+
+            <div class="card border-dashed">
+                <div class="card-body">
+                    <div class="input-group">
+                        <select id="select-cicle" class="form-select">
+                            <option value="">Selecciona un cicle</option>
+                            {% for familia_data in cicles_agrupats_per_familia %}
+                                <optgroup label="{{ familia_data.familia_nom }}">
+                                    {% for cicle in familia_data.cicles %}
+                                        <option value="{{ cicle.id }}"
+                                                data-nom="{{ cicle.nom }}"
+                                                data-grau="{{ cicle.grau }}"
+                                                data-familia="{{ cicle.familia_nom }}">
+                                            {{ cicle.nom }} ({{ cicle.grau }})
+                                        </option>
+                                    {% endfor %}
+                                </optgroup>
+                            {% endfor %}
+                        </select>
+                        <button class="btn btn-warning" type="button" onclick="afegirCicle()">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    </div>
+                    <small class="text-muted mt-2 d-block">Selecciona un cicle i prem el botó + per afegir-lo.</small>
+                    <div id="error-cicles" class="error-validacio form-text text-danger"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -245,7 +245,7 @@
                                         <div class="input-group">
                                             
                                             <select id="select-cicle" class="form-select">
-                                                <option value="">Selecciona un cicle</option>
+                                                <option value="">Selecciona un estudi</option>
                                                 {# ARA ITEREM SOBRE LA LLISTA DE DICT, NO DE TUPLES #}
                                                 {% for familia_data in cicles_agrupats_per_familia %}
                                                     <optgroup label="{{ familia_data.familia_nom }}"> {# Accedim a la clau 'familia_nom' del diccionari #}
@@ -264,7 +264,7 @@
                                                 <i class="bi bi-plus-lg"></i>
                                             </button>
                                         </div>
-                                        <small class="text-muted mt-2 d-block">Selecciona un cicle per afegir-lo.</small>
+                                        <small class="text-muted mt-2 d-block">Selecciona uns estudis i prem el botó + per afegir-lo..</small>
                                         <div  id="error-cicles" class="error-validacio form-text text-danger"></div>
                                     </div>
                                 </div>
@@ -295,7 +295,7 @@
                                         </button>
                                     </div>
 
-                                    <small class="text-muted">Pots escriure lliurement o seleccionar una capacitat suggerida.</small>
+                                    <small class="text-muted">Pots escriure lliurement o seleccionar una capacitat suggerida. Prem + per afegir-la a la llista</small>
                                 </div>
                             </div>
                     </div>
@@ -326,7 +326,7 @@
                                         <i class="bi bi-plus-lg"></i>
                                     </button>
                                 </div>
-                                <small class="text-muted mt-2 d-block">Prem Enter o fes clic a "Afegir" per afegir una funció</small>
+                                <small class="text-muted mt-2 d-block">Prem Enter o fes clic a "+" per afegir una nova funció</small>
                                 <div  id="error-funcions" class="error-validacio form-text text-danger"></div>
                             </div>
                         </div>
@@ -372,7 +372,7 @@
                                         </button>
                                     </div>
                                 </div>
-                                <small class="text-muted d-block mt-2">Pots escriure un idioma i nivell nous o triar dels suggerits.</small>
+                                <small class="text-muted d-block mt-2">Pots escriure un idioma i nivell nous o triar-ne un dels suggerits. Prem "+" per afegir-lo a la llista</small>
                                 <div  id="error-idiomes" class="error-validacio form-text text-danger"></div>
                             </div>
                         </div>

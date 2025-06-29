@@ -90,6 +90,7 @@ def afegir_oferta(request):
     
     
     context = {
+    'mode': 'afegir',
     'cicles': Cicle.objects.all(),
     'cicles_agrupats_per_familia': cicles_agrupats_per_familia,
     'capacitats': CapacitatClau.objects.all(),
@@ -99,7 +100,7 @@ def afegir_oferta(request):
     'EXPERIENCIA': Oferta.EXPERIENCIA,
     'current_page' : 'llista_ofertes'
     }
-    return render(request, 'borsa_treball/afegir_oferta_empresa.html', context)
+    return render(request, 'borsa_treball/formulari_oferta_empresa.html', context)
 
 #
 # Crear l'oferta : API
@@ -255,7 +256,7 @@ def crear_oferta_api(request):
 
             # Relacions many-to-many amb variables validades
             oferta.cicles.set(cicles_ids) 
-             
+
             #if capacitats_ids:
             #    oferta.capacitats_clau.set(capacitats_ids)  
 

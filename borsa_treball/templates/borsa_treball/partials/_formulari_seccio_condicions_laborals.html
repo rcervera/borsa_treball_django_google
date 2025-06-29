@@ -1,0 +1,85 @@
+<div class="mb-5">
+    <h5 class="text-primary mb-4">
+        <i class="bi bi-briefcase me-2"></i>Condicions Laborals
+    </h5>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label for="tipus_contracte" class="form-label">
+                <i class="bi bi-file-earmark-text text-muted me-2"></i>Tipus de contracte *
+            </label>
+            <select class="form-select" id="tipus_contracte" name="tipus_contracte" required>
+                <option value="">Selecciona tipus</option>
+                {% for code, name in TIPUS_CONTRACTE %}
+                    <option value="{{ code }}" {% if oferta.tipus_contracte == code %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+            <div id="error-tipus_contracte" class="error-validacio form-text text-danger"></div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label for="destinatari" class="form-label">
+                <i class="bi bi-send text-muted me-2"></i>A qui va dirigida l'oferta
+            </label>
+            <select class="form-select" id="destinatari" name="destinatari" required>
+                <option value="">Selecciona destinatari</option>
+                {% for code, name in PUBLIC_DESTINATARI %}
+                    <option value="{{ code }}" {% if oferta.public_destinatari == code %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+            <div id="error-destinatari" class="error-validacio form-text text-danger"></div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label for="experiencia" class="form-label">
+                <i class="bi bi-calendar4-range text-muted me-2"></i>Experiència requerida
+            </label>
+            <select class="form-select" id="experiencia" name="experiencia">
+                <option value="">Selecciona experiència</option>
+                {% for code, name in EXPERIENCIA %}
+                    <option value="{{ code }}" {% if oferta.experiencia == code %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+            <div id="error-experiencia" class="error-validacio form-text text-danger"></div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label for="horari" class="form-label">
+                <i class="bi bi-alarm text-muted me-2"></i>Horari
+            </label>
+            <input type="text" class="form-control" id="horari" name="horari" placeholder="Ex: 9:00 - 17:00" value="{{ oferta.horari|default:'' }}">
+            <div id="error-horari" class="error-validacio form-text text-danger"></div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <label for="jornada" class="form-label">
+                <i class="bi bi-clock text-muted me-2"></i>Jornada *
+            </label>
+            <select class="form-select" id="jornada" name="jornada" required>
+                <option value="">Selecciona jornada</option>
+                {% for code, name in JORNADA %}
+                    <option value="{{ code }}" {% if oferta.jornada == code %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+            <div id="error-jornada" class="error-validacio form-text text-danger"></div>
+        </div>
+
+        <div class="col-md-3 mb-3" id="div_hores" {% if oferta.jornada != "PA" %}style="display: none;"{% endif %}>
+            <label for="hores" class="form-label">
+                <i class="bi bi-clock text-muted me-2"></i>Nombre d'hores
+            </label>
+            <input type="number" class="form-control" id="hores" name="hores" min="1" placeholder="Ex: 20" value="{{ oferta.hores_setmanals|default_if_none:'' }}">
+            <div id="error-hores" class="error-validacio form-text text-danger"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <label for="salari" class="form-label">
+                <i class="bi bi-currency-euro text-muted me-2"></i>Salari
+            </label>
+            <input type="text" class="form-control" id="salari" name="salari" placeholder="Ex: 18.000-22.000€" value="{{ oferta.salari|default:'' }}">
+            <div id="error-salari" class="error-validacio form-text text-danger"></div>
+        </div>
+    </div>
+</div>

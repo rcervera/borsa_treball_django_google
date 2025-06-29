@@ -1,0 +1,15 @@
+<div class="mb-5">
+  <h5 class="text-primary mb-4">
+    <i class="bi bi-info-square me-2"></i>Altres
+  </h5>
+
+  <div class="row">
+    <div class="mb-3">
+      <label for="requisits" class="form-label">
+        <i class="bi bi-info-square text-muted me-2"></i>Altres requisits
+      </label>
+      <textarea class="form-control" id="requisits" name="requisits" rows="4" placeholder="Escriu altres requisits necessaris per al lloc de treball...">{{ oferta.requisits|default:'' }}</textarea>
+      <div id="error-requisits" class="error-validacio form-text text-danger"></div>
+    </div>
+  </div>
+</div>

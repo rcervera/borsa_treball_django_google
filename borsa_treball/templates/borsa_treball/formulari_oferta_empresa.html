@@ -1,0 +1,586 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if mode == "editar" %}Editar Oferta - Borsa de Treball{% else %}Nova Oferta - Borsa de Treball{% endif %}{% endblock %}
+
+{% block page_title %}Les meves ofertes{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10 col-md-11">
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-5">
+
+                {% if mode == "editar" %}
+                <div class="d-flex justify-content-end mb-3">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-gear me-2"></i>Accions
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            {% if oferta.candidatures_count > 0 %}
+                            <li><a class="dropdown-item" href="{% url 'llista_candidatures_oferta' oferta.id %}">
+                                <i class="bi bi-people me-2"></i>Veure candidatures ({{ oferta.candidatures_count }})
+                            </a></li>
+                            {% else %}
+                            <li><span class="dropdown-item-text text-muted">
+                                <i class="bi bi-people me-2"></i>Cap candidatura
+                            </span></li>
+                            {% endif %}
+                            {% if oferta.estat in ('RV', 'OC') %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="toggleVisibilitat('{{ oferta.id }}',this)">
+                                {% if oferta.estat == 'RV' %}
+                                <i class="bi bi-eye-slash me-2"></i>Ocultar l'oferta
+                                {% else %}
+                                <i class="bi bi-eye me-2"></i>Fer visible l'oferta
+                                {% endif %}
+                            </a></li>
+                            <li><a class="dropdown-item text-danger" href="#" onclick="confirmarEliminacio('{{ oferta.id }}')">
+                                <i class="bi bi-trash me-2"></i>Eliminar oferta
+                            </a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="text-center mb-4">
+                    <h2 class="h4 text-dark mb-2">Editar Oferta de Treball</h2>
+                    <p class="text-muted">Pots modificar les dades de l'oferta de treball</p>
+                    <div class="mb-2">
+                        {% if oferta.es_caducada %}
+                        <span class="badge bg-danger-subtle text-danger">
+                            <i class="bi bi-x-circle me-1"></i>Caducada
+                        </span>
+                        {% endif %}
+                        <span id="estat-oferta">
+                            {% if oferta.estat == 'RV' %}<span class="badge bg-secondary-subtle text-danger"><i class="bi bi-lightbulb-off me-1"></i>En revisió</span>
+                            {% elif oferta.estat == 'OC' %}<span class="badge bg-secondary-subtle text-secondary"><i class="bi bi-eye-slash me-1"></i>Oculta</span>
+                            {% elif oferta.estat == 'AC' %}<span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle me-1"></i>Activa</span>
+                            {% elif oferta.estat == 'TC' %}<span class="badge bg-warning-subtle text-warning"><i class="bi bi-lock-fill me-1"></i>Tancada</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                <div class="alert alert-info alert-info-small">
+                    <div class="d-flex">
+                        <div class="alert-icon me-2">
+                            <i class="bi bi-question-circle"></i>
+                        </div>
+                        <div class="alert-content">
+                            {% if oferta.estat == 'AC' %}<p class="mb-2">No es pot eliminar ni canviar l'estat de l'oferta quan està activa.</p>{% endif %}
+                            {% if oferta.estat == 'RV' %}<p class="mb-2">L'oferta està pendent de validació.</p>{% endif %}
+                            {% if oferta.estat in ('OC', 'RV') %}<p class="mb-0">Estudiants no poden presentar candidatures mentre estigui oculta o en revisió.</p>{% endif %}
+                            {% if oferta.estat == 'AC' %}<p class="mb-0">Hi pot haver candidatures pendents de revisió.</p>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center mb-4">
+                    <h2 class="h4 text-dark mb-2">Nova Oferta de Treball</h2>
+                    <p class="text-muted">Publica una nova oferta per trobar el millor talent</p>
+                </div>
+                {% endif %}
+
+
+
+                <div id="api-missatges"></div>
+
+
+                {% include "partials/_formulari_oferta.html" %}
+
+                
+
+                <div class="d-flex justify-content-between align-items-center pt-4 border-top">                    
+                    <button type="submit" form="ofertaForm" class="btn btn-primary rounded-pill">
+                        <i class="bi bi-check-circle me-2"></i>
+                        {% if mode == "editar" %}Desar canvis{% else %}Desar Oferta{% endif %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if mode == "editar" %}
+<!-- Modal confirmació eliminació -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                    Confirmar eliminació
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Estàs segur que vols eliminar aquesta oferta? Aquesta acció no es pot desfer.</p>
+                <div class="alert alert-warning">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Atenció:</strong> S'eliminarà l'oferta {{ oferta.titol}}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">
+                    <i class="bi bi-trash me-2"></i>Eliminar Oferta
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    const ofertaId = "{{ oferta.id|default:'' }}";
+    let ofertaToDelete = null;
+
+    {% if mode == "editar" %}
+        
+       
+       
+    {% endif %}
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    // GESTIO CAPACITATS
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+
+    let capacitatsLliures = [];
+
+    function afegirCapacitatLliure() {
+        const input = document.getElementById('nova-capacitat-lliure');
+        const nom = input.value.trim();
+
+        if (nom && !capacitatsLliures.includes(nom)) {
+            capacitatsLliures.push(nom);
+            renderitzarCapacitatsLliures();
+            input.value = '';
+            input.focus();
+        }
+    }
+
+    function eliminarCapacitatLliure(index) {
+        capacitatsLliures.splice(index, 1);
+        renderitzarCapacitatsLliures();
+    }
+
+    function renderitzarCapacitatsLliures() {
+        const container = document.getElementById('capacitatsLliures-container');
+        container.innerHTML = '';
+
+        if (capacitatsLliures.length === 0) {
+            container.innerHTML = `
+                <div class="text-center text-muted py-3">
+                    <i class="bi bi-stars" style="font-size: 2rem;"></i>
+                    <p class="mt-2 mb-0">No has afegit cap capacitat lliure</p>
+                </div>
+            `;
+            return;
+        }
+
+        capacitatsLliures.forEach((nom, index) => {
+            const div = document.createElement('div');
+            div.className = 'capacitat-item p-3 mb-2 rounded d-flex justify-content-between align-items-start bg-light border';
+
+            div.innerHTML = `
+                <div class="flex-grow-1">
+                    <strong class="text-success">${index + 1}.</strong> ${nom}
+                    <input type="hidden" name="capacitats_lliures[]" value="${nom}">
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="eliminarCapacitatLliure(${index})" title="Eliminar">
+                    <i class="bi bi-trash"></i>
+                </button>
+            `;
+
+            container.appendChild(div);
+        });
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    // GESTIO FUNCIONS
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+
+    let funcions = [];
+
+    function afegirFuncio() {
+        const input = document.getElementById('nova-funcio');
+        const descripcio = input.value.trim();
+        
+        if (descripcio) {
+            funcions.push(descripcio);
+            renderitzarFuncions();
+            input.value = '';
+            input.focus();
+        }
+    }
+
+    function eliminarFuncio(index) {
+        funcions.splice(index, 1);
+        renderitzarFuncions();
+    }
+
+    function renderitzarFuncions() {
+        const container = document.getElementById('funcions-container');
+        container.innerHTML = '';
+        
+        if (funcions.length === 0) {
+            container.innerHTML = `
+                <div class="text-center text-muted py-3">
+                    <i class="bi bi-list-task" style="font-size: 2rem;"></i>
+                    <p class="mt-2 mb-0">Encara no has afegit cap funció</p>
+                    <small>Afegeix les funcions principals del càrrec</small>
+                </div>
+            `;
+            return;
+        }
+        
+        funcions.forEach((funcio, index) => {
+            const div = document.createElement('div');
+            div.className = 'funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start';
+            
+            div.innerHTML = `
+                <div class="flex-grow-1">
+                    <strong class="text-primary">${index + 1}.</strong> ${funcio}
+                    <input type="hidden" name="funcions" value="${funcio}">
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="eliminarFuncio(${index})" title="Eliminar funció">
+                    <i class="bi bi-trash"></i>
+                </button>
+            `;
+            
+            container.appendChild(div);
+        });
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    // GESTIO IDIOMES
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+
+    let idiomes = [];
+
+    function afegirIdioma() {
+        const nom = document.getElementById('idioma_nom').value.trim();
+        const nivell = document.getElementById('idioma_nivell').value.trim();
+
+        if (nom && nivell) {
+            idiomes.push({ nom, nivell });
+            renderitzarIdiomes();
+            document.getElementById('idioma_nom').value = '';
+            document.getElementById('idioma_nivell').value = '';
+        }
+    }
+
+    function eliminarIdioma(index) {
+        idiomes.splice(index, 1);
+        renderitzarIdiomes();
+    }
+
+    function renderitzarIdiomes() {
+        const container = document.getElementById('idiomes-container');
+        container.innerHTML = '';
+
+        if (idiomes.length === 0) {
+            container.innerHTML = `
+                <div class="text-center text-muted py-3">
+                    <i class="bi bi-translate" style="font-size: 2rem;"></i>
+                    <p class="mt-2 mb-0">No has afegit cap idioma</p>
+                    <small>Afegeix idiomes i nivells requerits</small>
+                </div>
+            `;
+            return;
+        }
+
+        idiomes.forEach((idioma, index) => {
+            const div = document.createElement('div');
+            div.className = 'funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start';
+            div.innerHTML = `
+                <div class="flex-grow-1">
+                    <strong class="text-primary">${index + 1}.</strong> ${idioma.nom} — <em>${idioma.nivell}</em>
+                    <input type="hidden" name="idiomes_nom" value="${idioma.nom}">
+                    <input type="hidden" name="idiomes_nivell" value="${idioma.nivell}">
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="eliminarIdioma(${index})" title="Eliminar idioma">
+                    <i class="bi bi-trash"></i>
+                </button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    // GESTIO ESTUDIS
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+
+    let cicles_seleccionats = [];
+    // Aquesta variable global emmagatzemarà tots els cicles originals per referència
+    // La inicialitzarem des del DOM en `inicialitzarCicles()`
+    let tots_els_cicles_disponibles = {}; // Objecte per emmagatzemar cicles agrupats per família
+
+    function inicialitzarCicles() {
+        const select = document.getElementById('select-cicle');
+        tots_els_cicles_disponibles = {}; // Netejar per evitar duplicats
+
+        // Iterar sobre els optgroups i les opcions per reconstruir la estructura
+        Array.from(select.children).forEach(node => {
+            if (node.tagName === 'OPTGROUP') {
+                const familiaNom = node.label;
+                tots_els_cicles_disponibles[familiaNom] = tots_els_cicles_disponibles[familiaNom] || [];
+                Array.from(node.children).forEach(option => {
+                    if (option.value) {
+                        tots_els_cicles_disponibles[familiaNom].push({
+                            id: option.value,
+                            nom: option.dataset.nom,
+                            grau: option.dataset.grau,
+                            familia: option.dataset.familia // Es podria treure si ja està a la clau de l'objecte
+                        });
+                    }
+                });
+            } else if (node.tagName === 'OPTION' && node.value) { // Per si hi ha opcions fora d'optgroup
+                const familiaNom = node.dataset.familia || 'Altres'; // Assignar una família per defecte
+                tots_els_cicles_disponibles[familiaNom] = tots_els_cicles_disponibles[familiaNom] || [];
+                tots_els_cicles_disponibles[familiaNom].push({
+                    id: node.value,
+                    nom: node.dataset.nom,
+                    grau: node.dataset.grau,
+                    familia: node.dataset.familia
+                });
+            }
+        });
+
+        renderitzarCiclesDisponibles();
+        renderitzarCiclesSeleccionats(); // Assegurar que el contenidor de seleccionades es renderitza buit a l'inici
+    }
+
+    function afegirCicle() {
+        const select = document.getElementById('select-cicle');
+        const selectedOption = select.options[select.selectedIndex];
+
+        if (selectedOption && selectedOption.value) {
+            const id = selectedOption.value;
+            const nom = selectedOption.dataset.nom;
+            const grau = selectedOption.dataset.grau;
+            const familia = selectedOption.dataset.familia;
+
+            cicles_seleccionats.push({ id, nom, grau, familia });
+            
+            // Eliminar el cicle seleccionat de la llista de disponibles
+            for (const familiaNom in tots_els_cicles_disponibles) {
+                tots_els_cicles_disponibles[familiaNom] = tots_els_cicles_disponibles[familiaNom].filter(c => c.id !== id);
+            }
+
+            renderitzarCiclesDisponibles();
+            renderitzarCiclesSeleccionats();
+        }
+    }
+
+    function eliminarCicle(index) {
+        const cicleEliminat = cicles_seleccionats.splice(index, 1)[0];
+        
+        // Tornar el cicle eliminat a la llista de disponibles
+        const familiaDelCicle = cicleEliminat.familia || 'Altres';
+        tots_els_cicles_disponibles[familiaDelCicle] = tots_els_cicles_disponibles[familiaDelCicle] || [];
+        tots_els_cicles_disponibles[familiaDelCicle].push(cicleEliminat);
+        
+        // Ordenar els cicles dins de la seva família per mantenir l'ordre alfabètic
+        tots_els_cicles_disponibles[familiaDelCicle].sort((a, b) => a.nom.localeCompare(b.nom));
+
+        renderitzarCiclesDisponibles();
+        renderitzarCiclesSeleccionats();
+    }
+
+    function renderitzarCiclesDisponibles() {
+        const select = document.getElementById('select-cicle');
+        select.innerHTML = '<option value="">Selecciona un cicle</option>'; // Restablir el select
+
+        // Ordenar famílies per nom per una visualització consistent
+        const familiesOrdenades = Object.keys(tots_els_cicles_disponibles).sort();
+
+        familiesOrdenades.forEach(familiaNom => {
+            const ciclesFamilia = tots_els_cicles_disponibles[familiaNom];
+            if (ciclesFamilia.length > 0) { // Només crear optgroup si hi ha cicles
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = familiaNom;
+
+                ciclesFamilia.forEach(cicle => {
+                    const option = document.createElement('option');
+                    option.value = cicle.id;
+                    option.dataset.nom = cicle.nom;
+                    option.dataset.grau = cicle.grau;
+                    option.dataset.familia = cicle.familia;
+                    option.textContent = `${cicle.nom} (${cicle.grau})`;
+                    optgroup.appendChild(option);
+                });
+                select.appendChild(optgroup);
+            }
+        });
+    }
+
+    function renderitzarCiclesSeleccionats() {
+        const container = document.getElementById('cicles-container');
+        container.innerHTML = '';
+
+        if (cicles_seleccionats.length === 0) {
+            container.innerHTML = `
+                <div class="text-center text-muted py-3">
+                    <i class="bi bi-mortarboard" style="font-size: 2rem;"></i>
+                    <p class="mt-2 mb-0">No has afegit cap estudi</p>
+                    <small>Selecciona els cicles als quals va dirigida l'oferta</small>
+                </div>
+            `;
+            return;
+        }
+
+        cicles_seleccionats.forEach((cicle, index) => {
+            const div = document.createElement('div');
+            div.className = 'funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start';
+            div.innerHTML = `
+                <div class="flex-grow-1">
+                    <strong class="text-primary">${index + 1}.</strong> ${cicle.nom} — <em>${cicle.grau} (${cicle.familia})</em>
+                    <input type="hidden" name="cicles" value="${cicle.id}">
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="eliminarCicle(${index})" title="Eliminar cicle">
+                    <i class="bi bi-trash"></i>
+                </button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    // GESTIO EVENTS 
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        funcions = {{ funcions_existents|default:"[]"|safe }};
+        idiomes = {{ idiomes_existents|default:"[]"|safe }};
+        capacitatsLliures = {{ capacitats_lliures_existents|default:"[]"|safe }};
+
+        cicles_seleccionats = {{ cicles_existents|default:"[]"|safe }};
+        cicles_seleccionats.forEach(c => c.id = c.id.toString());
+
+        inicialitzarCicles(); 
+        renderitzarIdiomes();
+        renderitzarFuncions();
+        renderitzarCapacitatsLliures();
+
+        // Afegir funció amb Enter
+        document.getElementById('nova-funcio').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                afegirFuncio();
+            }
+        });
+        
+        document.getElementById("jornada").addEventListener("change", function () {
+            const divHores = document.getElementById("div_hores");
+            if (this.value === "PA") {
+                divHores.style.display = "block";
+            } else {
+                divHores.style.display = "none";
+                document.getElementById("hores").value = '';
+            }
+        });
+
+
+    document.getElementById("ofertaForm").addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const formData = new FormData(form);
+
+        // Construir objecte de dades per a l'API
+        const data = {
+            titol: formData.get("titol"),
+            data_limit: formData.get("data_limit"),
+            numero_vacants: formData.get("numero_vacants"),
+            descripcio: formData.get("descripcio"),
+            tipus_contracte: formData.get("tipus_contracte"),
+            jornada: formData.get("jornada"),
+            hores: formData.get("hores"),
+            horari: formData.get("horari"),
+            salari: formData.get("salari"),
+            lloc_treball: formData.get("lloc_treball"),
+            destinatari: formData.get("destinatari"),
+            experiencia: formData.get("experiencia"),
+            requisits: formData.get("requisits"),
+            visible: formData.get("visible") === "on",
+            cicles: cicles_seleccionats.map(c => c.id), 
+            //capacitats_clau: capacitats_clau_seleccionades.map(c => c.id), 
+            funcions: funcions, 
+            capacitatsLliures: capacitatsLliures,
+            idiomes: idiomes    
+        };
+
+        try {
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const resposta = await fetch("/api/empresa/oferta/nova", {
+                method: "POST",
+                headers: { "Content-Type": "application/json",
+                        'X-CSRFToken': csrftoken,
+                },
+                body: JSON.stringify(data)
+            });
+
+            const resultat = await resposta.json();
+
+            const cont = document.getElementById("api-missatges");
+            cont.innerHTML = "";
+
+            // Esborra errors anteriors
+            form.querySelectorAll('.error-validacio').forEach(div => div.innerText = '');
+            form.querySelectorAll('.invalid-feedback').forEach(div => div.innerText = '');
+            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+            if (resultat.success) {
+                
+                //cont.innerHTML = `<div class="alert alert-success">${resultat.message}</div>`;
+                if (typeof window.showSuccessToast === 'function') {
+                            showSuccessToast('Oferta registrada correctament!');
+                }
+                        
+                setTimeout(() => {
+                            window.location.href = "{% url 'llista_ofertes_empresa' %}";
+                }, 2000);     
+                    
+
+
+            } else {
+                const errors = resultat.errors;
+                for (const camp in errors) {
+                    const missatge = errors[camp];
+                    const input = form.querySelector(`[name="${camp}"]`);
+                    const errorDiv = document.getElementById(`error-${camp}`);
+                
+
+                    if (input) input.classList.add('is-invalid');
+                    if (errorDiv) errorDiv.innerText = missatge;
+                }
+
+                if (typeof window.showErrorToast === 'function') {
+                            showErrorToast('Hi ha errors en el formulari. Revisa les dades.');
+                }
+
+                // cont.innerHTML = `<div class="alert alert-danger">Hi ha errors en el formulari.</div>`;
+            }
+
+        } catch (error) {
+            document.getElementById("api-missatges").innerHTML = `<div class="alert alert-danger">Error de connexió amb el servidor.</div>`;
+        }
+    });
+
+    
+        
+    // Establir data mínima com avui
+    const dataLimit = document.getElementById('data_limit');
+    if (dataLimit) {
+        const avui = new Date().toISOString().split('T')[0];
+            dataLimit.min = avui;
+    }
+        
+    
+    
+    });
+
+</script>
+{% endif %}
+{% endblock %}

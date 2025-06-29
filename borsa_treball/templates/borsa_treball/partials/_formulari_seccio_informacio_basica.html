@@ -1,0 +1,56 @@
+<div class="mb-5">
+    <h5 class="text-primary mb-4">
+        <i class="bi bi-info-circle me-2"></i>Informació Bàsica
+    </h5>
+
+    <div class="row">
+        <div class="col-md-8 mb-3">
+            <label for="titol" class="form-label">
+                <i class="bi bi-card-heading text-muted me-2"></i>Títol de l'oferta *
+            </label>
+            <input type="text" class="form-control" id="titol" name="titol" 
+                   placeholder="Ex: Desenvolupador/a Web Junior"
+                   value="{{ oferta.titol|default:'' }}" required>
+            <div id="error-titol" class="error-validacio form-text text-danger"></div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label for="data_limit" class="form-label">
+                <i class="bi bi-calendar-event text-muted me-2"></i>Data límit *
+            </label>
+            <input type="date" class="form-control" id="data_limit" name="data_limit" 
+                   value="{{ data_limit_formatted|default:'' }}" required>
+            <div id="error-data_limit" class="error-validacio form-text text-danger"></div>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="descripcio" class="form-label">
+            <i class="bi bi-file-text text-muted me-2"></i>Descripció de l'oferta *
+        </label>
+        <textarea class="form-control" id="descripcio" name="descripcio" rows="4"
+                  placeholder="Descriu les responsabilitats i objectius del lloc de treball..." required>{{ oferta.descripcio|default:'' }}</textarea>
+        <div id="error-descripcio" class="error-validacio form-text text-danger"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mb-3">
+            <label for="lloc_treball" class="form-label">
+                <i class="bi bi-geo-alt text-muted me-2"></i>Lloc de treball *
+            </label>
+            <input type="text" class="form-control" id="lloc_treball" name="lloc_treball" 
+                   placeholder="Exemple: Tarragona"
+                   value="{{ oferta.lloc_treball|default:'' }}" required>
+            <div id="error-lloc_treball" class="error-validacio form-text text-danger"></div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label for="numero_vacants" class="form-label">
+                <i class="bi bi-people-fill text-muted me-2"></i>Vacants *
+            </label>
+            <input type="number" class="form-control" id="numero_vacants" name="numero_vacants"
+                   min="1" max="100" value="{{ oferta.numero_vacants|default:'' }}" required>
+            <div id="error-numero_vacants" class="error-validacio form-text text-danger"></div>
+        </div>
+    </div>
+</div>

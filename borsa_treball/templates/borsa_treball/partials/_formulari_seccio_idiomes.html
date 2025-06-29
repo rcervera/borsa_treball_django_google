@@ -1,0 +1,46 @@
+<div class="mb-5">
+  <h5 class="text-primary mb-4">
+    <i class="bi bi-translate me-2"></i>Idiomes Requerits
+  </h5>
+
+  <div id="idiomes-container" class="mb-3">
+    <!-- S'omple amb JavaScript -->
+  </div>
+
+  <div class="card border-dashed">
+    <div class="card-body">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-6">
+          <label for="idioma_nom" class="form-label">Idioma</label>
+          <input type="text" id="idioma_nom" list="llista_idiomes" class="form-control" placeholder="Ex: Català">
+          <datalist id="llista_idiomes">
+            <option value="Català">
+            <option value="Castellà">
+            <option value="Anglès">
+            <option value="Francès">
+            <option value="Alemany">
+          </datalist>
+        </div>
+        <div class="col-md-5">
+          <label for="idioma_nivell" class="form-label">Nivell</label>
+          <input type="text" id="idioma_nivell" list="llista_nivells" class="form-control" placeholder="Ex: Alt, Parlat, Escrit">
+          <datalist id="llista_nivells">
+            <option value="Alt">
+            <option value="Mitjà">
+            <option value="Baix">
+            <option value="Parlat">
+            <option value="Escrit">
+            <option value="Nadiu">
+          </datalist>
+        </div>
+        <div class="col-md-1 text-end">
+          <button type="button" class="btn btn-warning w-100" onclick="afegirIdioma()">
+            <i class="bi bi-plus-lg me-1"></i>
+          </button>
+        </div>
+      </div>
+      <small class="text-muted d-block mt-2">Pots escriure un idioma i nivell nous o triar dels suggerits.</small>
+      <div id="error-idiomes" class="error-validacio form-text text-danger"></div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+<div class="mb-5">
+    <h5 class="text-primary mb-4">
+        <i class="bi bi-stars me-2"></i> Capacitats clau (lliures)
+    </h5>
+
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <div id="capacitatsLliures-container" class="mb-3">
+                <!-- S'omple amb JavaScript -->
+            </div>
+
+            <div class="input-group mb-2">
+                <input type="text" id="nova-capacitat-lliure" class="form-control" placeholder="Escriu una capacitat clau" list="datalist-capacitats">
+                <datalist id="datalist-capacitats">
+                    {% for capacitat in capacitats %}
+                        <option value="{{ capacitat.nom }}"></option>
+                    {% endfor %}
+                </datalist>
+                <button type="button" class="btn btn-success" onclick="afegirCapacitatLliure()">
+                    <i class="bi bi-plus-circle"></i>
+                </button>
+            </div>
+
+            <small class="text-muted">Pots escriure lliurement o seleccionar una capacitat suggerida.</small>
+            <div id="error-capacitats" class="error-validacio form-text text-danger"></div>
+        </div>
+    </div>
+</div>
