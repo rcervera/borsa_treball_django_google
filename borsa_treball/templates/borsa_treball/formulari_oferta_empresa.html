@@ -197,6 +197,10 @@
             const form = e.target;
             const formData = new FormData(form);
 
+            const ofertaId = form.dataset.ofertaId || null;
+            const url = ofertaId ? `/api/empresa/oferta/${ofertaId}/` : "/api/empresa/oferta/nova";
+            const method = ofertaId ? "PUT" : "POST";
+
             // Construir objecte de dades per a l'API
             const data = {
                 titol: formData.get("titol"),
@@ -226,8 +230,8 @@
 
             try {
                 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-                const resposta = await fetch("/api/empresa/oferta/nova", {
-                    method: "POST",
+                const resposta = await fetch(url, {
+                    method: method,
                     headers: { "Content-Type": "application/json",
                             'X-CSRFToken': csrftoken,
                     },

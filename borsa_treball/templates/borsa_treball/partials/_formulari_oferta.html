@@ -1,4 +1,4 @@
-    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate id="ofertaForm">
+    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate id="ofertaForm" data-oferta-id="{{ oferta.id }}">
     {% csrf_token %}
 
     {% include 'borsa_treball/partials/_formulari_seccio_informacio_basica.html' %}
