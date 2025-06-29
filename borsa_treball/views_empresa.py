@@ -770,7 +770,7 @@ def api_actualitzar_oferta(request, oferta_id):
             oferta.descripcio = descripcio
             oferta.tipus_contracte = tipus_contracte
             oferta.jornada = jornada
-            oferta.hores = hores_valor  
+            oferta.hores_setmanals = hores_valor  
             oferta.horari = horari
             oferta.salari = salari
             oferta.requisits = requisits
