@@ -798,7 +798,7 @@ def api_actualitzar_oferta(request, oferta_id):
             oferta.capacitats.all().delete()
 
             # Afegeix les noves
-            capacitats = data.get("capacitats_lliures", [])
+            capacitats = data.get("capacitatsLliures", [])
             for nom in capacitats:
                 if nom.strip():
                     CapacitatOferta.objects.create(oferta=oferta, nom=nom.strip())
