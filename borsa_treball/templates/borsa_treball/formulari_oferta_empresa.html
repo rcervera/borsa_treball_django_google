@@ -87,7 +87,7 @@
 
                 {% include "borsa_treball/partials/_formulari_oferta.html" %}
 
-                {% if oferta.estat == 'AC' %}
+                {% if oferta.estat == 'OC' or oferta.estat == 'RV' %}
                     <div class="d-flex justify-content-end pt-4 border-top">
                         <button type="submit" form="ofertaForm" class="btn btn-primary btn-lg rounded-pill px-5">
                             <i class="bi bi-check-circle me-2"></i>

@@ -47,7 +47,7 @@ const IdiomesManager = (function () {
             div.className = 'funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start';
             div.innerHTML = `
                 <div class="flex-grow-1">
-                    <strong class="text-primary">${index + 1}.</strong> ${idioma.idioma} — <em>${idioma.nivell}</em>
+                    ${idioma.idioma} — <em>${idioma.nivell}</em>
                     <input type="hidden" name="idiomes_nom" value="${idioma.idioma}">
                     <input type="hidden" name="idiomes_nivell" value="${idioma.nivell}">
                 </div>

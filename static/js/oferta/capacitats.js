@@ -47,7 +47,7 @@ const CapacitatsManager = (function () {
             div.className = 'funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start';
             div.innerHTML = `
                 <div class="flex-grow-1">
-                    <strong class="text-primary">${index + 1}.</strong> ${cap}
+                    ${cap}
                     <input type="hidden" name="capacitats" value="${cap}">
                 </div>
                 <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="CapacitatsManager.eliminarCapacitat(${index})" title="Eliminar capacitat">
