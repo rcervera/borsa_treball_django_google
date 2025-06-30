@@ -48,7 +48,7 @@
                                      Carta de presentació *
                             </label>
                             <textarea class="form-control" id="carta_presentacio" name="carta_presentacio" 
-                                     rows="8" required {% if candidatura.estat != 'EN' %}readonly{% endif %}>{{ candidatura.carta_presentacio }}</textarea>
+                                     rows="8" required {% if candidatura.estat != 'EP' %}readonly{% endif %}>{{ candidatura.carta_presentacio }}</textarea>
                             <div class="form-text d-flex justify-content-between">
                                 <span>Explica per què ets el candidat ideal per aquesta oferta</span>
                                 <span id="comptadorCaracters" class="text-muted">0 caràcters</span>
@@ -77,7 +77,7 @@
                                         </div>
                                     </div>
                                     {% endif %}
-                                    {% if candidatura.estat in 'EP,RJ' %}
+                                    {% if candidatura.estat == 'EP' %}
                                         <input class="form-control" type="file" id="cv_adjunt" name="cv_adjunt" 
                                                 accept=".pdf,.doc,.docx">
                                         <div class="form-text">PDF, DOC o DOCX (màx. 5MB)</div>
