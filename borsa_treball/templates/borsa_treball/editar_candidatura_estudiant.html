@@ -91,7 +91,7 @@
                         
                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                
-                                {% if candidatura.estat in 'EP,RJ' %}
+                                {% if candidatura.estat == 'EN_PROCES' %}
                                     <button type="submit" class="btn btn-primary rounded-pill" id="btnGuardar">
                                         <span class="spinner-border spinner-border-sm me-2 d-none" id="loadingSpinner"></span>
                                         <i class="bi bi-check-lg me-1"></i>Guardar canvis
