@@ -95,7 +95,7 @@
                             Desar Oferta
                         </button>
                     </div>
-                {% elif mode == "editar" and (oferta.estat == 'OC' or oferta.estat == 'RV') %}
+                {% elif mode == "editar" and oferta.estat == 'OC' or mode == "editar" and oferta.estat == 'RV' %}
                     <div class="d-flex justify-content-end pt-4 border-top">
                         <button type="submit" form="ofertaForm" class="btn btn-primary btn-lg rounded-pill px-5">
                             <i class="bi bi-check-circle me-2"></i>
