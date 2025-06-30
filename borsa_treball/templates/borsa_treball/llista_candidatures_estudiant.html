@@ -113,7 +113,7 @@
                                             </h5>
                                             <div class="mb-2">
                                                 {% if not candidatura.activa %}
-                                                    <span class="badge bg-secondary text-danger">Pendent de validació</span>
+                                                    <span class="badge bg-light text-danger">Pendent de validació</span>
                                                 {% elif candidatura.estat == 'EP' %}
                                                     <span class="badge bg-info">{{ candidatura.get_estat_display }}</span>
                                                 {% elif candidatura.estat == 'PR' %}
