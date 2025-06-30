@@ -88,7 +88,7 @@
                 {% include "borsa_treball/partials/_formulari_oferta.html" %}
 
                
-                {% if mode == "afegir" or (mode == "editar" and oferta.estat in ('OC', 'RV')) %}
+                {% if mode == "afegir" or (mode == "editar" and (oferta.estat == 'OC' or oferta.estat == 'RV')) %}
                     <div class="d-flex justify-content-end pt-4 border-top">
                         <button type="submit" form="ofertaForm" class="btn btn-primary btn-lg rounded-pill px-5">
                             <i class="bi bi-check-circle me-2"></i>
