@@ -141,16 +141,7 @@
     let ofertaToDelete = null;
 
     {% if mode == "editar" %}
-        
-       
-       
-    {% endif %}
-
     
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    // GESTIO EVENTS 
-    /////////////////////////////////////////////////////////////////////////////////////////////////
-
     // CANVI ESTAT
     function toggleVisibilitat(ofertaId, el) {
             // Mostrar loading
@@ -212,6 +203,8 @@
         const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
         modal.show();
     }
+
+    {% endif %}
     
         document.addEventListener('DOMContentLoaded', function() {
 
@@ -356,7 +349,7 @@
         }   
 
         
-
+     {% if mode == "editar" %}
     document.getElementById('confirmDelete').addEventListener('click', function() {
         if (ofertaToDelete) {
             // Mostrar loading
@@ -409,6 +402,7 @@
         }
     });
 
+    {% endif %}
         
         
     });
