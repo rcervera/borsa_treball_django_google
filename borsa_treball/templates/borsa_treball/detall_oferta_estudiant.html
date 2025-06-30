@@ -130,9 +130,8 @@
                                     <i class="bi bi-stars me-2"></i>Capacitats demanades
                                 </h5>
                                 {% for capacitat in oferta.capacitats.all %}
-                                <div class="d-flex align-items-start mb-3">
-                                    
-                                    <span class="modern-badge">{{ capacitat.nom }}</span>
+                                <div class="d-flex align-items-center p-2 bg-light rounded mb-2">                                  
+                                    {{ capacitat.nom }}
                                 </div>
                                 {% endfor %}
                             </div>
