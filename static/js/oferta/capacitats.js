@@ -14,8 +14,8 @@ const CapacitatsManager = (function () {
     function afegirCapacitatLliure() {
         const input = document.getElementById('nova-capacitat-lliure');
         const capacitat = input.value.trim();
-
-        if (capacitat) {
+       
+        if (capacitat && !capacitatsLliures.includes(capacitat)) {
             capacitatsLliures.push(capacitat);
             input.value = '';
             renderitzarCapacitats();
@@ -44,7 +44,7 @@ const CapacitatsManager = (function () {
 
         capacitatsLliures.forEach((cap, index) => {
             const div = document.createElement('div');
-            div.className = 'capacitat-item p-3 mb-2 rounded d-flex justify-content-between align-items-start';
+            div.className = 'funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start';
             div.innerHTML = `
                 <div class="flex-grow-1">
                     <strong class="text-primary">${index + 1}.</strong> ${cap}

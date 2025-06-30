@@ -69,8 +69,8 @@
                         <div class="alert-content">
                             {% if oferta.estat == 'AC' %}<p class="mb-2">No es pot eliminar ni canviar l'estat de l'oferta quan està activa.</p>{% endif %}
                             {% if oferta.estat == 'RV' %}<p class="mb-2">L'oferta està pendent de validació.</p>{% endif %}
-                            {% if oferta.estat == 'RV' or oferta.estat == 'OC' %}<p class="mb-0">Estudiants no poden presentar candidatures mentre estigui oculta o en revisió.</p>{% endif %}
-                            {% if oferta.estat == 'AC' %}<p class="mb-0">Hi pot haver candidatures pendents de revisió.</p>{% endif %}
+                            {% if oferta.estat == 'RV' or oferta.estat == 'OC' %}<p class="mb-0">Els estudiants no poden presentar candidatures mentre estigui oculta o en revisió.</p>{% endif %}
+                            {% if oferta.estat == 'AC' %}<p class="mb-0">Pot haver-hi candidatures pendents de revisió.</p>{% endif %}
                         </div>
                     </div>
                 </div>
@@ -82,20 +82,19 @@
                 {% endif %}
 
 
-
                 <div id="api-missatges"></div>
 
 
                 {% include "borsa_treball/partials/_formulari_oferta.html" %}
 
-
-
-                <div class="d-flex justify-content-end pt-4 border-top">
-                    <button type="submit" form="ofertaForm" class="btn btn-primary btn-lg rounded-pill px-5">
-                        <i class="bi bi-check-circle me-2"></i>
-                        {% if mode == "editar" %}Desar canvis{% else %}Desar Oferta{% endif %}
-                    </button>
-                </div>
+                {% if oferta.estat == 'AC' %}
+                    <div class="d-flex justify-content-end pt-4 border-top">
+                        <button type="submit" form="ofertaForm" class="btn btn-primary btn-lg rounded-pill px-5">
+                            <i class="bi bi-check-circle me-2"></i>
+                            {% if mode == "editar" %}Desar canvis{% else %}Desar Oferta{% endif %}
+                        </button>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -174,7 +173,7 @@
                     const estatDiv = document.getElementById(`estat-oferta`);
                     if (estatDiv) {
                         estatDiv.innerHTML = data.estat == 'RV'
-                            ? `<span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle me-1"></i>En revisió</span>`
+                            ? `<span class="badge bg-secondary-subtle text-danger"><i class="bi bi-check-circle me-1"></i>En revisió</span>`
                             : `<span class="badge bg-secondary-subtle text-secondary"><i class="bi bi-eye-slash me-1"></i>Oculta</span>`;
                     }
 
@@ -335,7 +334,10 @@
                 }
 
             } catch (error) {
-                document.getElementById("api-missatges").innerHTML = `<div class="alert alert-danger">Error de connexió amb el servidor.</div>`;
+                if (typeof window.showErrorToast === 'function') {
+                                showErrorToast('Error de connexió amb el servidor.');
+                }
+                //document.getElementById("api-missatges").innerHTML = `<div class="alert alert-danger">Error de connexió amb el servidor.</div>`;
             }
         });
 
@@ -394,7 +396,7 @@
                 console.error('Error:', error);
                 
                 if (typeof window.showErrorToast === 'function') {
-                        showErrorToast('Error de connexió.');
+                        showErrorToast('Error de connexió amb el servidor.');
                 }
                 button.innerHTML = originalText;
                 button.disabled = false;

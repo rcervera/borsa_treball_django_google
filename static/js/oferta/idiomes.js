@@ -44,7 +44,7 @@ const IdiomesManager = (function () {
 
         idiomes.forEach((idioma, index) => {
             const div = document.createElement('div');
-            div.className = 'idioma-item p-3 mb-2 rounded d-flex justify-content-between align-items-start';
+            div.className = 'funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start';
             div.innerHTML = `
                 <div class="flex-grow-1">
                     <strong class="text-primary">${index + 1}.</strong> ${idioma.idioma} — <em>${idioma.nivell}</em>
