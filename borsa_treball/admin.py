@@ -133,6 +133,7 @@ class OfertaAdmin(admin.ModelAdmin):
     estat_colored.short_description = "Estat"
     estat_colored.admin_order_field = 'estat'  # permet ordenar per estat real
     
+    
     def descripcio_curta(self, obj):
         if not obj.descripcio:
             return "-"
@@ -151,7 +152,15 @@ from django.contrib import admin
 from .models import Candidatura
 
 class CandidaturaAdmin(admin.ModelAdmin):
-    list_display = ('empresa_nom', 'estudiant_nom', 'data_candidatura', 'estat', 'activa',  'cv_disponible', ) 
+    list_display = (
+            'oferta_titol',
+            'empresa_nom',
+            'estudiant_nom',
+            'data_candidatura',
+            'estat',
+            'activa',
+            'cv_disponible',
+    )
     list_filter = ('estat', 'activa', 'oferta__empresa__nom_comercial') 
    
     search_fields = (
@@ -160,6 +169,7 @@ class CandidaturaAdmin(admin.ModelAdmin):
         'oferta__empresa__nom_comercial',
         'oferta__titol'
     )
+
     date_hierarchy = 'data_candidatura'
     autocomplete_fields = ['estudiant', 'oferta']
     list_per_page = 20  
@@ -189,6 +199,12 @@ class CandidaturaAdmin(admin.ModelAdmin):
             'fields': ('carta_presentacio', 'notes_empresa', 'puntuacio', 'data_canvi_estat')
         })
     )
+
+    def oferta_titol(self, obj):
+        return obj.oferta.titol
+    oferta_titol.short_description = "Títol oferta"
+    oferta_titol.admin_order_field = 'oferta__titol'
+
 
     def cv_disponible(self, obj):
         """Indica si hi ha CV a la llista"""
