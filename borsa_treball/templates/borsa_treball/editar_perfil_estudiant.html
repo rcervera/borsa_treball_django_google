@@ -330,7 +330,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             showSuccessToast(result.message);
                 }
             } else {
-                showApiMessage('perfil-api-missatges', 'danger', result.message || 'Hi ha hagut un error en guardar el perfil.');
+                //showApiMessage('perfil-api-missatges', 'danger', result.message || 'Hi ha hagut un error en guardar el perfil.');
+                
+                if (typeof window.showErrorToast === 'function') {
+                        showErrorToast(result.message || 'Hi ha hagut un error en guardar el perfil.');
+                }
                 if (result.errors) {
                     displayErrors(estudiantProfileForm, result.errors);
                 }
@@ -338,7 +342,10 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('Error:', error);
-            showApiMessage('perfil-api-missatges', 'danger', 'Error de xarxa o del servidor.');
+            //showApiMessage('perfil-api-missatges', 'danger', 'Error de xarxa o del servidor.');
+            if (typeof window.showErrorToast === 'function') {
+                showErrorToast('Error de xarxa o del servidor.');
+            }
         })
         .finally(() => {
             saveProfileBtn.innerHTML = originalBtnText;
@@ -369,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function() {
         addEstudiBtn.disabled = true;
 
         console.log(data)
-        fetch('{% url "api_afegir_estudi_estudiant" %}', { // <-- Define this URL in urls.py
+        fetch('{% url "api_afegir_estudi_estudiant" %}', { 
             method: 'POST',
             headers: {
                 'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
@@ -413,7 +420,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 attachDeleteEstudiListeners(); 
                 addEstudiForm.reset(); // Clear the form
             } else {
-                showApiMessage('perfil-api-missatges', 'danger', result.message || 'Hi ha hagut un error en afegir l\'estudi.');
+                //showApiMessage('perfil-api-missatges', 'danger', result.message || 'Hi ha hagut un error en afegir l\'estudi.');
+                if (typeof window.showErrorToast === 'function') {
+                    showErrorToast(result.message || 'Hi ha hagut un error en afegir l\'estudi.');
+                }
                 if (result.errors) {
                     displayErrors(addEstudiForm, result.errors);
                 }
@@ -421,7 +431,10 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('Error:', error);
-            showApiMessage('perfil-api-missatges', 'danger', 'Error de xarxa o del servidor.');
+            //showApiMessage('perfil-api-missatges', 'danger', 'Error de xarxa o del servidor.');
+            if (typeof window.showErrorToast === 'function') {
+                showErrorToast('Error de xarxa o del servidor.');
+            }
         })
         .finally(() => {
             addEstudiBtn.innerHTML = originalBtnText;
@@ -523,7 +536,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 if (!changePasswordForm.checkValidity()) {
                     changePasswordForm.classList.add('was-validated');
-                    showApiMessage('perfil-api-missatges', 'danger', 'Revisa els camps de contrasenya.');
+                    //showApiMessage('perfil-api-missatges', 'danger', 'Revisa els camps de contrasenya.');
+                    if (typeof window.showErrorToast === 'function') {
+                        showErrorToast('Revisa els camps de contrasenya.');
+                    }
+                    
                     return;
                 }
 
@@ -541,7 +558,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     const data = await response.json();
 
                     if (data.success) {
-                        showApiMessage('perfil-api-missatges', 'success', data.message);
+                        //showApiMessage('perfil-api-missatges', 'success', data.message);
+                        if (typeof window.showSuccessToast === 'function') {
+                            showSuccessToast(data.message);
+                        }
                         changePasswordForm.reset();
                         changePasswordForm.classList.remove('was-validated');
                     } else {
@@ -565,14 +585,22 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                         
                         if (data.message && (!errors || Object.keys(errors).length === 0)) {
-                             showApiMessage('perfil-api-missatges', 'danger', data.message);
+                             // showApiMessage('perfil-api-missatges', 'danger', data.message);
+                            if (typeof window.showErrorToast === 'function') {
+                                showErrorToast(data.message);
                         } else if (!errors || Object.keys(errors).length === 0) {
-                            showApiMessage('perfil-api-missatges', 'danger', 'Hi ha hagut un error en el canvi de contrasenya. Si us plau, revisa les dades.');
+                           // showApiMessage('perfil-api-missatges', 'danger', 'Hi ha hagut un error en el canvi de contrasenya. Si us plau, revisa les dades.');
+                            if (typeof window.showErrorToast === 'function') {
+                                showErrorToast('Hi ha hagut un error en el canvi de contrasenya. Si us plau, revisa les dades.');
+                            }
                         }
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    showApiMessage('perfil-api-missatges', 'danger', 'Hi ha hagut un error de xarxa o del servidor.');
+                    //showApiMessage('perfil-api-missatges', 'danger', 'Hi ha hagut un error de xarxa o del servidor.');
+                    if (typeof window.showErrorToast === 'function') {
+                        showErrorToast('Hi ha hagut un error de xarxa o del servidor.');
+                    }
                 }
             });
         }
