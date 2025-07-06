@@ -628,7 +628,7 @@ def llista_candidatures_estudiant(request):
 
 @login_required
 def editar_candidatura_estudiant(request, candidatura_id):
-    """Vista per editar una candidatura sense Django forms"""
+    """Vista per editar una candidatura"""
    
     try:
         estudiant = request.user.estudiant

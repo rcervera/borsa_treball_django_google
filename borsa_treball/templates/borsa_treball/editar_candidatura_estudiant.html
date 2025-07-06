@@ -412,16 +412,27 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
 
             if (response.ok) {
-                showFeedbackMessage(data.message, 'success');
+                 if (typeof window.showSuccessToast === 'function') {
+                        showSuccessToast(data.message);
+                 }
+                
             } else if (response.status === 400) {
                 displayErrors(data.errors);
-                showFeedbackMessage(data.error || 'Hi ha hagut errors de validació.', 'danger');
+                if (typeof window.showErrorToast === 'function') {
+                        showErrorToast('Hi ha errors en el formulari. Revisa les dades.');
+              }
+                
             } else {
-                showFeedbackMessage(`Error: ${data.error || 'S\'ha produït un error inesperat.'}`, 'danger');
+                if (typeof window.showErrorToast === 'function') {
+                        showErrorToast('S\'ha produït un error inesperat.');
+                }
+                
             }
         } catch (error) {
-            console.error('Error submitting form:', error);
-            showFeedbackMessage('S\'ha produït un error en connectar amb el servidor. Torna-ho a intentar.', 'danger');
+            if (typeof window.showErrorToast === 'function') {
+                        showErrorToast('S\'ha produït un error en connectar amb el servidor. Torna-ho a intentar.');
+            }
+            
         } finally {
             // Hide loading state
             btnGuardar.disabled = false;
@@ -450,17 +461,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await response.json();
 
                 if (response.ok) {
-                    showDeleteFeedbackMessage(data.message + ' Redirigint...', 'success');
+                    if (typeof window.showSuccessToast === 'function') {
+                        showSuccessToast(data.message + ' Redirigint...');
+                    }
+                    
                     // Redirecció retardada després de l'èxit
                     setTimeout(() => {
                         window.location.href = '{% url "llista_candidatures_estudiant" %}';
                     }, 2000); // Redirigeix després de 2 segons
                 } else {
-                    showDeleteFeedbackMessage(`Error: ${data.error || 'No s\'ha pogut eliminar la candidatura.'}`, 'danger');
+                     if (typeof window.showErrorToast === 'function') {
+                        showErrorToast(Error: ${data.error || 'No s\'ha pogut eliminar la candidatura.');
+                     }
+                   
                 }
             } catch (error) {
                 console.error('Error deleting candidacy:', error);
-                showDeleteFeedbackMessage('Hi ha hagut un error en intentar eliminar la candidatura.', 'danger');
+                if (typeof window.showErrorToast === 'function') {
+                        showErrorToast('Hi ha hagut un error en intentar eliminar la candidatura.');
+                }
+               
             } finally {
                 candidaturaAEliminar = null; // Clear the ID
             }
