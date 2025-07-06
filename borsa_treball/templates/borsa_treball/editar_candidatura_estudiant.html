@@ -55,7 +55,9 @@
                                      Carta de presentació *
                             </label>
                             <textarea class="form-control" id="carta_presentacio" name="carta_presentacio" 
-                                     rows="8" required {% if candidatura.estat != 'EP' %}readonly{% endif %}>{{ candidatura.carta_presentacio }}</textarea>
+                                    rows="8" required
+                                    {% if candidatura and candidatura.estat != 'EP' %}readonly{% endif %}>{{ candidatura.carta_presentacio|default_if_none:'' }}
+                            </textarea>
                             <div class="form-text d-flex justify-content-between">
                                 <span>Explica per què ets el candidat ideal per aquesta oferta</span>
                                 <span id="comptadorCaracters" class="text-muted">0 caràcters</span>
@@ -70,26 +72,27 @@
                                         <i class="bi bi-file-earmark-pdf me-2 text-primary"></i>
                                         Currículum Vitae *
                                     </label>
-                                    {% if candidatura.cv_adjunt %}
-                                    <div class="current-file mb-2">
-                                        <div class="alert alert-light d-flex align-items-center">
-                                            <i class="bi bi-file-earmark-pdf text-danger me-2"></i>
-                                            <div class="flex-grow-1">
-                                                <strong>Fitxer actual:</strong><br>
-                                                <small>{{ candidatura.cv_adjunt.name|slice:"15:" }}</small>
+                                    {% if candidatura and candidatura.cv_adjunt %}
+                                        <div class="current-file mb-2">
+                                            <div class="alert alert-light d-flex align-items-center">
+                                                <i class="bi bi-file-earmark-pdf text-danger me-2"></i>
+                                                <div class="flex-grow-1">
+                                                    <strong>Fitxer actual:</strong><br>
+                                                    <small>{{ candidatura.cv_adjunt.name|slice:"15:" }}</small>
+                                                </div>
+                                                <a href="{% url 'descarregar_cv_candidatura_estudiant' candidatura.id %}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
                                             </div>
-                                            <a href="{% url 'descarregar_cv_candidatura_estudiant' candidatura.id %}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
                                         </div>
-                                    </div>
                                     {% endif %}
-                                    {% if candidatura.estat == 'EP' %}
-                                        <input class="form-control" type="file" id="cv_adjunt" name="cv_adjunt" 
-                                                accept=".pdf,.doc,.docx">
+
+                                    {% if not candidatura or candidatura.estat == 'EP' %}
+                                        <input class="form-control" type="file" id="cv_adjunt" name="cv_adjunt" accept=".pdf,.doc,.docx">
                                         <div class="form-text">PDF, DOC o DOCX (màx. 5MB)</div>
                                         <div class="invalid-feedback" id="errorCV"></div>
-                                     {% endif %}
+                                    {% endif %}
+
                                 </div>
                             </div>
                             
