@@ -453,7 +453,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (candidaturaAEliminar) {
             try {
-                const response = await fetch(`/candidatures/${candidaturaAEliminar}/eliminar_api/`, {
+               
+                const response = await fetch( `{% url 'eliminar_candidatura_api' ${candidaturaAEliminar} %}`, {
                     method: 'POST',
                     headers: {
                         'X-CSRFToken': csrftoken,
