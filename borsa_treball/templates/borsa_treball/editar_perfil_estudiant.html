@@ -196,7 +196,40 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalEliminacioEstudi" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar eliminació</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Aquesta acció no es pot desfer. Està segur que vols eliminar-lo?
+                </div>
+                <div id="deleteFeedbackMessage" class="alert d-none" role="alert"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
+                <button class="btn btn-danger" id="btnConfirmarEliminacio">
+                    <i class="bi bi-trash me-1"></i>Eliminar estudi
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
+
+let estudiAEliminarId = null;
+
+function confirmarEliminacioEstudi(estudiId) {
+    candidaturaAEliminar = estudiId;    
+    new bootstrap.Modal(document.getElementById('modalEliminacioEstudi')).show();
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const apiMessagesContainer = document.getElementById('perfil-api-missatges');
 
@@ -409,59 +442,67 @@ document.addEventListener('DOMContentLoaded', function() {
 
             button.onclick = null; // Remove previous listeners to prevent duplicates
             button.addEventListener('click', function() {
-                const estudiId = this.dataset.estudiId;
-                if (confirm('Estàs segur que vols eliminar aquest estudi?')) {
-                    const deleteBtn = this;
-                    deleteBtn.disabled = true; // Disable button during request
 
-                    const form = button.closest('form');
-                    const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
-                   
-                    fetch(`/api/perfil/estudiant/estudis/${estudiId}/esborrar/`, { 
-                        method: 'POST', // Or 'DELETE' if your API supports it and handles CSRF
-                        headers: {
-                            'X-CSRFToken': csrfToken,
-                            'Content-Type': 'application/json',
-                        },
-                    })
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.success) {
-                            // showApiMessage('perfil-api-missatges', 'success', result.message);
-                            if (typeof window.showSuccessToast === 'function') {
-                                 showSuccessToast(result.message);
-                            }
-                            document.getElementById(`estudi-${estudiId}`).remove(); // Remove from DOM
-                            // If no studies left, show the "no studies" alert
-                            if (document.querySelectorAll('#estudis-list .card').length === 0) {
-                                document.getElementById('estudis-list').innerHTML = `
-                                <div class="text-center text-muted py-3">
-                                    <i class="bi bi-mortarboard" style="font-size: 2rem;"></i>
-                                    <p class="mt-2 mb-0">No has afegit cap estudi</p>
-                                    <small>Selecciona els teus estudis</small>
-                                </div>
-                            `;
-                            }
-                        } else {
-                            //showApiMessage('perfil-api-missatges', 'danger', result.message || 'Error en eliminar l\'estudi.');
-                            if (typeof window.showErrorToast === 'function') {
-                                showErrorToast(result.message || 'Error en eliminar l\'estudi.');
-                            }
-                            deleteBtn.disabled = false; // Re-enable button on error
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        //showApiMessage('perfil-api-missatges', 'danger', 'Error de xarxa o del servidor.');
-                         if (typeof window.showErrorToast === 'function') {
-                                showErrorToast('Error de xarxa o del servidor.');
-                        }
-                        deleteBtn.disabled = false; // Re-enable button on error
-                    });
-                }
+                estudiAEliminarId = this.dataset.estudiId;
+                const modal = new bootstrap.Modal(document.getElementById('modalEliminacioEstudi'));
+                modal.show();
+
+                
             });
         });
     }
+
+    document.getElementById('btnConfirmarEliminacio').addEventListener('click', function() {
+            if (!estudiAEliminarId) return;
+
+            const deleteCard = document.getElementById(`estudi-${estudiAEliminarId}`);
+            const form = document.querySelector('#addEstudiForm');
+            const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch(`/api/perfil/estudiant/estudis/${estudiAEliminarId}/esborrar/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    if (typeof window.showSuccessToast === 'function') {
+                        showSuccessToast(result.message);
+                    }
+                    deleteCard.remove();
+
+                    const estudisCards = document.querySelectorAll('#estudis-list .card');
+                    if (estudisCards.length === 0) {
+                        document.getElementById('estudis-list').innerHTML = `
+                            <div class="text-center text-muted py-3">
+                                <i class="bi bi-mortarboard" style="font-size: 2rem;"></i>
+                                <p class="mt-2 mb-0">No has afegit cap estudi</p>
+                                <small>Selecciona els teus estudis</small>
+                            </div>
+                        `;
+                    }
+                } else {
+                    if (typeof window.showErrorToast === 'function') {
+                        showErrorToast(result.message || 'Error en eliminar l\'estudi.');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (typeof window.showErrorToast === 'function') {
+                    showErrorToast('Error de xarxa o del servidor.');
+                }
+            })
+            .finally(() => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('modalEliminacioEstudi'));
+                if (modal) modal.hide();
+                estudiAEliminarId = null;
+            });
+    });
+
 
     attachDeleteEstudiListeners(); // Initial call to attach listeners on page load
 
