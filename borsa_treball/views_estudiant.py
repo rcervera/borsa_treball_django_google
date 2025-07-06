@@ -569,10 +569,11 @@ def afegir_candidatura(request, oferta_id):
     # Si hi ha errors o és un GET request, renderitzar el formulari amb els errors
     context = {
         'oferta': oferta,
+        'candidatura': None,  # No hi ha candidatura existent
         'errors': errors,
         'carta_presentacio': carta_presentacio_data, # Passar la carta per mantenir el text al formulari
     }
-    return render(request, 'borsa_treball/afegir_candidatura.html', context)
+    return render(request, 'borsa_treball/editar_candidatura_estudiant.html', context)
 
 
 
