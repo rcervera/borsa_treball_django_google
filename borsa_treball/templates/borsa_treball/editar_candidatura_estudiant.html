@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Editar candidatura - {{ candidatura.oferta.titol }}{% endblock %}
+{% block title %}
+    {% if candidatura %}
+        Editar candidatura - {{ candidatura.oferta.titol }}
+    {% else %}
+        Nova candidatura - {{ oferta.titol }}
+    {% endif %}
+{% endblock %}
 
 {% block content %}
 <div class="container py-4">
@@ -9,7 +15,8 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h3 class="mb-0 text-primary">
-                        <i class="bi bi-send me-2"></i>Editar Candidatura
+                        <i class="bi bi-send me-2"></i>
+                        {% if candidatura %}Editar Candidatura{% else %}Nova Candidatura{% endif %}
                     </h3>
                     <p class="mb-5 mt-2 opacity-75">
                         Dades de la teva candidatura
@@ -211,6 +218,7 @@
 
 
 <script>
+const candidaturaId = {% if candidatura %}{{ candidatura.id }}{% else %}null{% endif %};
 let candidaturaAEliminar = null;
 
 function confirmarEliminacio(candidaturaId) {
@@ -359,52 +367,49 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        clearErrors(); // Clear previous errors
-        feedbackMessageDiv.classList.add('d-none'); // Hide general feedback message
+        clearErrors(); 
+        feedbackMessageDiv.classList.add('d-none');
 
         let isValid = true;
         const cartaLongitud = cartaTextarea.value.trim().length;
+
         if (cartaLongitud < 50 || cartaLongitud > 2000) {
             cartaTextarea.classList.add('is-invalid');
             document.getElementById('errorCarta').textContent = cartaLongitud < 50 ? 'La carta ha de tenir almenys 50 caràcters.' : 'La carta no pot superar els 2000 caràcters.';
             isValid = false;
         }
 
-        // **MODIFICACIÓ AQUÍ**: Validació del CV només si no hi ha un CV actual o si se n'està pujant un de nou.
-        
-        const hasExistingCv = {% if candidatura.cv_adjunt %}'{{ candidatura.cv_adjunt.url }}' !== '';{% else %}false;{% endif %};
+        const hasExistingCv = candidaturaId !== null && {% if candidatura.cv_adjunt %}true{% else %}false{% endif %};
 
-        
         if (!cvInput.files.length && !hasExistingCv) {
             document.getElementById('cv_adjunt').classList.add('is-invalid');
             document.getElementById('errorCV').textContent = 'Has d\'adjuntar un currículum.';
             isValid = false;
-        } else if (cvInput.files.length) { // Si s'està pujant un nou CV, validar-lo.
+        } else if (cvInput.files.length) {
             const allowedTypesCV = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
             if (!validarFitxer(cvInput, 5 * 1024 * 1024, allowedTypesCV, 'errorCV')) {
                 isValid = false;
             }
         }
-        // Si hi ha un CV existent i no es puja un de nou, es considera vàlid i no s'aplica validació.
-        
-        
 
         if (!isValid) {
-             if (typeof window.showErrorToast === 'function') {
-                        showErrorToast('Hi ha errors en el formulari. Revisa les dades.');
+            if (typeof window.showErrorToast === 'function') {
+                showErrorToast('Hi ha errors en el formulari. Revisa les dades.');
             }
-            // Si el formulari no és vàlid, no enviem la petició
             return;
         }
 
-        // Show loading state
         btnGuardar.disabled = true;
         loadingSpinner.classList.remove('d-none');
 
         const formData = new FormData(form);
 
+        const url = candidaturaId
+            ? `/api/candidatures/${candidaturaId}/editar/`  // o {% url 'editar_candidatura_api' candidatura.id %} si uses reverse
+            : `/api/ofertes/{{ oferta.id }}/candidatura/`;  // només quan afegeixes
+
         try {
-            const response = await fetch(`{% url 'editar_candidatura_api' candidatura.id %}`, {
+            const response = await fetch(url, {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -415,29 +420,34 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
 
             if (response.ok) {
-                 if (typeof window.showSuccessToast === 'function') {
-                        showSuccessToast(data.message);
-                 }
-                
+                if (typeof window.showSuccessToast === 'function') {
+                    showSuccessToast(data.message || 'Candidatura enviada correctament.');
+                }
+
+                if (!candidaturaId) {
+                    // Si és afegir, pots redirigir a la llista o a l'edició
+                    setTimeout(() => {
+                        window.location.href = `{% url 'llista_candidatures_estudiant' %}`;
+                    }, 1500);
+                }
+
             } else if (response.status === 400) {
                 displayErrors(data.errors);
                 if (typeof window.showErrorToast === 'function') {
-                        showErrorToast('Hi ha errors en el formulari. Revisa les dades.');
+                    showErrorToast('Hi ha errors en el formulari. Revisa les dades.');
                 }
-                
+
             } else {
                 if (typeof window.showErrorToast === 'function') {
-                        showErrorToast('S\'ha produït un error inesperat.');
+                    showErrorToast(data.error || 'S\'ha produït un error inesperat.');
                 }
-                
             }
+
         } catch (error) {
             if (typeof window.showErrorToast === 'function') {
-                        showErrorToast('S\'ha produït un error en connectar amb el servidor. Torna-ho a intentar.');
+                showErrorToast('S\'ha produït un error de xarxa o del servidor.');
             }
-            
         } finally {
-            // Hide loading state
             btnGuardar.disabled = false;
             loadingSpinner.classList.add('d-none');
         }

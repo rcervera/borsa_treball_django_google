@@ -59,6 +59,7 @@ urlpatterns = [
     path('estudiant/ofertes/', views_estudiant.llista_ofertes_estudiants_auth, name='llista_ofertes_estudiant'),
     path('estudiant/ofertes/<int:oferta_id>/', views_estudiant.detall_oferta_estudiant, name='detall_oferta_estudiant'),
     path('estudiant/ofertes/<int:oferta_id>/candidatura/', views_estudiant.afegir_candidatura, name='afegir_candidatura'),
+    path('api/ofertes/<int:oferta_id>/candidatura/', views_estudiant.afegir_candidatura_api, name='afegir_candidatura_api'),
     path('estudiant/candidatures/<int:candidatura_id>/editar/', views_estudiant.editar_candidatura_estudiant, name='editar_candidatura_estudiant'),
     path('estudiant/candidatura/cv/<int:candidatura_id>', views_estudiant.descarregar_cv_candidatura, name='descarregar_cv_candidatura_estudiant'),
     path('api/candidatures/<int:candidatura_id>/edit/', views_estudiant.editar_candidatura_api, name='editar_candidatura_api'),

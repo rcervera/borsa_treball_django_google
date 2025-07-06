@@ -888,3 +888,61 @@ def editar_candidatura_api(request, candidatura_id):
     except Exception as e:
         # Catch any unexpected errors during save
         return JsonResponse({'error': f'Hi ha hagut un error inesperat en desar la candidatura: {str(e)}'}, status=500) # Internal Server Error
+
+
+@login_required
+@require_http_methods(["POST"])
+def afegir_candidatura_api(request, oferta_id):
+    """
+    API endpoint per afegir una candidatura a una oferta donada per estudiants autenticats.
+    Retorna JSON amb errors o missatge d'èxit.
+    """
+    errors = {}
+
+    try:
+        estudiant = request.user.estudiant
+    except Estudiant.DoesNotExist:
+        return JsonResponse({'error': 'No tens permisos per presentar candidatures.'}, status=403)
+
+    oferta = get_object_or_404(Oferta, pk=oferta_id, estat='AC')
+
+    # Comprovem si ja existeix una candidatura
+    if Candidatura.objects.filter(oferta=oferta, estudiant=estudiant).exists():
+        return JsonResponse({'error': 'Ja has presentat una candidatura a aquesta oferta.'}, status=400)
+
+    carta_presentacio = request.POST.get('carta_presentacio', '').strip()
+    cv_adjunt = request.FILES.get('cv_adjunt')
+
+    # --- Validacions ---
+    if not carta_presentacio:
+        errors['carta_presentacio'] = 'La carta de presentació és obligatòria.'
+    elif len(carta_presentacio) < 50:
+        errors['carta_presentacio'] = f'La carta ha de tenir almenys 50 caràcters. Ara en té {len(carta_presentacio)}.'
+    elif len(carta_presentacio) > 2000:
+        errors['carta_presentacio'] = f'La carta no pot superar els 2000 caràcters. Ara en té {len(carta_presentacio)}.'
+
+    if not cv_adjunt:
+        errors['cv_adjunt'] = 'Heu d\'adjuntar el vostre Currículum Vitae.'
+    else:
+        ext = os.path.splitext(cv_adjunt.name)[1].lower()
+        if ext not in ['.pdf', '.doc', '.docx']:
+            errors['cv_adjunt'] = 'Només es permeten fitxers PDF, DOC o DOCX.'
+        elif cv_adjunt.size > 5 * 1024 * 1024:
+            errors['cv_adjunt'] = 'El fitxer no pot superar els 5MB.'
+
+    # Si hi ha errors, retornem
+    if errors:
+        return JsonResponse({'errors': errors}, status=400)
+
+    # Guardar candidatura
+    try:
+        Candidatura.objects.create(
+            oferta=oferta,
+            estudiant=estudiant,
+            carta_presentacio=carta_presentacio,
+            cv_adjunt=cv_adjunt,
+            estat='EP'
+        )
+        return JsonResponse({'message': 'Candidatura enviada correctament!'}, status=201)
+    except Exception as e:
+        return JsonResponse({'error': f'Error inesperat en desar la candidatura: {str(e)}'}, status=500)
