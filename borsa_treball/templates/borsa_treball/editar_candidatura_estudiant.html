@@ -100,18 +100,24 @@
                         </div>
                         
                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                               
-                                {% if candidatura.estat == 'EP' %}
+                               {% if not candidatura or candidatura.estat == 'EP' %}
                                     <button type="submit" class="btn btn-primary rounded-pill" id="btnGuardar">
                                         <span class="spinner-border spinner-border-sm me-2 d-none" id="loadingSpinner"></span>
-                                        <i class="bi bi-check-lg me-1"></i>Guardar canvis
+                                        <i class="bi bi-check-lg me-1"></i>
+                                        {% if candidatura %}Guardar canvis{% else %}Enviar candidatura{% endif %}
                                     </button>
-
-                                        <div class="btn btn-danger rounded-pill" 
-                                                 onclick="confirmarEliminacio({{ candidatura.id }}, '{{ candidatura.oferta.titol }}')">
-                                                 <i class="bi bi-trash me-1"></i>Eliminar
-                                        </div>
                                 {% endif %}
+
+                                {% if candidatura %}
+                                    {% if candidatura.estat == 'EP' %}
+                                        <div class="btn btn-danger rounded-pill"
+                                            onclick="confirmarEliminacio({{ candidatura.id }}, '{{ candidatura.oferta.titol }}')">
+                                            <i class="bi bi-trash me-1"></i>Eliminar
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+
+
                            </div>
                     </form>
                 </div>
