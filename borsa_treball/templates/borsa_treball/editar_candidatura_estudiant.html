@@ -22,21 +22,23 @@
                         Dades de la teva candidatura
                     </p>
 
-                    <div class="mb-2">
-                        {% if not candidatura.activa %}
-                                <span class="badge bg-danger">Pendent de validació</span>
-                        {% elif candidatura.estat == 'EP' %}
-                            <span class="badge bg-info">{{ candidatura.get_estat_display }}</span>
-                        {% elif candidatura.estat == 'PR' %}
-                            <span class="badge bg-warning">{{ candidatura.get_estat_display }}</span>
-                        {% elif candidatura.estat == 'EN' %}
-                            <span class="badge bg-primary">{{ candidatura.get_estat_display }}</span>
-                        {% elif candidatura.estat == 'CO' %}
-                            <span class="badge bg-success">{{ candidatura.get_estat_display }}</span>
-                        {% elif candidatura.estat == 'RJ' %}
-                               <span class="badge bg-danger">{{ candidatura.get_estat_display }}</span>
-                        {% endif %}
-                    </div>
+                    {% if candidatura %}
+                        <div class="mb-2">
+                            {% if not candidatura.activa %}
+                                    <span class="badge bg-secondary text-danger">Pendent de validació</span>
+                            {% elif candidatura.estat == 'EP' %}
+                                <span class="badge bg-info">{{ candidatura.get_estat_display }}</span>
+                            {% elif candidatura.estat == 'PR' %}
+                                <span class="badge bg-warning">{{ candidatura.get_estat_display }}</span>
+                            {% elif candidatura.estat == 'EN' %}
+                                <span class="badge bg-primary">{{ candidatura.get_estat_display }}</span>
+                            {% elif candidatura.estat == 'CO' %}
+                                <span class="badge bg-success">{{ candidatura.get_estat_display }}</span>
+                            {% elif candidatura.estat == 'RJ' %}
+                                <span class="badge bg-danger">{{ candidatura.get_estat_display }}</span>
+                            {% endif %}
+                        </div>
+                    {% endif %}
 
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle me-2"></i>
