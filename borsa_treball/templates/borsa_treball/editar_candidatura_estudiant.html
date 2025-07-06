@@ -117,7 +117,6 @@
                 </div>
             </div>
         </div>
-        
         <div class="col-lg-4">
     <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
         <div class="card-body p-4">
@@ -127,34 +126,54 @@
 
             <div class="mb-3">
                 <h6 class="text-dark mb-2">
-                    {{ candidatura.oferta.titol|default:oferta.titol }}
+                    {% if candidatura %}
+                        {{ candidatura.oferta.titol }}
+                    {% else %}
+                        {{ oferta.titol }}
+                    {% endif %}
                 </h6>
 
                 <div class="d-flex align-items-center text-muted">
                     <i class="bi bi-geo-alt me-2"></i>
-                    <span>{{ candidatura.oferta.lloc_treball|default:oferta.lloc_treball }}</span>
+                    <span>
+                        {% if candidatura %}
+                            {{ candidatura.oferta.lloc_treball }}
+                        {% else %}
+                            {{ oferta.lloc_treball }}
+                        {% endif %}
+                    </span>
                 </div>
 
                 <p class="text-muted mb-3" style="line-height: 1.5;">
-                    {{ candidatura.oferta.descripcio|default:oferta.descripcio|truncatewords:25 }}
+                    {% if candidatura %}
+                        {{ candidatura.oferta.descripcio|truncatewords:25 }}
+                    {% else %}
+                        {{ oferta.descripcio|truncatewords:25 }}
+                    {% endif %}
                 </p>
             </div>
 
             <div class="mb-3">
                 <div class="d-flex flex-wrap">
                     <span class="badge bg-primary me-2 mb-2">
-                        {{ candidatura.oferta.get_tipus_contracte_display|default:oferta.get_tipus_contracte_display }}
+                        {% if candidatura %}
+                            {{ candidatura.oferta.get_tipus_contracte_display }}
+                        {% else %}
+                            {{ oferta.get_tipus_contracte_display }}
+                        {% endif %}
                     </span>
                     <span class="badge bg-secondary me-2 mb-2">
-                        {{ candidatura.oferta.get_jornada_display|default:oferta.get_jornada_display }}
-                    </span>
-                    {% if candidatura %}
-                        {% if candidatura.oferta.salari %}
-                            <span class="badge bg-success mb-2">
-                                <i class="bi bi-currency-euro me-1"></i>
-                                {{ candidatura.oferta.salari }}
-                            </span>
+                        {% if candidatura %}
+                            {{ candidatura.oferta.get_jornada_display }}
+                        {% else %}
+                            {{ oferta.get_jornada_display }}
                         {% endif %}
+                    </span>
+                    {% if candidatura and candidatura.oferta.salari %}
+                        <span class="badge bg-success mb-2">
+                            <i class="bi bi-currency-euro me-1"></i>
+                            {{ candidatura.oferta.salari }}
+                        </span>
                     {% elif oferta.salari %}
                         <span class="badge bg-success mb-2">
                             <i class="bi bi-currency-euro me-1"></i>
@@ -168,7 +187,11 @@
                 <div class="d-flex justify-content-between mb-2">
                     <span class="text-muted">Data límit:</span>
                     <strong class="{% if dies_restants <= 7 %}text-danger{% elif dies_restants <= 14 %}text-warning{% else %}text-success{% endif %}">
-                        {{ candidatura.oferta.data_limit|default:oferta.data_limit|date:"d/m/Y" }}
+                        {% if candidatura %}
+                            {{ candidatura.oferta.data_limit|date:"d/m/Y" }}
+                        {% else %}
+                            {{ oferta.data_limit|date:"d/m/Y" }}
+                        {% endif %}
                     </strong>
                 </div>
             </div>
@@ -197,6 +220,9 @@
                 </ul>
             </div>
         </div>
+    </div>
+</div>
+
     </div>
 </div>
 
