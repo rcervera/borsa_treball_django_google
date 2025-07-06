@@ -454,6 +454,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Confirmation for deletion
+    {% if candidatura %}
     document.getElementById('btnConfirmarEliminacio').addEventListener('click', async function() {
         const modalElement = document.getElementById('modalEliminacio');
         const modal = bootstrap.Modal.getInstance(modalElement);
@@ -500,6 +501,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+    {% endif %}
 });
 </script>
 {% endblock %}
