@@ -588,6 +588,7 @@ document.addEventListener('DOMContentLoaded', function() {
                              // showApiMessage('perfil-api-missatges', 'danger', data.message);
                             if (typeof window.showErrorToast === 'function') {
                                 showErrorToast(data.message);
+                            }
                         } else if (!errors || Object.keys(errors).length === 0) {
                            // showApiMessage('perfil-api-missatges', 'danger', 'Hi ha hagut un error en el canvi de contrasenya. Si us plau, revisa les dades.');
                             if (typeof window.showErrorToast === 'function') {
