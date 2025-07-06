@@ -390,7 +390,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
 
         if (!isValid) {
-            showFeedbackMessage('Si us plau, revisa els errors del formulari.', 'danger');
+             if (typeof window.showErrorToast === 'function') {
+                        showErrorToast('Hi ha errors en el formulari. Revisa les dades.');
+            }
+            // Si el formulari no és vàlid, no enviem la petició
             return;
         }
 
