@@ -16,6 +16,7 @@ from datetime import datetime
 from django.core.paginator import Paginator
 
 from .models import Oferta, Empresa, Cicle, Funcio, NivellIdioma, CapacitatClau 
+from django.core.validators import validate_email
 
 
 def llista_ofertes_tauler(request):
@@ -159,13 +160,22 @@ def api_actualitzar_perfil_estudiant(request):
     # Validate fields
     if not nom: errors['nom'] = ['El nom és obligatori.']
     if not cognoms: errors['cognoms'] = ['Els cognoms són obligatoris.']
-    if not telefon: errors['telefon'] = ['El telèfon és obligatori.']
+       
+    if telefon and not re.match(r'^\+?[0-9\s\-\(\)]{1,15}$', telefon):
+        errors['telefon'] = 'El telèfon no té un format vàlid (pot incloure "+" al principi, números, espais, guions i parèntesis; màxim 15 caràcters).')
 
+    # Validate email
     if not email:
         errors['email'] = ['El correu electrònic és obligatori.']
-    elif Usuari.objects.filter(email=email).exclude(id=user.id).exists(): # Check if email is taken by another user
-        errors['email'] = ['Aquest correu electrònic ja està registrat per un altre usuari.']
+    else:
+        try:
+            validate_email(email)
+        except ValidationError:
+            errors['email_contacte'] = 'L\'email de contacte no té un format vàlid.'
+        if Usuari.objects.filter(email=email).exclude(id=user.id).exists(): # Check if email is taken by another user
+            errors['email'] = ['Aquest correu electrònic ja està registrat per un altre usuari.']
 
+    # Validate DNI       
     if not dni:
         errors['dni'] = ['El DNI és obligatori.']
     else:

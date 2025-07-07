@@ -45,7 +45,7 @@
                             <label for="telefon" class="form-label">
                                 <i class="bi bi-telephone me-2 text-muted"></i>Telèfon
                             </label>
-                            <input type="tel" class="form-control" id="telefon" name="telefon" value="{{ estudiant.usuari.telefon }}" required>
+                            <input type="tel" class="form-control" id="telefon" name="telefon" value="{{ estudiant.usuari.telefon }}">
                             <div class="invalid-feedback" id="telefon_error"></div>
                         </div>
                         <div class="col-md-6">
@@ -82,7 +82,7 @@
                 
 
                 <h6>Afegir Nou Estudi</h6>
-                <form id="addEstudiForm">
+                <form id="addEstudiForm" novalidate class="needs-validation">
                     {% csrf_token %}
 
                     <div id="estudis-list" class="mb-4">
