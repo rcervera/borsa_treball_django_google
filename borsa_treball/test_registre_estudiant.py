@@ -115,7 +115,8 @@ class RegistreEstudiantTestCase(TestCase):
             response = self.client.post(self.url, data=json.dumps(dades), content_type='application/json')
             self.assertEqual(response.status_code, 400)
             self.assertIn('dni', response.json()['errors'])
-            self.assertIn('duplicat', response.json()['errors']['dni'][0].lower())
+            self.assertIn('registrat', response.json()['errors']['dni'][0].lower())
+            
 
     #  Validació anys (any_inici futur)
     def test_registre_any_inici_futur(self):
