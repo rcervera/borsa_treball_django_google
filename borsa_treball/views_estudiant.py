@@ -154,15 +154,17 @@ def api_actualitzar_perfil_estudiant(request):
     cognoms = data.get('cognoms', '').strip()
     email = data.get('email', '').strip()
     telefon = data.get('telefon', '').strip()
-    dni = data.get('dni', '').strip()
-    carnet_conduir = data.get('carnet_conduir', False) # This will be a boolean
+    dni = data.get('dni', '').strip()   
+    carnet_conduir = bool(data.get('carnet_conduir', False))
+
 
     # Validate fields
     if not nom: errors['nom'] = ['El nom és obligatori.']
     if not cognoms: errors['cognoms'] = ['Els cognoms són obligatoris.']
        
     if telefon and not re.match(r'^\+?[0-9\s\-\(\)]{1,15}$', telefon):
-        errors['telefon'] = 'El telèfon no té un format vàlid (pot incloure "+" al principi, números, espais, guions i parèntesis; màxim 15 caràcters).'
+            errors['telefon'] = ['El telèfon no té un format vàlid (pot incloure "+" al principi, números, espais, guions i parèntesis; màxim 15 caràcters).']
+
 
     # Validate email
     if not email:
@@ -171,7 +173,7 @@ def api_actualitzar_perfil_estudiant(request):
         try:
             validate_email(email)
         except ValidationError:
-            errors['email'] = 'L\'email de contacte no té un format vàlid.'
+            errors['email'] = ['L\'email de contacte no té un format vàlid.']
         if Usuari.objects.filter(email=email).exclude(id=user.id).exists(): # Check if email is taken by another user
             errors['email'] = ['Aquest correu electrònic ja està registrat per un altre usuari.']
 
