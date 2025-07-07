@@ -108,7 +108,7 @@ import json
 import re # For DNI validation if needed
 
 # Import your models
-from .models import Usuari, Estudiant, Cicle, EstudiEstudiant, RegistreAuditoria # Add any others you need
+from .models import Usuari, Estudiant, Cicle, EstudiEstudiant
 
 @login_required
 def perfil_estudiant(request):
@@ -296,12 +296,7 @@ def api_afegir_estudi_estudiant(request):
             centre_estudis=centre_estudis if centre_estudis else None
         )
 
-        RegistreAuditoria.objects.create(
-            accio="Afegir Estudi Estudiant",
-            model_afectat="EstudiEstudiant",
-            descripcio=f"Estudiant {estudiant.usuari.get_full_name()} ha afegit nou estudi: {cicle_obj.nom} ({any_inici}-{any_fi or 'Actual'})",
-            usuari=request.user
-        )
+       
 
         return JsonResponse({
             'success': True,
@@ -333,12 +328,7 @@ def api_esborrar_estudi_estudiant(request, estudi_id):
         cicle_nom = estudi.cicle.nom # Get name before deleting for audit log
         estudi.delete()
 
-        RegistreAuditoria.objects.create(
-            accio="Esborrar Estudi Estudiant",
-            model_afectat="EstudiEstudiant",
-            descripcio=f"Estudiant {estudiant.usuari.get_full_name()} ha esborrat l'estudi: {cicle_nom} (ID: {estudi_id})",
-            usuari=request.user
-        )
+       
 
         return JsonResponse({'success': True, 'message': 'Estudi eliminat correctament!'})
     except Exception as e:

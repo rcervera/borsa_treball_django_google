@@ -1,3 +1,4 @@
+import json
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -145,3 +146,41 @@ class ActualitzarPerfilEstudiantTest(TestCase):
         response = self.client.post(self.url, data=payload, content_type='application/json')
         self.assertEqual(response.status_code, 400)
         self.assertIn('dni', response.json()['errors'])
+
+    def test_actualitzacio_correcta_perfil_estudiant(self):
+        nou_email = 'nouemail@prova.com'
+        resposta = self.client.post(
+            self.url,
+            data=json.dumps({
+                'nom': 'NomNou',
+                'cognoms': 'CognomsNous',
+                'email': nou_email,
+                'telefon': '+34611222333',
+                'dni': '87654321B',
+                'carnet_conduir': True
+            }),
+            content_type='application/json'
+        )
+
+        self.assertEqual(resposta.status_code, 200)
+        dades = resposta.json()
+        self.assertTrue(dades['success'])
+        self.assertEqual(dades['nom'], 'NomNou')
+        self.assertEqual(dades['cognoms'], 'CognomsNous')
+
+        # Refresquem les dades de l'usuari i comprovem canvis
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.nom, 'NomNou')
+        self.assertEqual(self.user.cognoms, 'CognomsNous')
+        self.assertEqual(self.user.email, nou_email)
+        self.assertEqual(self.user.telefon, '+34611222333')
+
+        self.estudiant.refresh_from_db()
+        self.assertEqual(self.estudiant.dni, '87654321B')
+        self.assertTrue(self.estudiant.carnet_conduir)
+
+        # Verifiquem que la sessió segueix activa
+        resposta_seguent = self.client.get(self.url)
+        self.assertNotEqual(resposta_seguent.status_code, 302)  # No ha redirigit a login
+   
+    
