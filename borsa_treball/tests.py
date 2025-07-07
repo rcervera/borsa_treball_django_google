@@ -169,18 +169,27 @@ class ActualitzarPerfilEstudiantTest(TestCase):
         self.assertEqual(dades['cognoms'], 'CognomsNous')
 
         # Refresquem les dades de l'usuari i comprovem canvis
-        self.user.refresh_from_db()
-        self.assertEqual(self.user.nom, 'NomNou')
-        self.assertEqual(self.user.cognoms, 'CognomsNous')
-        self.assertEqual(self.user.email, nou_email)
-        self.assertEqual(self.user.telefon, '+34611222333')
+        self.usuari.refresh_from_db()
+        self.assertEqual(self.usuari.email, nou_email)
+        self.assertEqual(self.usuari.telefon, '+34611222333')       
+        self.assertEqual(self.usuari.nom, 'NomNou')
+        self.assertEqual(self.usuari.cognoms, 'CognomsNous')
+       
 
         self.estudiant.refresh_from_db()
         self.assertEqual(self.estudiant.dni, '87654321B')
         self.assertTrue(self.estudiant.carnet_conduir)
 
         # Verifiquem que la sessió segueix activa
-        resposta_seguent = self.client.get(self.url)
-        self.assertNotEqual(resposta_seguent.status_code, 302)  # No ha redirigit a login
+        resposta_seguent = self.client.post(self.url, data=json.dumps({
+            'nom': 'Test',
+            'cognoms': 'Usuari',
+            'email': 'test@prova.com',
+            'telefon': '+34611111111',
+            'dni': '11111111H',
+            'carnet_conduir': False
+        }), content_type='application/json')
+
+        self.assertNotEqual(resposta_seguent.status_code, 302)
    
     
