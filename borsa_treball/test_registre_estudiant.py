@@ -8,7 +8,7 @@ class RegistreEstudiantTestCase(TestCase):
 
     def setUp(self):
         self.client = Client()
-        self.url = reverse('registre_estudiant')
+        self.url = reverse('registre_estudiant_api')
         
         # Crear una família professional
         self.familia = FamiliaProfessional.objects.create(
