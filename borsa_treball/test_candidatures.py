@@ -3,7 +3,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from datetime import timedelta
 from django.utils.timezone import now
-from .models import FamiliaProfessional, Usuari, Empresa, Sector, Cicle, Oferta, CapacitatClau, Candidatura
+from .models import Estudiant, FamiliaProfessional, Usuari, Empresa, Sector, Cicle, Oferta, CapacitatClau, Candidatura
 
 class AfegirCandidaturaTest(TestCase):
     def setUp(self):
@@ -15,6 +15,13 @@ class AfegirCandidaturaTest(TestCase):
             password="test1234",
             tipus="EST"
         )
+
+        self.estudiant = Estudiant.objects.create(
+            usuari=self.usuari,
+            dni="12345678A",
+            carnet_conduir=False
+        )
+        
         self.client.login(email="estudiant@test.com", password="test1234")
 
         # Crear sector, cicle, capacitat
