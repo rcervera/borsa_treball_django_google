@@ -103,7 +103,7 @@ class AfegirCandidaturaTest(TestCase):
                 'carta_presentacio': 'Aquesta és una carta de presentació amb més de 50 caràcters , espero que sí que arribi i sigui prou llarg.',
                 'cv_adjunt': cv_file,  # passa el fitxer aquí dins directament
             },
-            format='multipart'
+            content_type='multipart/form-data'
         )
 
         print("STATUS:", response.status_code)
