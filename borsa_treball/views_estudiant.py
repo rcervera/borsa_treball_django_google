@@ -916,7 +916,8 @@ def afegir_candidatura_api(request, oferta_id):
         return JsonResponse({'error': 'Ja has presentat una candidatura a aquesta oferta.'}, status=400)
 
     carta_presentacio = request.POST.get('carta_presentacio', '').strip()
-    cv_adjunt = request.FILES.get('cv_adjunt')
+    
+    return JsonResponse({'message': 'Candidatura enviada correctament!'}, status=201)
 
     # --- Validacions ---
     if not carta_presentacio:
@@ -926,8 +927,10 @@ def afegir_candidatura_api(request, oferta_id):
     elif len(carta_presentacio) > 2000:
         errors['carta_presentacio'] = f'La carta no pot superar els 2000 caràcters. Ara en té {len(carta_presentacio)}.'
 
-    return JsonResponse({'message': 'Candidatura enviada correctament!'}, status=201)
+   
 
+
+    cv_adjunt = request.FILES.get('cv_adjunt')
 
     if not cv_adjunt:
         errors['cv_adjunt'] = 'Heu d\'adjuntar el vostre Currículum Vitae.'
