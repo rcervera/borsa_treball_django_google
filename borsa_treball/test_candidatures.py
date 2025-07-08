@@ -1,119 +1,222 @@
+import os
+from datetime import date
 from django.test import TestCase, Client
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
-from datetime import timedelta
-from django.utils.timezone import now
-from .models import Estudiant, FamiliaProfessional, Usuari, Empresa, Sector, Cicle, Oferta, CapacitatClau, Candidatura
+from django.core.files.uploadedfile import SimpleUploadedFile
+from unittest.mock import patch
 
-class AfegirCandidaturaTest(TestCase):
+# Canvia 'la_teva_app' pel nom real de la teva aplicació
+# Importem tots els models necessaris, incloent el model d'usuari personalitzat
+from .models import Usuari, Estudiant, Empresa, Sector, Oferta, Candidatura
+
+class AfegirCandidaturaAPITestCase(TestCase):
+    """
+    Conjunt de proves per a l'endpoint de l'API afegir_candidatura_api,
+    adaptat a un model d'usuari personalitzat.
+    """
+
     def setUp(self):
+        """
+        Configuració inicial per a totes les proves. S'executa abans de cada test.
+        """
         self.client = Client()
 
-        # Crear usuari estudiant i iniciar sessió
-        self.usuari = Usuari.objects.create_user(
-            email="estudiant@test.com",
-            password="test1234",
-            tipus="EST"
+        # --- Creació d'usuaris amb el model personalitzat ---
+        # 1. Usuari que és un estudiant
+        self.user_estudiant = Usuari.objects.create_user(
+            email='estudiant@test.com',
+            password='password123',
+            tipus='EST',
+            nom='Joan',
+            cognoms='Petit'
+        )
+        self.estudiant = Estudiant.objects.create(
+            usuari=self.user_estudiant,
+            dni='12345678A'
         )
 
-        self.estudiant = Estudiant.objects.create(
-            usuari=self.usuari,
-            dni="12345678A",
-            carnet_conduir=False
+        # 2. Usuari que NO és un estudiant (per exemple, un administrador)
+        self.user_no_estudiant = Usuari.objects.create_user(
+            email='admin@test.com',
+            password='password123',
+            tipus='ADM'
         )
         
-        self.client.login(email="estudiant@test.com", password="test1234")
-
-        # Crear sector, cicle, capacitat
-        self.sector = Sector.objects.create(nom="Informàtica")       
-        self.capacitat = CapacitatClau.objects.create(nom="Treball en equip")
-
-        # Crear empresa
-        self.empresa_user = Usuari.objects.create_user(
-            email="empresa@test.com",
-            password="empresa1234",
-            tipus="EMP"
+        # 3. Usuari d'empresa per poder crear ofertes
+        self.user_empresa = Usuari.objects.create_user(
+            email='empresa@test.com',
+            password='password123',
+            tipus='EMP'
         )
+        self.sector = Sector.objects.create(nom='Tecnologia')
         self.empresa = Empresa.objects.create(
-            usuari=self.empresa_user,
-            cif="B12345678",
-            nom_comercial="TechCorp",
-            rao_social="TechCorp SL",
+            usuari=self.user_empresa,
+            cif='A12345678',
+            nom_comercial='Empresa de Prova',
+            rao_social='Empresa de Prova SL',
             sector=self.sector
         )
 
-        # Crear família professional
-        self.familia = FamiliaProfessional.objects.create(
-            codi="IF",
-            nom="Informàtica i Comunicacions"
-        )
-
-        # Crear cicle relacionat amb la família
-        self.cicle = Cicle.objects.create(
-            familia=self.familia,
-            codi="DAM",
-            nom="Desenvolupament d'Aplicacions Multiplataforma",
-            grau="GS",
-            durada=2000
-        )
-
-        # Crear oferta
-        self.oferta = Oferta.objects.create(
+        # --- Creació d'ofertes associades a l'empresa ---
+        # Oferta activa
+        self.oferta_activa = Oferta.objects.create(
             empresa=self.empresa,
-            titol="Desenvolupador Django",
-            descripcio="Backend amb Django",
-            numero_vacants=1,
-            data_limit=now().date() + timedelta(days=15),
-            lloc_treball="Barcelona",
-            tipus_contracte='PR',
-            jornada='CO',
-            public_destinatari='EST',
-            experiencia='SE',
-            estat='AC',  # ACTIVA
-            activa=True,
-            visible=True
+            titol='Desenvolupador Python Junior',
+            descripcio='Una gran oportunitat.',
+            estat='AC',  # AC = Activa
+            data_limit=date(2025, 12, 31),
+            lloc_treball='Remot',
+            tipus_contracte='IN',
+            jornada='CO'
         )
-        self.oferta.cicles.add(self.cicle)
-        self.oferta.capacitats_clau.add(self.capacitat)
 
-    def test_afegir_candidatura_amb_errors(self):
-        # No adjuntem cap CV i la carta és massa curta
-        form_data = {
-            'carta_presentacio': 'Massa curta.',
+        # Oferta inactiva
+        self.oferta_inactiva = Oferta.objects.create(
+            empresa=self.empresa,
+            titol='Dissenyador Gràfic',
+            descripcio='Oferta tancada.',
+            estat='TC',  # TC = Tancada
+            data_limit=date(2025, 1, 1),
+            lloc_treball='Oficina',
+            tipus_contracte='PR',
+            jornada='PA'
+        )
+
+        # URL de l'API
+        self.url_activa = reverse('afegir_candidatura_api', args=[self.oferta_activa.id])
+        self.url_inactiva = reverse('afegir_candidatura_api', args=[self.oferta_inactiva.id])
+
+        # Fitxer de prova per al CV
+        self.cv_file = SimpleUploadedFile(
+            "cv.pdf",
+            b"contingut del cv de prova",
+            content_type="application/pdf"
+        )
+        self.cv_file.seek(0)
+        
+        # Dades de prova per a una candidatura vàlida
+        self.valid_data = {
+            'carta_presentacio': 'Aquesta és una carta de presentació prou llarga per passar la validació inicial i demostrar el meu interès.',
+            'cv_adjunt': self.cv_file,
         }
 
-        url = reverse('afegir_candidatura_api', args=[self.oferta.id])
-        response = self.client.post(url, form_data, format='multipart')
+    def tearDown(self):
+        """
+        Neteja després de cada prova.
+        """
+        candidatures = Candidatura.objects.all()
+        for candidatura in candidatures:
+            if candidatura.cv_adjunt and hasattr(candidatura.cv_adjunt, 'path') and os.path.exists(candidatura.cv_adjunt.path):
+                os.remove(candidatura.cv_adjunt.path)
 
-        self.assertEqual(response.status_code, 400)
-        json_data = response.json()
-        self.assertIn('errors', json_data)
-        self.assertIn('cv_adjunt', json_data['errors'])
-        self.assertIn('carta_presentacio', json_data['errors'])
-
-    def test_afegir_candidatura_correcta(self):
-        # Crear fitxer fals (PDF)
-        cv_file = SimpleUploadedFile("cv.pdf", b"Contingut fals del CV", content_type="application/pdf")
-     
-
-        url = reverse('afegir_candidatura_api', args=[self.oferta.id])
-        response = self.client.post(
-            url,
-            data={
-                'carta_presentacio': 'Text suficientment llarg per passar la validació de mínim 50 caràcters sjssjsjsjsjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj.',
-                'cv_adjunt': cv_file,   # Fitxer dins data, no dins files
-            },
-            content_type='multipart/form-data'  # IMPORTANT per enviar fitxers
-        )
-
-        print("STATUS:", response.status_code)
-        print("RESPONSE:", response.content.decode())
+    def test_creacio_candidatura_exitosa(self):
+        """
+        Verifica que un estudiant autenticat pot crear una candidatura amb èxit.
+        """
+        self.client.login(email='estudiant@test.com', password='password123')
+        response = self.client.post(self.url_activa, self.valid_data)
 
         self.assertEqual(response.status_code, 201)
-        self.assertIn('message', response.json())
+        self.assertEqual(response.json()['message'], 'Candidatura enviada correctament!')
+        self.assertTrue(Candidatura.objects.filter(estudiant=self.estudiant, oferta=self.oferta_activa).exists())
 
-        # Comprovem que s'ha creat una candidatura
-        self.assertEqual(Candidatura.objects.count(), 1)
-        candidatura = Candidatura.objects.first()
-        self.assertEqual(candidatura.oferta, self.oferta)
-        self.assertEqual(candidatura.estudiant, self.estudiant)
+    def test_usuari_no_autenticat(self):
+        """
+        Verifica que un usuari no autenticat és redirigit a la pàgina de login.
+        """
+        response = self.client.post(self.url_activa, self.valid_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/accounts/login/', response.url)
+
+    def test_usuari_no_estudiant(self):
+        """
+        Verifica que un usuari autenticat però sense perfil d'estudiant rep un error 403.
+        """
+        self.client.login(email='admin@test.com', password='password123')
+        response = self.client.post(self.url_activa, self.valid_data)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json()['error'], 'No tens permisos per presentar candidatures.')
+
+    def test_metode_no_permes(self):
+        """
+        Verifica que només s'accepten peticions POST.
+        """
+        self.client.login(email='estudiant@test.com', password='password123')
+        response = self.client.get(self.url_activa)
+        self.assertEqual(response.status_code, 405)
+
+    def test_oferta_no_trobada(self):
+        """
+        Verifica que es retorna un 404 si l'ID de l'oferta no existeix.
+        """
+        self.client.login(email='estudiant@test.com', password='password123')
+        url_inexistent = reverse('afegir_candidatura_api', args=[999])
+        response = self.client.post(url_inexistent, self.valid_data)
+        self.assertEqual(response.status_code, 404)
+
+    def test_oferta_no_activa(self):
+        """
+        Verifica que es retorna un 404 si l'oferta no està en estat 'AC'.
+        """
+        self.client.login(email='estudiant@test.com', password='password123')
+        response = self.client.post(self.url_inactiva, self.valid_data)
+        self.assertEqual(response.status_code, 404)
+
+    def test_candidatura_duplicada(self):
+        """
+        Verifica que un estudiant no pot aplicar dues vegades a la mateixa oferta.
+        """
+        Candidatura.objects.create(
+            oferta=self.oferta_activa,
+            estudiant=self.estudiant,
+            carta_presentacio='Primera aplicació.',
+            cv_adjunt=SimpleUploadedFile("cv1.pdf", b"contingut")
+        )
+        self.client.login(email='estudiant@test.com', password='password123')
+        response = self.client.post(self.url_activa, self.valid_data)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()['error'], 'Ja has presentat una candidatura a aquesta oferta.')
+
+    def test_errors_de_validacio(self):
+        """
+        Verifica tots els possibles errors de validació dels camps.
+        """
+        self.client.login(email='estudiant@test.com', password='password123')
+        
+        # Cas 1: Carta de presentació buida
+        data = self.valid_data.copy()
+        data['carta_presentacio'] = ''
+        response = self.client.post(self.url_activa, data)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()['errors']['carta_presentacio'], 'La carta de presentació és obligatòria.')
+
+        # Altres casos de validació... (es mantenen igual)
+        # Cas 2: Carta de presentació massa curta
+        data['carta_presentacio'] = 'curta'
+        response = self.client.post(self.url_activa, data)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('La carta ha de tenir almenys 50 caràcters.', response.json()['errors']['carta_presentacio'])
+
+        # Cas 3: CV no adjuntat
+        data = {'carta_presentacio': self.valid_data['carta_presentacio']}
+        response = self.client.post(self.url_activa, data)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()['errors']['cv_adjunt'], 'Heu d\'adjuntar el vostre Currículum Vitae.')
+
+    @patch('la_teva_app.views.Candidatura.objects.create')
+    def test_error_inesperat_al_guardar(self, mock_create):
+        """
+        Verifica que es gestiona correctament un error inesperat en crear la candidatura.
+        """
+        mock_create.side_effect = Exception("Error de base de dades simulat")
+        self.client.login(email='estudiant@test.com', password='password123')
+        
+        self.cv_file.seek(0)
+        data = {
+            'carta_presentacio': 'Aquesta és una carta de presentació prou llarga per passar la validació inicial i demostrar el meu interès.',
+            'cv_adjunt': self.cv_file,
+        }
+        
+        response = self.client.post(self.url_activa, data)
+        self.assertEqual(response.status_code, 500)
+        self.assertIn('Error inesperat en desar la candidatura', response.json()['error'])
