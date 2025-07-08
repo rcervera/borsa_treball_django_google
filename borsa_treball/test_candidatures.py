@@ -94,21 +94,16 @@ class AfegirCandidaturaTest(TestCase):
     def test_afegir_candidatura_correcta(self):
         # Crear fitxer fals (PDF)
         cv_file = SimpleUploadedFile("cv.pdf", b"Contingut fals del CV", content_type="application/pdf")
-
-        form_data = {
-            'carta_presentacio': 'Aquesta és una carta de presentació prou llarga per passar la validació.',
-            'cv_adjunt': cv_file
-        }
+     
 
         url = reverse('afegir_candidatura_api', args=[self.oferta.id])
         response = self.client.post(
             url,
             data={
-                'carta_presentacio': 'Text proussssssssssssssssssssssssssssssssssssssssssss llarg ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss...'
+                'carta_presentacio': 'Aquesta és una carta de presentació amb més de 50 caràcters , espero que sí que arribi i sigui prou llarg.',
+                'cv_adjunt': cv_file,  # passa el fitxer aquí dins directament
             },
-            files={
-                'cv_adjunt': cv_file
-            }
+            format='multipart'
         )
 
         print("STATUS:", response.status_code)
