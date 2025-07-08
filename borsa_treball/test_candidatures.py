@@ -101,10 +101,9 @@ class AfegirCandidaturaTest(TestCase):
             url,
             data={
                 'carta_presentacio': 'Text suficientment llarg per passar la validació de mínim 50 caràcters sjssjsjsjsjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj.',
+                'cv_adjunt': cv_file,   # Fitxer dins data, no dins files
             },
-            files={
-                'cv_adjunt': cv_file
-            }
+            content_type='multipart/form-data'  # IMPORTANT per enviar fitxers
         )
 
         print("STATUS:", response.status_code)
