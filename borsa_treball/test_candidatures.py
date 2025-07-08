@@ -1,19 +1,33 @@
 import os
+import shutil
+import tempfile
 from datetime import date
-from django.test import TestCase, Client
+from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
 from unittest.mock import patch
 
-# Canvia 'la_teva_app' pel nom real de la teva aplicació
-# Importem tots els models necessaris, incloent el model d'usuari personalitzat
-from .models import Usuari, Estudiant, Empresa, Sector, Oferta, Candidatura
+# Canvia 'borsa_treball' pel nom real de la teva aplicació si fos diferent
+from borsa_treball.models import Usuari, Estudiant, Empresa, Sector, Oferta, Candidatura
 
+# Sobreescrivim la configuració de MEDIA_ROOT per a les proves.
+# Això crea una carpeta temporal per als fitxers pujats durant els tests
+# i evita problemes de permisos.
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp())
 class AfegirCandidaturaAPITestCase(TestCase):
     """
     Conjunt de proves per a l'endpoint de l'API afegir_candidatura_api,
-    adaptat a un model d'usuari personalitzat.
+    adaptat a un model d'usuari personalitzat i amb correccions d'errors.
     """
+
+    @classmethod
+    def tearDownClass(cls):
+        """
+        S'executa un cop al final de totes les proves de la classe.
+        Esborra la carpeta temporal creada per a MEDIA_ROOT.
+        """
+        shutil.rmtree(cls.MEDIA_ROOT, ignore_errors=True)
+        super().tearDownClass()
 
     def setUp(self):
         """
@@ -100,21 +114,17 @@ class AfegirCandidaturaAPITestCase(TestCase):
             'cv_adjunt': self.cv_file,
         }
 
-    def tearDown(self):
-        """
-        Neteja després de cada prova.
-        """
-        candidatures = Candidatura.objects.all()
-        for candidatura in candidatures:
-            if candidatura.cv_adjunt and hasattr(candidatura.cv_adjunt, 'path') and os.path.exists(candidatura.cv_adjunt.path):
-                os.remove(candidatura.cv_adjunt.path)
-
     def test_creacio_candidatura_exitosa(self):
         """
         Verifica que un estudiant autenticat pot crear una candidatura amb èxit.
         """
         self.client.login(email='estudiant@test.com', password='password123')
-        response = self.client.post(self.url_activa, self.valid_data)
+        # Cal tornar a obrir el fitxer o clonar-lo per a cada petició POST
+        cv_file_copy = SimpleUploadedFile(self.cv_file.name, self.cv_file.read(), content_type=self.cv_file.content_type)
+        data = self.valid_data.copy()
+        data['cv_adjunt'] = cv_file_copy
+        
+        response = self.client.post(self.url_activa, data)
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json()['message'], 'Candidatura enviada correctament!')
@@ -126,7 +136,8 @@ class AfegirCandidaturaAPITestCase(TestCase):
         """
         response = self.client.post(self.url_activa, self.valid_data)
         self.assertEqual(response.status_code, 302)
-        self.assertIn('/accounts/login/', response.url)
+        # S'ajusta per comprovar l'inici de la URL, fent-ho més flexible
+        self.assertTrue(response.url.startswith('/login/'))
 
     def test_usuari_no_estudiant(self):
         """
@@ -173,7 +184,12 @@ class AfegirCandidaturaAPITestCase(TestCase):
             cv_adjunt=SimpleUploadedFile("cv1.pdf", b"contingut")
         )
         self.client.login(email='estudiant@test.com', password='password123')
-        response = self.client.post(self.url_activa, self.valid_data)
+        
+        cv_file_copy = SimpleUploadedFile(self.cv_file.name, self.cv_file.read(), content_type=self.cv_file.content_type)
+        data = self.valid_data.copy()
+        data['cv_adjunt'] = cv_file_copy
+        
+        response = self.client.post(self.url_activa, data)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()['error'], 'Ja has presentat una candidatura a aquesta oferta.')
 
@@ -190,8 +206,8 @@ class AfegirCandidaturaAPITestCase(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()['errors']['carta_presentacio'], 'La carta de presentació és obligatòria.')
 
-        # Altres casos de validació... (es mantenen igual)
         # Cas 2: Carta de presentació massa curta
+        data = self.valid_data.copy()
         data['carta_presentacio'] = 'curta'
         response = self.client.post(self.url_activa, data)
         self.assertEqual(response.status_code, 400)
@@ -203,7 +219,8 @@ class AfegirCandidaturaAPITestCase(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()['errors']['cv_adjunt'], 'Heu d\'adjuntar el vostre Currículum Vitae.')
 
-    @patch('la_teva_app.views.Candidatura.objects.create')
+    # S'ha corregit el nom de l'app de 'la_teva_app' a 'borsa_treball'
+    @patch('borsa_treball.views.Candidatura.objects.create')
     def test_error_inesperat_al_guardar(self, mock_create):
         """
         Verifica que es gestiona correctament un error inesperat en crear la candidatura.
@@ -211,11 +228,9 @@ class AfegirCandidaturaAPITestCase(TestCase):
         mock_create.side_effect = Exception("Error de base de dades simulat")
         self.client.login(email='estudiant@test.com', password='password123')
         
-        self.cv_file.seek(0)
-        data = {
-            'carta_presentacio': 'Aquesta és una carta de presentació prou llarga per passar la validació inicial i demostrar el meu interès.',
-            'cv_adjunt': self.cv_file,
-        }
+        cv_file_copy = SimpleUploadedFile(self.cv_file.name, self.cv_file.read(), content_type=self.cv_file.content_type)
+        data = self.valid_data.copy()
+        data['cv_adjunt'] = cv_file_copy
         
         response = self.client.post(self.url_activa, data)
         self.assertEqual(response.status_code, 500)
