@@ -70,7 +70,8 @@ class AfegirCandidaturaTest(TestCase):
         self.oferta.capacitats_clau.add(self.capacitat)
 
     def test_afegir_candidatura_api(self):
-        url = reverse('afegir_oferta_api', args=[self.oferta.id])  
+        
+        url = reverse('afegir_candidatura_api', args=[self.oferta.id])  
 
         cv_pdf = SimpleUploadedFile(
             "cv.pdf", b"%PDF-1.4 fake content", content_type="application/pdf"
