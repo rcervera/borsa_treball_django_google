@@ -90,7 +90,7 @@ class AfegirCandidaturaTest(TestCase):
             'cv_adjunt': cv_pdf
         }
       
-        response = self.client.post(url, dades)
+        response = self.client.post(url, dades, content_type='multipart/form-data')
       
 
         self.assertEqual(response.status_code, 201)
