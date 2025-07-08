@@ -90,3 +90,24 @@ class AfegirCandidaturaTest(TestCase):
         self.assertIn('errors', json_data)
         self.assertIn('cv_adjunt', json_data['errors'])
         self.assertIn('carta_presentacio', json_data['errors'])
+
+    def test_afegir_candidatura_correcta(self):
+        # Crear fitxer fals (PDF)
+        cv_file = SimpleUploadedFile("cv.pdf", b"Contingut fals del CV", content_type="application/pdf")
+
+        form_data = {
+            'carta_presentacio': 'Aquesta és una carta de presentació prou llarga per passar la validació.',
+            'cv_adjunt': cv_file
+        }
+
+        url = reverse('afegir_candidatura_api', args=[self.oferta.id])
+        response = self.client.post(url, form_data, format='multipart')
+
+        self.assertEqual(response.status_code, 201)
+        self.assertIn('message', response.json())
+
+        # Comprovem que s'ha creat una candidatura
+        self.assertEqual(Candidatura.objects.count(), 1)
+        candidatura = Candidatura.objects.first()
+        self.assertEqual(candidatura.oferta, self.oferta)
+        self.assertEqual(candidatura.estudiant, self.estudiant)
