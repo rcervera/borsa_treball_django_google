@@ -917,10 +917,11 @@ def afegir_candidatura_api(request, oferta_id):
     if Candidatura.objects.filter(oferta=oferta, estudiant=estudiant).exists():
         return JsonResponse({'error': 'Ja has presentat una candidatura a aquesta oferta.'}, status=400)
     
-    return JsonResponse({'message': 'Candidatura enviada correctament!'}, status=201)
+   
 
     carta_presentacio = request.POST.get('carta_presentacio', '').strip()
     
+    return JsonResponse({'message': 'Candidatura enviada correctament!'}, status=201)
    
 
     # --- Validacions ---
