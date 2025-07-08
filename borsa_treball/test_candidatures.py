@@ -13,7 +13,9 @@ from borsa_treball.models import Usuari, Estudiant, Empresa, Sector, Oferta, Can
 # Sobreescrivim la configuració de MEDIA_ROOT per a les proves.
 # Això crea una carpeta temporal per als fitxers pujats durant els tests
 # i evita problemes de permisos.
-@override_settings(MEDIA_ROOT=tempfile.mkdtemp())
+temp_dir = tempfile.mkdtemp()
+
+@override_settings(MEDIA_ROOT=temp_dir)
 class AfegirCandidaturaAPITestCase(TestCase):
     """
     Conjunt de proves per a l'endpoint de l'API afegir_candidatura_api,
@@ -26,7 +28,7 @@ class AfegirCandidaturaAPITestCase(TestCase):
         S'executa un cop al final de totes les proves de la classe.
         Esborra la carpeta temporal creada per a MEDIA_ROOT.
         """
-        shutil.rmtree(cls.MEDIA_ROOT, ignore_errors=True)
+        shutil.rmtree(temp_dir, ignore_errors=True)
         super().tearDownClass()
 
     def setUp(self):
