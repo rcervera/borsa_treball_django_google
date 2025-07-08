@@ -92,7 +92,8 @@ class AfegirCandidaturaTest(TestCase):
       
         response = self.client.post(url, dades, content_type='multipart/form-data')
       
-        print("JSON response:", response.json())
+        print("Response content:", response.content.decode())
+
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Candidatura.objects.count(), 1)
