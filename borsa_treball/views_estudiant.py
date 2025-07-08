@@ -517,7 +517,7 @@ def afegir_candidatura(request, oferta_id):
     
     # Verificar si ja existeix candidatura
     if Candidatura.objects.filter(oferta=oferta, estudiant=estudiant).exists():
-        # Pots afegir un missatge de flaix aquí per informar a l'usuari
+        # !! afegir un missatge de flaix aquí per informar a l'usuari
         return redirect('llista_candidatures_estudiant') 
 
     errors = {}
