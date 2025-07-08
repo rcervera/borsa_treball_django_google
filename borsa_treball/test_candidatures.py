@@ -3,7 +3,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from datetime import timedelta
 from django.utils.timezone import now
-from .models import Usuari, Empresa, Sector, Cicle, Oferta, CapacitatClau, Candidatura
+from .models import FamiliaProfessional, Usuari, Empresa, Sector, Cicle, Oferta, CapacitatClau, Candidatura
 
 class AfegirCandidaturaTest(TestCase):
     def setUp(self):
@@ -18,8 +18,7 @@ class AfegirCandidaturaTest(TestCase):
         self.client.login(email="estudiant@test.com", password="test1234")
 
         # Crear sector, cicle, capacitat
-        self.sector = Sector.objects.create(nom="Informàtica")
-        self.cicle = Cicle.objects.create(nom="DAM")
+        self.sector = Sector.objects.create(nom="Informàtica")       
         self.capacitat = CapacitatClau.objects.create(nom="Treball en equip")
 
         # Crear empresa
@@ -34,6 +33,21 @@ class AfegirCandidaturaTest(TestCase):
             nom_comercial="TechCorp",
             rao_social="TechCorp SL",
             sector=self.sector
+        )
+
+        # Crear família professional
+        self.familia = FamiliaProfessional.objects.create(
+            codi="IF",
+            nom="Informàtica i Comunicacions"
+        )
+
+        # Crear cicle relacionat amb la família
+        self.cicle = Cicle.objects.create(
+            familia=self.familia,
+            codi="DAM",
+            nom="Desenvolupament d'Aplicacions Multiplataforma",
+            grau="GS",
+            durada=2000
         )
 
         # Crear oferta
