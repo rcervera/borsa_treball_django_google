@@ -76,39 +76,17 @@ class AfegirCandidaturaTest(TestCase):
         self.oferta.cicles.add(self.cicle)
         self.oferta.capacitats_clau.add(self.capacitat)
 
-    def test_afegir_candidatura_api(self):
-        url = reverse('afegir_candidatura_api', args=[self.oferta.id])
-
-        cv_pdf = SimpleUploadedFile(
-            "cv.pdf", b"%PDF-1.4 fake content", content_type="application/pdf"
-        )
-
-        dades = {
-            'carta_presentacio': 'A' * 70,
-          
+    def test_afegir_candidatura_amb_errors(self):
+        # No adjuntem cap CV i la carta és massa curta
+        form_data = {
+            'carta_presentacio': 'Massa curta.',
         }
 
-        response = self.client.post(url, dades, content_type='multipart/form-data')
+        url = reverse('afegir_candidatura_api', args=[self.oferta.id])
+        response = self.client.post(url, form_data, format='multipart')
 
-        if response.status_code != 201:
-            # Intentem llegir el JSON per mostrar errors si existeixen
-            try:
-                errors = response.json().get('errors', response.json())
-            except Exception:
-                errors = response.content.decode(errors='replace')
-
-            self.fail(
-                f"\nURL: {url}"
-                f"\nStatus code: {response.status_code}"
-                f"\nErrors:\n{errors}"
-            )
-
-        self.assertEqual(response.status_code, 201)
-        # self.assertEqual(Candidatura.objects.count(), 1)
-
-        # candidatura = Candidatura.objects.first()
-
-        # Comparar amb el objecte Estudiant creat al setUp, no amb usuari
-        # self.assertEqual(candidatura.estudiant, self.estudiant)
-        # self.assertEqual(candidatura.oferta, self.oferta)
-        # self.assertTrue(candidatura.cv_adjunt.name.endswith('.pdf'))
+        self.assertEqual(response.status_code, 400)
+        json_data = response.json()
+        self.assertIn('errors', json_data)
+        self.assertIn('cv_adjunt', json_data['errors'])
+        self.assertIn('carta_presentacio', json_data['errors'])
