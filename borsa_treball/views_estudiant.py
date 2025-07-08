@@ -911,13 +911,15 @@ def afegir_candidatura_api(request, oferta_id):
    
     oferta = get_object_or_404(Oferta, pk=oferta_id, estat='AC')
 
+    return JsonResponse({'message': 'Candidatura enviada correctament!'}, status=201)
+
     # Comprovem si ja existeix una candidatura
     if Candidatura.objects.filter(oferta=oferta, estudiant=estudiant).exists():
         return JsonResponse({'error': 'Ja has presentat una candidatura a aquesta oferta.'}, status=400)
 
     carta_presentacio = request.POST.get('carta_presentacio', '').strip()
     
-    return JsonResponse({'message': 'Candidatura enviada correctament!'}, status=201)
+   
 
     # --- Validacions ---
     if not carta_presentacio:
