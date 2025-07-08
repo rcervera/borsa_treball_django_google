@@ -92,7 +92,7 @@ class AfegirCandidaturaTest(TestCase):
       
         response = self.client.post(url, dades, content_type='multipart/form-data')
       
-        print("Response content:", response.content.decode())
+        self.fail(response.content.decode())
 
 
         self.assertEqual(response.status_code, 201)
