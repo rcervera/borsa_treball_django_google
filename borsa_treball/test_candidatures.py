@@ -91,11 +91,16 @@ class AfegirCandidaturaTest(TestCase):
         response = self.client.post(url, dades, content_type='multipart/form-data')
 
         if response.status_code != 201:
+            # Intentem llegir el JSON per mostrar errors si existeixen
+            try:
+                errors = response.json().get('errors', response.json())
+            except Exception:
+                errors = response.content.decode(errors='replace')
+
             self.fail(
                 f"\nURL: {url}"
                 f"\nStatus code: {response.status_code}"
-                f"\nContent-Type: {response.get('Content-Type', 'No header')}"
-                f"\nContent:\n{response.content.decode(errors='replace')}"
+                f"\nErrors:\n{errors}"
             )
 
         self.assertEqual(response.status_code, 201)
