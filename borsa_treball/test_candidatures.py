@@ -84,7 +84,7 @@ class AfegirCandidaturaTest(TestCase):
         )
 
         dades = {
-            'carta_presentacio': 'Aquesta és una carta de presentació prou llarga per passar la validació.',
+            'carta_presentacio': 'A' * 70,
             'cv_adjunt': cv_pdf
         }
 
