@@ -914,8 +914,8 @@ def afegir_candidatura_api(request, oferta_id):
     
 
     # Comprovem si ja existeix una candidatura
-    if Candidatura.objects.filter(oferta=oferta, estudiant=estudiant).exists():
-        return JsonResponse({'error': 'Ja has presentat una candidatura a aquesta oferta.'}, status=400)
+   # if Candidatura.objects.filter(oferta=oferta, estudiant=estudiant).exists():
+   #     return JsonResponse({'error': 'Ja has presentat una candidatura a aquesta oferta.'}, status=400)
     
    
 
@@ -923,6 +923,7 @@ def afegir_candidatura_api(request, oferta_id):
     
     return JsonResponse({'message': 'Candidatura enviada correctament!'}, status=201)
    
+
 
     # --- Validacions ---
     if not carta_presentacio:
