@@ -73,13 +73,18 @@ class AfegirCandidaturaTest(TestCase):
         
         url = reverse('afegir_candidatura_api', args=[self.oferta.id])  
 
+        
         cv_pdf = SimpleUploadedFile(
             "cv.pdf", b"%PDF-1.4 fake content", content_type="application/pdf"
         )
 
-        response = self.client.post(url, {
-            'cv': cv_pdf
-        })
+        dades = {
+            'carta_presentacio': 'Aquesta és una carta de presentació prou llarga per passar la validació.',
+            'cv_adjunt': cv_pdf
+        }
+      
+        response = self.client.post(self.url, dades)
+      
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Candidatura.objects.count(), 1)
