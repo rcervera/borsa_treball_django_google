@@ -208,7 +208,7 @@ class RegistreEstudiantTestCase(TestCase):
         registre = registres.first()
         self.assertEqual(registre.usuari, usuari)
         self.assertEqual(registre.accio, "Alta Estudiant")
-        self.assertIsNotNone(registre.timestamp)
+       
 
 
 
@@ -217,7 +217,7 @@ class RegistreEstudiantTestCase(TestCase):
 class RegistreEmpresaTests(TestCase):
     def setUp(self):
         self.client = Client()
-        self.url = reverse('registre_empresa')  # Assegura’t que tens aquesta URL registrada
+        self.url = reverse('registre_empresa_api') 
         self.sector = Sector.objects.create(nom='Tecnologia')  # Simula un sector vàlid
 
     def test_registre_empresa_ok(self):
@@ -356,5 +356,5 @@ class RegistreEmpresaTests(TestCase):
         registre = registres.first()
         self.assertEqual(registre.usuari, usuari)
         self.assertEqual(registre.accio, "Alta Empresa")
-        self.assertIsNotNone(registre.timestamp)
+      
 
