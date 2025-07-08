@@ -899,8 +899,7 @@ def afegir_candidatura_api(request, oferta_id):
     """
     API endpoint per afegir una candidatura a una oferta donada per estudiants autenticats.
     Retorna JSON amb errors o missatge d'èxit.
-    """
-    return JsonResponse({'message': 'Candidatura enviada correctament!'}, status=201)
+    """  
 
     errors = {}
 
@@ -908,6 +907,9 @@ def afegir_candidatura_api(request, oferta_id):
         estudiant = request.user.estudiant
     except Estudiant.DoesNotExist:
         return JsonResponse({'error': 'No tens permisos per presentar candidatures.'}, status=403)
+
+    return JsonResponse({'message': 'Candidatura enviada correctament!'}, status=201)
+
 
     oferta = get_object_or_404(Oferta, pk=oferta_id, estat='AC')
 
