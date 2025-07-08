@@ -85,7 +85,7 @@ class AfegirCandidaturaTest(TestCase):
 
         dades = {
             'carta_presentacio': 'A' * 70,
-            'cv_adjunt': cv_pdf
+          
         }
 
         response = self.client.post(url, dades, content_type='multipart/form-data')
