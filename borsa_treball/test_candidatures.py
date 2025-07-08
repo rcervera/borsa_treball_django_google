@@ -111,6 +111,8 @@ class AfegirCandidaturaTest(TestCase):
             }
         )
 
+        print("STATUS:", response.status_code)
+        print("RESPONSE:", response.content.decode())
 
         self.assertEqual(response.status_code, 201)
         self.assertIn('message', response.json())
