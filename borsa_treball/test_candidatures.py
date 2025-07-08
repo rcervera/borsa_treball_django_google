@@ -77,10 +77,8 @@ class AfegirCandidaturaTest(TestCase):
         self.oferta.capacitats_clau.add(self.capacitat)
 
     def test_afegir_candidatura_api(self):
-        
-        url = reverse('afegir_candidatura_api', args=[self.oferta.id])  
+        url = reverse('afegir_candidatura_api', args=[self.oferta.id])
 
-        
         cv_pdf = SimpleUploadedFile(
             "cv.pdf", b"%PDF-1.4 fake content", content_type="application/pdf"
         )
@@ -89,20 +87,23 @@ class AfegirCandidaturaTest(TestCase):
             'carta_presentacio': 'Aquesta és una carta de presentació prou llarga per passar la validació.',
             'cv_adjunt': cv_pdf
         }
-      
-        response = self.client.post(url, dades, content_type='multipart/form-data')
-      
-        self.fail(
-            f"\nURL: {url}"
-            f"\nStatus code: {response.status_code}"
-            f"\nContent-Type: {response['Content-Type']}"
-            f"\nContent:\n{response.content.decode(errors='replace')}"
-        )
 
+        response = self.client.post(url, dades, content_type='multipart/form-data')
+
+        if response.status_code != 201:
+            self.fail(
+                f"\nURL: {url}"
+                f"\nStatus code: {response.status_code}"
+                f"\nContent-Type: {response.get('Content-Type', 'No header')}"
+                f"\nContent:\n{response.content.decode(errors='replace')}"
+            )
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Candidatura.objects.count(), 1)
+
         candidatura = Candidatura.objects.first()
-        self.assertEqual(candidatura.estudiant, self.usuari)
+
+        # Comparar amb el objecte Estudiant creat al setUp, no amb usuari
+        self.assertEqual(candidatura.estudiant, self.estudiant)
         self.assertEqual(candidatura.oferta, self.oferta)
-        self.assertTrue(candidatura.cv.name.endswith('.pdf'))
+        self.assertTrue(candidatura.cv_adjunt.name.endswith('.pdf'))
