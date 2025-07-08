@@ -101,7 +101,16 @@ class AfegirCandidaturaTest(TestCase):
         }
 
         url = reverse('afegir_candidatura_api', args=[self.oferta.id])
-        response = self.client.post(url, form_data, content_type='multipart/form-data')
+        response = self.client.post(
+            url,
+            data={
+                'carta_presentacio': 'Text proussssssssssssssssssssssssssssssssssssssssssss llarg ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss...'
+            },
+            files={
+                'cv_adjunt': cv_file
+            }
+        )
+
 
         self.assertEqual(response.status_code, 201)
         self.assertIn('message', response.json())
