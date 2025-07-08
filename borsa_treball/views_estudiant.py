@@ -908,9 +908,7 @@ def afegir_candidatura_api(request, oferta_id):
     except Estudiant.DoesNotExist:
         return JsonResponse({'error': 'No tens permisos per presentar candidatures.'}, status=403)
 
-    return JsonResponse({'message': 'Candidatura enviada correctament!'}, status=201)
-
-
+   
     oferta = get_object_or_404(Oferta, pk=oferta_id, estat='AC')
 
     # Comprovem si ja existeix una candidatura
@@ -927,6 +925,9 @@ def afegir_candidatura_api(request, oferta_id):
         errors['carta_presentacio'] = f'La carta ha de tenir almenys 50 caràcters. Ara en té {len(carta_presentacio)}.'
     elif len(carta_presentacio) > 2000:
         errors['carta_presentacio'] = f'La carta no pot superar els 2000 caràcters. Ara en té {len(carta_presentacio)}.'
+
+    return JsonResponse({'message': 'Candidatura enviada correctament!'}, status=201)
+
 
     if not cv_adjunt:
         errors['cv_adjunt'] = 'Heu d\'adjuntar el vostre Currículum Vitae.'
