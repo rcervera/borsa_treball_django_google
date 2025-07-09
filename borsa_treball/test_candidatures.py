@@ -285,6 +285,9 @@ class EditarCandidaturaAPITestCase(TestCase):
             tipus_contracte='IN',
             jornada='CO'
         )
+
+        self.cv_file = SimpleUploadedFile("cv_nou.pdf", b"cv actualitzat", content_type="application/pdf")
+        
         self.candidatura = Candidatura.objects.create(
             estudiant=self.estudiant,
             oferta=self.oferta,
@@ -293,7 +296,7 @@ class EditarCandidaturaAPITestCase(TestCase):
             cv_adjunt=self.cv_file
         )
         self.url = reverse('editar_candidatura_api', args=[self.candidatura.id])
-        self.cv_file = SimpleUploadedFile("cv_nou.pdf", b"cv actualitzat", content_type="application/pdf")
+        
 
     def test_edicio_correcta(self):
         """
