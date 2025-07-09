@@ -520,61 +520,13 @@ def afegir_candidatura(request, oferta_id):
         # !! afegir un missatge de flaix aquí per informar a l'usuari
         return redirect('llista_candidatures_estudiant') 
 
-    errors = {}
-    carta_presentacio_data = '' # Per mantenir la carta si hi ha errors
-
-    if request.method == 'POST':
-        carta_presentacio = request.POST.get('carta_presentacio', '').strip()
-        cv_adjunt = request.FILES.get('cv_adjunt', None)
-        
-        # --- Validació de servidor ---
-        
-        # Validació de la carta de presentació
-        if not carta_presentacio:
-            errors['carta_presentacio'] = "La carta de presentació és obligatòria."
-        elif len(carta_presentacio) < 50:
-            errors['carta_presentacio'] = f"La carta de presentació ha de tenir un mínim de 50 caràcters. Actualment té {len(carta_presentacio)}."
-        elif len(carta_presentacio) > 2000:
-            errors['carta_presentacio'] = f"La carta de presentació no pot excedir els 2000 caràcters. Actualment té {len(carta_presentacio)}."
-        
-        # Guardar la carta_presentacio per si hi ha errors i es vol mantenir
-        carta_presentacio_data = carta_presentacio
-
-        # Validació del CV adjunt
-        if not cv_adjunt:
-            errors['cv_adjunt'] = "Heu d'adjuntar el vostre Currículum Vitae."
-        else:
-            # Validar tipus de fitxer (extensió)
-            valid_extensions = ['.pdf', '.doc', '.docx']
-            ext = os.path.splitext(cv_adjunt.name)[1].lower()
-            if ext not in valid_extensions:
-                errors['cv_adjunt'] = "Format de fitxer no vàlid. Només s'accepten PDF, DOC i DOCX."
-            
-            # Validar mida del fitxer (5MB = 5 * 1024 * 1024 bytes)
-            max_size_mb = 5
-            max_size_bytes = max_size_mb * 1024 * 1024
-            if cv_adjunt.size > max_size_bytes:
-                errors['cv_adjunt'] = f"El fitxer és massa gran. La mida màxima permesa és de {max_size_mb}MB."
-        
-        # Si no hi ha errors, crear la candidatura
-        if not errors:
-            Candidatura.objects.create(
-                oferta=oferta,
-                estudiant=estudiant,
-                carta_presentacio=carta_presentacio,
-                cv_adjunt=cv_adjunt,        
-                estat='EP'  # En procés
-            )
-            # Pots afegir un missatge de flaix d'èxit aquí
-            return redirect('llista_candidatures_estudiant')
-    
-    # Si hi ha errors o és un GET request, renderitzar el formulari amb els errors
     context = {
         'oferta': oferta,
         'candidatura': None,  # No hi ha candidatura existent
-        'errors': errors,
-        'carta_presentacio': carta_presentacio_data, # Passar la carta per mantenir el text al formulari
+        'errors': {},
+        'carta_presentacio': '', # Passar la carta per mantenir el text al formulari
     }
+
     return render(request, 'borsa_treball/editar_candidatura_estudiant.html', context)
 
 
@@ -646,65 +598,6 @@ def editar_candidatura_estudiant(request, candidatura_id):
         id=candidatura_id,
         estudiant=request.user.estudiant
     )
-    
-   
-    
-    if request.method == 'POST':
-
-        # Només es pot editar si està en procés
-        if candidatura.estat != EstatCandidatura.EN_PROCES:
-            messages.error(request, 'No pots editar aquesta candidatura.')
-            return redirect('llista_candidatures_estudiant')
-    
-
-        # Obtenir dades del formulari
-        carta_presentacio = request.POST.get('carta_presentacio', '').strip()
-        cv_adjunt = request.FILES.get('cv_adjunt')
-        altres_adjunts = request.FILES.get('altres_adjunts')
-        
-        # Validacions
-        errors = {}
-        
-        # Validar carta de presentació
-        if not carta_presentacio:
-            errors['carta_presentacio'] = 'La carta de presentació és obligatòria'
-        elif len(carta_presentacio) < 50:
-            errors['carta_presentacio'] = 'La carta ha de tenir almenys 50 caràcters'
-        elif len(carta_presentacio) > 2000:
-            errors['carta_presentacio'] = 'La carta no pot superar els 2000 caràcters'
-        
-        # Validar CV si s'ha pujat
-        if cv_adjunt:
-            if cv_adjunt.size > 5 * 1024 * 1024:  # 5MB
-                errors['cv_adjunt'] = 'El CV no pot superar els 5MB'
-            
-            allowed_types = ['application/pdf', 'application/msword', 
-                           'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
-            if cv_adjunt.content_type not in allowed_types:
-                errors['cv_adjunt'] = 'Format no vàlid. Només PDF, DOC o DOCX'
-        
-        # Validar altres adjunts si s'han pujat
-        if altres_adjunts:
-            if altres_adjunts.size > 10 * 1024 * 1024:  # 10MB
-                errors['altres_adjunts'] = 'Els altres documents no poden superar els 10MB'
-        
-        # Si no hi ha errors, guardar
-        if not errors:
-            candidatura.carta_presentacio = carta_presentacio
-            
-            if cv_adjunt:
-                candidatura.cv_adjunt = cv_adjunt
-            
-            if altres_adjunts:
-                candidatura.altres_adjunts = altres_adjunts
-            
-            candidatura.save()
-            messages.success(request, 'Candidatura actualitzada correctament!')
-            return redirect('llista_candidatures_estudiant')
-        else:
-            # Afegir errors als missatges
-            for field, error in errors.items():
-                messages.error(request, error)
     
     context = {
         'candidatura': candidatura,
