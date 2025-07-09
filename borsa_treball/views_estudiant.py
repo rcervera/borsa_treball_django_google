@@ -1,24 +1,36 @@
+# Imports de Python estàndard
+import json
 import mimetypes
 import os
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Q, Count
-from django.utils import timezone
-from .models import Oferta, Empresa, Cicle, Candidatura, Estudiant, EstatCandidatura
-
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.utils import timezone
+import re
 from datetime import datetime
-from django.core.paginator import Paginator
 
-from .models import Oferta, Empresa, Cicle, Funcio, NivellIdioma, CapacitatClau 
+# Imports de Django
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.validators import validate_email
+from django.db import transaction
+from django.db.models import Q, Count
+from django.http import Http404, HttpResponse, JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
+from django.views.decorators.http import require_POST, require_http_methods
 
+# Imports locals (models)
+from .models import (
+    Oferta, Empresa, Cicle, Candidatura, Estudiant, EstatCandidatura,
+    Funcio, NivellIdioma, CapacitatClau, Usuari, EstudiEstudiant
+)
 
+#
+#   OFERTES 
+#
+#
+
+# Vista pública per llistar ofertes de feina actives i no caducades
 def llista_ofertes_tauler(request):
     """
     Vista pública per llistar ofertes de feina actives i no caducades.
@@ -71,7 +83,7 @@ def llista_ofertes_tauler(request):
     return render(request, 'borsa_treball/tauler_ofertes.html', context)
 
 
-
+# Vista per veure els detalls d'una oferta des del tauler d'ofertes
 def detall_oferta_tauler(request, oferta_id):
     """
     Vista per veure els detalls complets d'una oferta.
@@ -94,21 +106,168 @@ def detall_oferta_tauler(request, oferta_id):
     
     return render(request, 'borsa_treball/detall_oferta_tauler.html', context)
 
+# Vista per llistar ofertes disponibles als estudiants autenticats
+@login_required
+def llista_ofertes_estudiants_auth(request):
+    """
+    Vista per mostrar ofertes disponibles als estudiants amb filtres i paginació.
+    """
+    try:
+        estudiant = request.user.estudiant
+    except Estudiant.DoesNotExist:
+        messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
+        return redirect('index')
+    
+    # Obtenir ofertes actives i no caducades
+    ofertes = Oferta.objects.filter(
+        estat='AC',
+        data_limit__gte=timezone.now().date()
+    ).select_related('empresa').prefetch_related('cicles', 'candidatures')
+    
+    # Filtres
+    cerca = request.GET.get('cerca', '')
+    empresa_id = request.GET.get('empresa', '')
+    cicle_id = request.GET.get('cicle', '')
+    tipus_contracte = request.GET.get('tipus_contracte', '')
+    jornada = request.GET.get('jornada', '')
+    ordenar = request.GET.get('ordenar', '-data_publicacio')
+    
+    # Aplicar filtres
+    if cerca:
+        ofertes = ofertes.filter(
+            Q(titol__icontains=cerca) |
+            Q(descripcio__icontains=cerca) |
+            Q(lloc_treball__icontains=cerca) |
+            Q(empresa__nom_comercial__icontains=cerca)
+        )
+    
+    if empresa_id:
+        ofertes = ofertes.filter(empresa_id=empresa_id)
+    
+    if cicle_id:
+        ofertes = ofertes.filter(cicles__id=cicle_id)
+    
+    if tipus_contracte:
+        ofertes = ofertes.filter(tipus_contracte=tipus_contracte)
+    
+    if jornada:
+        ofertes = ofertes.filter(jornada=jornada)
+    
+    # Ordenació
+    if ordenar == 'titol':
+        ofertes = ofertes.order_by('titol')
+    elif ordenar == 'empresa':
+        ofertes = ofertes.order_by('empresa__nom_comercial')
+    elif ordenar == 'data_limit':
+        ofertes = ofertes.order_by('data_limit')
+    elif ordenar == '-data_limit':
+        ofertes = ofertes.order_by('-data_limit')
+    elif ordenar == 'lloc_treball':
+        ofertes = ofertes.order_by('lloc_treball')
+    else:  # -data_publicacio (per defecte)
+        ofertes = ofertes.order_by('-data_publicacio')
+    
+    # Eliminar duplicats si hi ha filtres per cicles
+    if cicle_id:
+        ofertes = ofertes.distinct()
+    
+    # Obtenir candidatures existents de l'estudiant
+    candidatures_existents = set(
+        Candidatura.objects.filter(estudiant=estudiant)
+        .values_list('oferta_id', flat=True)
+    )
+    
+    # Paginació
+    paginator = Paginator(ofertes, 12)  # 12 ofertes per pàgina
+    page = request.GET.get('page')
+    
+    try:
+        ofertes_paginades = paginator.page(page)
+    except PageNotAnInteger:
+        ofertes_paginades = paginator.page(1)
+    except EmptyPage:
+        ofertes_paginades = paginator.page(paginator.num_pages)
+    
+    # Dades per filtres
+    empreses = Empresa.objects.filter(
+        ofertes__estat='AC',
+        ofertes__data_limit__gte=timezone.now().date()
+    ).distinct().order_by('nom_comercial')
+    
+    cicles = Cicle.objects.filter(
+        ofertes__estat='AC',
+        ofertes__data_limit__gte=timezone.now().date()
+    ).distinct().order_by('nom')
+    
+    # Estadístiques
+    total_ofertes = ofertes.count()
+    ofertes_amb_candidatura = len([o for o in ofertes if o.id in candidatures_existents])
+    ofertes_sense_candidatura = total_ofertes - ofertes_amb_candidatura
+    
+    context = {
+        'ofertes': ofertes_paginades,
+        'candidatures_existents': candidatures_existents,
+        'empreses': empreses,
+        'cicles': cicles,
+        'cerca': cerca,
+        'empresa_seleccionada': empresa_id,
+        'cicle_seleccionat': cicle_id,
+        'tipus_contracte_seleccionat': tipus_contracte,
+        'jornada_seleccionada': jornada,
+        'ordenar': ordenar,
+        'total_ofertes': total_ofertes,
+        'ofertes_amb_candidatura': ofertes_amb_candidatura,
+        'ofertes_sense_candidatura': ofertes_sense_candidatura,
+        'tipus_contracte_choices': Oferta.TIPUS_CONTRACTE,
+        'jornada_choices': Oferta.JORNADA,
+        'current_page' : 'llista_ofertes'
+    }
+    
+    return render(request, 'borsa_treball/llista_ofertes_estudiant.html', context)
 
+## Vista per veure els detalls d'una oferta des de la perspectiva de l'estudiant
+@login_required
+def detall_oferta_estudiant(request, oferta_id):
+    """
+    Vista per veure els detalls d'una oferta des de la perspectiva de l'estudiant.
+    """
+    try:
+        estudiant = request.user.estudiant
+    except Estudiant.DoesNotExist:
+        messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
+        return redirect('index')
+    
+    # Obtenir l'oferta activa i no caducada
+    oferta = get_object_or_404(
+        Oferta,
+        id=oferta_id,
+        estat='AC',
+        data_limit__gte=timezone.now().date()
+    )
+    
+    # Verificar si ja té candidatura
+    candidatura_existent = Candidatura.objects.filter(
+        oferta=oferta,
+        estudiant=estudiant
+    ).first()
+    
+    # Calcular dies restants
+    today = timezone.now().date()
+    dies_restants = (oferta.data_limit - today).days
+    
+    context = {
+        'oferta': oferta,
+        'candidatura_existent': candidatura_existent,
+        'dies_restants': dies_restants,
+        'today': today,
+    }
+    
+    return render(request, 'borsa_treball/detall_oferta_estudiant.html', context)
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse, JsonResponse
-from django.views.decorators.http import require_POST, require_http_methods
-from django.db import transaction
-from django.core.exceptions import ValidationError
-from django.contrib.auth.password_validation import validate_password
-from datetime import datetime
-import json
-import re # For DNI validation if needed
-
-# Import your models
-from .models import Usuari, Estudiant, Cicle, EstudiEstudiant
+#
+#   PERFIL ESTUDIANT
+#
+#
 
 @login_required
 def perfil_estudiant(request):
@@ -313,7 +472,7 @@ def api_afegir_estudi_estudiant(request):
         return JsonResponse({'success': False, 'message': 'Error intern del servidor al afegir l\'estudi.'}, status=500)
 
 @login_required
-@require_POST # Can also be @require_http_methods(['DELETE']) if you use HTTP DELETE
+@require_POST 
 def api_esborrar_estudi_estudiant(request, estudi_id):
     """
     API endpoint to delete an EstudiEstudiant record.
@@ -336,202 +495,16 @@ def api_esborrar_estudi_estudiant(request, estudi_id):
         return JsonResponse({'success': False, 'message': 'Error intern del servidor al eliminar l\'estudi.'}, status=500)
 
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Q, Count
-from django.utils import timezone
-from .models import Oferta, Empresa, Cicle, Candidatura, Estudiant
-
-@login_required
-def llista_ofertes_estudiants_auth(request):
-    """
-    Vista per mostrar ofertes disponibles als estudiants amb filtres i paginació.
-    """
-    try:
-        estudiant = request.user.estudiant
-    except Estudiant.DoesNotExist:
-        messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
-        return redirect('index')
-    
-    # Obtenir ofertes actives i no caducades
-    ofertes = Oferta.objects.filter(
-        estat='AC',
-        data_limit__gte=timezone.now().date()
-    ).select_related('empresa').prefetch_related('cicles', 'candidatures')
-    
-    # Filtres
-    cerca = request.GET.get('cerca', '')
-    empresa_id = request.GET.get('empresa', '')
-    cicle_id = request.GET.get('cicle', '')
-    tipus_contracte = request.GET.get('tipus_contracte', '')
-    jornada = request.GET.get('jornada', '')
-    ordenar = request.GET.get('ordenar', '-data_publicacio')
-    
-    # Aplicar filtres
-    if cerca:
-        ofertes = ofertes.filter(
-            Q(titol__icontains=cerca) |
-            Q(descripcio__icontains=cerca) |
-            Q(lloc_treball__icontains=cerca) |
-            Q(empresa__nom_comercial__icontains=cerca)
-        )
-    
-    if empresa_id:
-        ofertes = ofertes.filter(empresa_id=empresa_id)
-    
-    if cicle_id:
-        ofertes = ofertes.filter(cicles__id=cicle_id)
-    
-    if tipus_contracte:
-        ofertes = ofertes.filter(tipus_contracte=tipus_contracte)
-    
-    if jornada:
-        ofertes = ofertes.filter(jornada=jornada)
-    
-    # Ordenació
-    if ordenar == 'titol':
-        ofertes = ofertes.order_by('titol')
-    elif ordenar == 'empresa':
-        ofertes = ofertes.order_by('empresa__nom_comercial')
-    elif ordenar == 'data_limit':
-        ofertes = ofertes.order_by('data_limit')
-    elif ordenar == '-data_limit':
-        ofertes = ofertes.order_by('-data_limit')
-    elif ordenar == 'lloc_treball':
-        ofertes = ofertes.order_by('lloc_treball')
-    else:  # -data_publicacio (per defecte)
-        ofertes = ofertes.order_by('-data_publicacio')
-    
-    # Eliminar duplicats si hi ha filtres per cicles
-    if cicle_id:
-        ofertes = ofertes.distinct()
-    
-    # Obtenir candidatures existents de l'estudiant
-    candidatures_existents = set(
-        Candidatura.objects.filter(estudiant=estudiant)
-        .values_list('oferta_id', flat=True)
-    )
-    
-    # Paginació
-    paginator = Paginator(ofertes, 12)  # 12 ofertes per pàgina
-    page = request.GET.get('page')
-    
-    try:
-        ofertes_paginades = paginator.page(page)
-    except PageNotAnInteger:
-        ofertes_paginades = paginator.page(1)
-    except EmptyPage:
-        ofertes_paginades = paginator.page(paginator.num_pages)
-    
-    # Dades per filtres
-    empreses = Empresa.objects.filter(
-        ofertes__estat='AC',
-        ofertes__data_limit__gte=timezone.now().date()
-    ).distinct().order_by('nom_comercial')
-    
-    cicles = Cicle.objects.filter(
-        ofertes__estat='AC',
-        ofertes__data_limit__gte=timezone.now().date()
-    ).distinct().order_by('nom')
-    
-    # Estadístiques
-    total_ofertes = ofertes.count()
-    ofertes_amb_candidatura = len([o for o in ofertes if o.id in candidatures_existents])
-    ofertes_sense_candidatura = total_ofertes - ofertes_amb_candidatura
-    
-    context = {
-        'ofertes': ofertes_paginades,
-        'candidatures_existents': candidatures_existents,
-        'empreses': empreses,
-        'cicles': cicles,
-        'cerca': cerca,
-        'empresa_seleccionada': empresa_id,
-        'cicle_seleccionat': cicle_id,
-        'tipus_contracte_seleccionat': tipus_contracte,
-        'jornada_seleccionada': jornada,
-        'ordenar': ordenar,
-        'total_ofertes': total_ofertes,
-        'ofertes_amb_candidatura': ofertes_amb_candidatura,
-        'ofertes_sense_candidatura': ofertes_sense_candidatura,
-        'tipus_contracte_choices': Oferta.TIPUS_CONTRACTE,
-        'jornada_choices': Oferta.JORNADA,
-        'current_page' : 'llista_ofertes'
-    }
-    
-    return render(request, 'borsa_treball/llista_ofertes_estudiant.html', context)
-
-
-@login_required
-def detall_oferta_estudiant(request, oferta_id):
-    """
-    Vista per veure els detalls d'una oferta des de la perspectiva de l'estudiant.
-    """
-    try:
-        estudiant = request.user.estudiant
-    except Estudiant.DoesNotExist:
-        messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
-        return redirect('index')
-    
-    # Obtenir l'oferta activa i no caducada
-    oferta = get_object_or_404(
-        Oferta,
-        id=oferta_id,
-        estat='AC',
-        data_limit__gte=timezone.now().date()
-    )
-    
-    # Verificar si ja té candidatura
-    candidatura_existent = Candidatura.objects.filter(
-        oferta=oferta,
-        estudiant=estudiant
-    ).first()
-    
-    # Calcular dies restants
-    today = timezone.now().date()
-    dies_restants = (oferta.data_limit - today).days
-    
-    context = {
-        'oferta': oferta,
-        'candidatura_existent': candidatura_existent,
-        'dies_restants': dies_restants,
-        'today': today,
-    }
-    
-    return render(request, 'borsa_treball/detall_oferta_estudiant.html', context)
 
 
 
-@login_required
-def afegir_candidatura(request, oferta_id):
-    # Obtenir l'estudiant loguejat
-    try:
-        estudiant = request.user.estudiant
-    except:
-        # Redirigir si l'usuari no és un estudiant o hi ha algun problema
-        return redirect('index') 
-    
-    # Obtenir l'oferta
-    oferta = get_object_or_404(Oferta, pk=oferta_id, estat='AC')
-    
-    # Verificar si ja existeix candidatura
-    if Candidatura.objects.filter(oferta=oferta, estudiant=estudiant).exists():
-        # !! afegir un missatge de flaix aquí per informar a l'usuari
-        return redirect('llista_candidatures_estudiant') 
+#
+#
+#   CANDIDATURES
+#
+#
 
-    context = {
-        'oferta': oferta,
-        'candidatura': None,  # No hi ha candidatura existent
-        'errors': {},
-        'carta_presentacio': '', # Passar la carta per mantenir el text al formulari
-    }
-
-    return render(request, 'borsa_treball/editar_candidatura_estudiant.html', context)
-
-
-
-
+# Vista per llistar les candidatures de l'estudiant autenticat
 @login_required
 def llista_candidatures_estudiant(request):
     """Vista per llistar les candidatures de l'estudiant loggejat"""
@@ -580,7 +553,36 @@ def llista_candidatures_estudiant(request):
     
     return render(request, 'borsa_treball/llista_candidatures_estudiant.html', context)
 
+#  Vista per mostrar formulari per afegir una candidatura a una oferta
+@login_required
+def afegir_candidatura(request, oferta_id):
+    # Obtenir l'estudiant loguejat
+    try:
+        estudiant = request.user.estudiant
+    except:
+        # Redirigir si l'usuari no és un estudiant o hi ha algun problema
+        return redirect('index') 
+    
+    # Obtenir l'oferta
+    oferta = get_object_or_404(Oferta, pk=oferta_id, estat='AC')
+    
+    # Verificar si ja existeix candidatura
+    if Candidatura.objects.filter(oferta=oferta, estudiant=estudiant).exists():
+        # !! afegir un missatge de flaix aquí per informar a l'usuari
+        return redirect('llista_candidatures_estudiant') 
 
+    context = {
+        'oferta': oferta,
+        'candidatura': None,  # No hi ha candidatura existent
+        'errors': {},
+        'carta_presentacio': '', # Passar la carta per mantenir el text al formulari
+    }
+
+    return render(request, 'borsa_treball/editar_candidatura_estudiant.html', context)
+
+
+# Vista per editar una candidatura d'un estudiant autenticat
+# Aquesta vista només permet editar candidatures que l'estudiant ja ha creat.
 @login_required
 def editar_candidatura_estudiant(request, candidatura_id):
     """Vista per editar una candidatura"""
@@ -591,8 +593,6 @@ def editar_candidatura_estudiant(request, candidatura_id):
         messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
         return redirect('index')
     
-
-
     candidatura = get_object_or_404(
         Candidatura,
         id=candidatura_id,
@@ -607,105 +607,69 @@ def editar_candidatura_estudiant(request, candidatura_id):
     return render(request, 'borsa_treball/editar_candidatura_estudiant.html', context)
 
 
+# Afegit candidatura API per estudiants autenticats
 @login_required
-def descarregar_cv_candidatura(request, candidatura_id):
+@require_http_methods(["POST"])
+def afegir_candidatura_api(request, oferta_id):
     """
-    Vista per descarregar el CV d'una candidatura.
-    """
+    API endpoint per afegir una candidatura a una oferta donada per estudiants autenticats.
+    Retorna JSON amb errors o missatge d'èxit.
+    """  
+
+    errors = {}
+
     try:
         estudiant = request.user.estudiant
     except Estudiant.DoesNotExist:
-        #return HttpResponse('sense permisos')
-        #messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
-        return redirect('index')
+        return JsonResponse({'error': 'No tens permisos per presentar candidatures.'}, status=403)
+   
+    oferta = get_object_or_404(Oferta, pk=oferta_id, estat='AC')
     
-    # Obtenir la candidatura i verificar permisos
-    candidatura = get_object_or_404(Candidatura, id=candidatura_id)
-    
-    if not candidatura.cv_adjunt:
-        raise Http404("CV no trobat")
-    
+    # Comprovem si ja existeix una candidatura
+    if Candidatura.objects.filter(oferta=oferta, estudiant=estudiant).exists():
+      return JsonResponse({'error': 'Ja has presentat una candidatura a aquesta oferta.'}, status=400)
+       
+
+    carta_presentacio = request.POST.get('carta_presentacio', '').strip()    
+   
+    # --- Validacions ---
+    if not carta_presentacio:
+        errors['carta_presentacio'] = 'La carta de presentació és obligatòria.'
+    elif len(carta_presentacio) < 50:
+        errors['carta_presentacio'] = f'La carta ha de tenir almenys 50 caràcters. Ara en té {len(carta_presentacio)}.'
+    elif len(carta_presentacio) > 2000:
+        errors['carta_presentacio'] = f'La carta no pot superar els 2000 caràcters. Ara en té {len(carta_presentacio)}.'
+
+    cv_adjunt = request.FILES.get('cv_adjunt')
+
+    if not cv_adjunt:
+        errors['cv_adjunt'] = 'Heu d\'adjuntar el vostre Currículum Vitae.'
+    else:
+        ext = os.path.splitext(cv_adjunt.name)[1].lower()
+        if ext not in ['.pdf', '.doc', '.docx']:
+            errors['cv_adjunt'] = 'Només es permeten fitxers PDF, DOC o DOCX.'
+        elif cv_adjunt.size > 5 * 1024 * 1024:
+            errors['cv_adjunt'] = 'El fitxer no pot superar els 5MB.'
+
+    # Si hi ha errors, retornem
+    if errors:
+        return JsonResponse({'errors': errors}, status=400)
+
+    # Guardar candidatura
     try:
-        # Obtenir el fitxer
-        file_path = candidatura.cv_adjunt.path
-        
-        if not os.path.exists(file_path):
-            raise Http404("Fitxer no trobat")
-        
-        # Determinar el tipus MIME
-        content_type, _ = mimetypes.guess_type(file_path)
-        if content_type is None:
-            content_type = 'application/octet-stream'
-        
-        # Crear la resposta
-        with open(file_path, 'rb') as f:
-            response = HttpResponse(f.read(), content_type=content_type)
-            
-        # Nom del fitxer per la descàrrega
-        filename = f"CV_{candidatura.estudiant.usuari.get_full_name()}_{candidatura.oferta.titol}.pdf"
-        filename = filename.replace(' ', '_').replace(',', '')
-        
-        response['Content-Disposition'] = f'attachment; filename="{filename}"'
-        return response
-        
+        Candidatura.objects.create(
+            oferta=oferta,
+            estudiant=estudiant,
+            carta_presentacio=carta_presentacio,
+            cv_adjunt=cv_adjunt,
+            estat='EP'
+        )
+        return JsonResponse({'message': 'Candidatura enviada correctament!'}, status=201)
     except Exception as e:
-        #return HttpResponse(f'Error en descarregar el CV: {str(e)}')
-        #messages.error(request, f'Error en descarregar el CV: {str(e)}')
-        return redirect('candidatures_oferta', oferta_id=candidatura.oferta.id)
-
-
-@login_required
-@require_POST
-def eliminar_candidatura_api(request, candidatura_id):
-    """
-    Vista API per eliminar una candidatura.
-    Retorna JsonResponse amb missatges i codis d'estat HTTP.
-    """
-    try:
-        # Comprovar si l'usuari és un estudiant.
-        # Si no ho és, no hauria de poder eliminar candidatures d'estudiant.
-        # Això pot llançar Estudiant.DoesNotExist si no hi ha un perfil d'estudiant associat.
-        estudiant = request.user.estudiant 
-    except Estudiant.DoesNotExist:
-        # L'usuari loggejat no té un perfil d'estudiant.
-        return JsonResponse(
-            {'error': 'Accés denegat. No estàs associat a un perfil d\'estudiant.'},
-            status=403 # Forbidden
-        )
+        return JsonResponse({'error': f'Error inesperat en desar la candidatura: {str(e)}'}, status=500)
     
-    try:
-        candidatura = get_object_or_404(
-            Candidatura,
-            id=candidatura_id,
-            estudiant=estudiant # Assegura que només pot eliminar les seves pròpies candidatures
-        )
-    except Exception: # Pot capturar Http404 de get_object_or_404 o altres errors
-        return JsonResponse(
-            {'error': 'Candidatura no trobada o no tens permís per accedir-hi.'},
-            status=404 # Not Found
-        )
-    
-    # Verificar que es pot eliminar segons el seu estat
-    if candidatura.estat not in [EstatCandidatura.EN_PROCES, EstatCandidatura.REBUTJADA]:
-        return JsonResponse(
-            {'error': 'No es pot eliminar aquesta candidatura en el seu estat actual.'},
-            status=400 # Bad Request
-        )
-    
-    try:
-        candidatura.delete()
-        return JsonResponse(
-            {'message': 'Candidatura eliminada correctament.'},
-            status=200 # OK
-        )
-    except Exception as e:
-        # Capturar qualsevol altre error durant l'eliminació (p.ex., error de base de dades)
-        return JsonResponse(
-            {'error': f'Error intern del servidor al eliminar la candidatura: {str(e)}'},
-            status=500 # Internal Server Error
-        )
 
-
+# Editar candidatura API per estudiants autenticats
 @login_required
 @require_http_methods(["POST"])
 def editar_candidatura_api(request, candidatura_id):
@@ -787,68 +751,99 @@ def editar_candidatura_api(request, candidatura_id):
 
 
 @login_required
-@require_http_methods(["POST"])
-def afegir_candidatura_api(request, oferta_id):
+def descarregar_cv_candidatura(request, candidatura_id):
     """
-    API endpoint per afegir una candidatura a una oferta donada per estudiants autenticats.
-    Retorna JSON amb errors o missatge d'èxit.
-    """  
-
-    errors = {}
-
+    Vista per descarregar el CV d'una candidatura.
+    """
     try:
         estudiant = request.user.estudiant
     except Estudiant.DoesNotExist:
-        return JsonResponse({'error': 'No tens permisos per presentar candidatures.'}, status=403)
-
-   
-    oferta = get_object_or_404(Oferta, pk=oferta_id, estat='AC')
-
+        #return HttpResponse('sense permisos')
+        #messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
+        return redirect('index')
     
-
-    # Comprovem si ja existeix una candidatura
-    if Candidatura.objects.filter(oferta=oferta, estudiant=estudiant).exists():
-      return JsonResponse({'error': 'Ja has presentat una candidatura a aquesta oferta.'}, status=400)
-       
-
-    carta_presentacio = request.POST.get('carta_presentacio', '').strip()
+    # Obtenir la candidatura i verificar permisos
+    candidatura = get_object_or_404(Candidatura, id=candidatura_id, estudiant=estudiant)
     
-   
-    # --- Validacions ---
-    if not carta_presentacio:
-        errors['carta_presentacio'] = 'La carta de presentació és obligatòria.'
-    elif len(carta_presentacio) < 50:
-        errors['carta_presentacio'] = f'La carta ha de tenir almenys 50 caràcters. Ara en té {len(carta_presentacio)}.'
-    elif len(carta_presentacio) > 2000:
-        errors['carta_presentacio'] = f'La carta no pot superar els 2000 caràcters. Ara en té {len(carta_presentacio)}.'
-
-   
-
-
-    cv_adjunt = request.FILES.get('cv_adjunt')
-
-    if not cv_adjunt:
-        errors['cv_adjunt'] = 'Heu d\'adjuntar el vostre Currículum Vitae.'
-    else:
-        ext = os.path.splitext(cv_adjunt.name)[1].lower()
-        if ext not in ['.pdf', '.doc', '.docx']:
-            errors['cv_adjunt'] = 'Només es permeten fitxers PDF, DOC o DOCX.'
-        elif cv_adjunt.size > 5 * 1024 * 1024:
-            errors['cv_adjunt'] = 'El fitxer no pot superar els 5MB.'
-
-    # Si hi ha errors, retornem
-    if errors:
-        return JsonResponse({'errors': errors}, status=400)
-
-    # Guardar candidatura
+    if not candidatura.cv_adjunt:
+        raise Http404("CV no trobat")
+    
     try:
-        Candidatura.objects.create(
-            oferta=oferta,
-            estudiant=estudiant,
-            carta_presentacio=carta_presentacio,
-            cv_adjunt=cv_adjunt,
-            estat='EP'
-        )
-        return JsonResponse({'message': 'Candidatura enviada correctament!'}, status=201)
+        # Obtenir el fitxer
+        file_path = candidatura.cv_adjunt.path
+        
+        if not os.path.exists(file_path):
+            raise Http404("Fitxer no trobat")
+        
+        # Determinar el tipus MIME
+        content_type, _ = mimetypes.guess_type(file_path)
+        if content_type is None:
+            content_type = 'application/octet-stream'
+        
+        # Crear la resposta
+        with open(file_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type=content_type)
+            
+        # Nom del fitxer per la descàrrega
+        filename = f"CV_{candidatura.estudiant.usuari.get_full_name()}_{candidatura.oferta.titol}.pdf"
+        filename = filename.replace(' ', '_').replace(',', '')
+        
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+        
     except Exception as e:
-        return JsonResponse({'error': f'Error inesperat en desar la candidatura: {str(e)}'}, status=500)
+        #return HttpResponse(f'Error en descarregar el CV: {str(e)}')
+        #messages.error(request, f'Error en descarregar el CV: {str(e)}')
+        return redirect('candidatures_oferta', oferta_id=candidatura.oferta.id)
+
+# Vista per eliminar una candidatura d'un estudiant autenticat
+@login_required
+@require_POST
+def eliminar_candidatura_api(request, candidatura_id):
+    """
+    Vista API per eliminar una candidatura.
+    Retorna JsonResponse amb missatges i codis d'estat HTTP.
+    """
+    try:
+        # Comprovar si l'usuari és un estudiant.
+        # Si no ho és, no hauria de poder eliminar candidatures d'estudiant.
+        # Això pot llançar Estudiant.DoesNotExist si no hi ha un perfil d'estudiant associat.
+        estudiant = request.user.estudiant 
+    except Estudiant.DoesNotExist:
+        # L'usuari loggejat no té un perfil d'estudiant.
+        return JsonResponse(
+            {'error': 'Accés denegat. No estàs associat a un perfil d\'estudiant.'},
+            status=403 # Forbidden
+        )
+    
+    try:
+        candidatura = get_object_or_404(
+            Candidatura,
+            id=candidatura_id,
+            estudiant=estudiant # Assegura que només pot eliminar les seves pròpies candidatures
+        )
+    except Exception: # Pot capturar Http404 de get_object_or_404 o altres errors
+        return JsonResponse(
+            {'error': 'Candidatura no trobada o no tens permís per accedir-hi.'},
+            status=404 # Not Found
+        )
+    
+    # Verificar que es pot eliminar segons el seu estat
+    if candidatura.estat not in [EstatCandidatura.EN_PROCES, EstatCandidatura.REBUTJADA]:
+        return JsonResponse(
+            {'error': 'No es pot eliminar aquesta candidatura en el seu estat actual.'},
+            status=400 # Bad Request
+        )
+    
+    try:
+        candidatura.delete()
+        return JsonResponse(
+            {'message': 'Candidatura eliminada correctament.'},
+            status=200 # OK
+        )
+    except Exception as e:
+        # Capturar qualsevol altre error durant l'eliminació (p.ex., error de base de dades)
+        return JsonResponse(
+            {'error': f'Error intern del servidor al eliminar la candidatura: {str(e)}'},
+            status=500 # Internal Server Error
+        )
