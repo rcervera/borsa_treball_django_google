@@ -237,3 +237,164 @@ class AfegirCandidaturaAPITestCase(TestCase):
         response = self.client.post(self.url_activa, data)
         self.assertEqual(response.status_code, 500)
         self.assertIn('Error inesperat en desar la candidatura', response.json()['error'])
+
+
+
+
+class EditarCandidaturaAPITestCase(TestCase):
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(temp_dir, ignore_errors=True)
+        super().tearDownClass()
+
+    def setUp(self):
+        """
+        Configura un estudiant, una empresa, una oferta i una candidatura editable.
+        """
+        self.client = Client()
+
+        self.user_estudiant = Usuari.objects.create_user(
+            email='edit@test.com',
+            password='editpass123',
+            tipus='EST',
+            nom='Maria',
+            cognoms='Casas'
+        )
+        self.estudiant = Estudiant.objects.create(usuari=self.user_estudiant, dni='99999999Z')
+
+        self.user_empresa = Usuari.objects.create_user(
+            email='empresa2@test.com',
+            password='password123',
+            tipus='EMP'
+        )
+        self.sector = Sector.objects.create(nom='Enginyeria')
+        self.empresa = Empresa.objects.create(
+            usuari=self.user_empresa,
+            cif='B98765432',
+            nom_comercial='Empresa Enginyeria',
+            rao_social='Enginyeria SL',
+            sector=self.sector
+        )
+        self.oferta = Oferta.objects.create(
+            empresa=self.empresa,
+            titol='Enginyer Elèctric',
+            descripcio='Feina estable',
+            estat='AC',
+            data_limit=date(2025, 12, 31),
+            lloc_treball='Barcelona',
+            tipus_contracte='IN',
+            jornada='CO'
+        )
+        self.candidatura = Candidatura.objects.create(
+            estudiant=self.estudiant,
+            oferta=self.oferta,
+            carta_presentacio='Carta inicial molt vàlida i llarga.',
+            estat='EN_PROCES',
+            cv_adjunt=self.cv_file
+        )
+        self.url = reverse('editar_candidatura_api', args=[self.candidatura.id])
+        self.cv_file = SimpleUploadedFile("cv_nou.pdf", b"cv actualitzat", content_type="application/pdf")
+
+    def test_edicio_correcta(self):
+        """
+        Verifica que un estudiant autenticat pot editar correctament la seva candidatura.
+        """
+        self.client.login(email='edit@test.com', password='editpass123')
+        data = {
+            'carta_presentacio': 'Aquesta és una nova carta de presentació vàlida que supera els 50 caràcters.',
+            'cv_adjunt': self.cv_file
+        }
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['message'], 'Candidatura actualitzada correctament!')
+
+    def test_no_autenticat(self):
+        """
+        Verifica que un usuari no autenticat és redirigit a la pàgina de login.
+        """
+        response = self.client.post(self.url, {})
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.url.startswith('/login/'))
+
+    def test_no_es_estudiant(self):
+        """
+        Verifica que un usuari sense perfil d'estudiant no pot editar candidatures.
+        """
+        usuari_admin = Usuari.objects.create_user(email='admin@test.com', password='adminpass', tipus='ADM')
+        self.client.login(email='admin@test.com', password='adminpass')
+        response = self.client.post(self.url, {})
+        self.assertEqual(response.status_code, 403)
+        self.assertIn('No tens permisos', response.json()['error'])
+
+    def test_candidatura_inexistent(self):
+        """
+        Verifica que es retorna un 404 si la candidatura no existeix.
+        """
+        self.client.login(email='edit@test.com', password='editpass123')
+        url = reverse('editar_candidatura_api', args=[9999])
+        response = self.client.post(url, {})
+        self.assertEqual(response.status_code, 404)
+
+    def test_candidatura_no_en_proces(self):
+        """
+        Verifica que només es poden editar candidatures en estat 'EN_PROCES'.
+        """
+        self.candidatura.estat = 'ACCEPTADA'
+        self.candidatura.save()
+        self.client.login(email='edit@test.com', password='editpass123')
+        response = self.client.post(self.url, {'carta_presentacio': 'Prova de carta.'})
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('no pots editar', response.json()['error'].lower())
+
+    def test_errors_validacio(self):
+        """
+        Verifica que es gestionen correctament els errors de validació dels camps.
+        """
+        self.client.login(email='edit@test.com', password='editpass123')
+
+        # Carta buida
+        response = self.client.post(self.url, {'carta_presentacio': ''})
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('és obligatòria', response.json()['errors']['carta_presentacio'])
+
+        # Massa curta
+        response = self.client.post(self.url, {'carta_presentacio': 'Curta'})
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('almenys 50 caràcters', response.json()['errors']['carta_presentacio'])
+
+        # Massa llarga
+        carta_llarga = 'a' * 2001
+        response = self.client.post(self.url, {'carta_presentacio': carta_llarga})
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('no pot superar els 2000', response.json()['errors']['carta_presentacio'])
+
+        # Arxiu massa gran
+        arxiu_gran = SimpleUploadedFile("cv.pdf", b"x" * (6 * 1024 * 1024), content_type="application/pdf")
+        response = self.client.post(self.url, {
+            'carta_presentacio': 'Carta vàlida amb més de 50 caràcters.',
+            'cv_adjunt': arxiu_gran
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('CV no pot superar', response.json()['errors']['cv_adjunt'])
+
+        # Tipus no vàlid
+        arxiu_invalid = SimpleUploadedFile("cv.txt", b"Hola món", content_type="text/plain")
+        response = self.client.post(self.url, {
+            'carta_presentacio': 'Carta vàlida amb més de 50 caràcters.',
+            'cv_adjunt': arxiu_invalid
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('Format no vàlid', response.json()['errors']['cv_adjunt'])
+
+    @patch('borsa_treball.views.Candidatura.save')
+    def test_error_en_guardar(self, mock_save):
+        """
+        Verifica que es gestiona correctament un error inesperat en desar la candidatura.
+        """
+        mock_save.side_effect = Exception("Error inesperat")
+        self.client.login(email='edit@test.com', password='editpass123')
+        response = self.client.post(self.url, {
+            'carta_presentacio': 'Carta vàlida amb més de 50 caràcters.',
+        })
+        self.assertEqual(response.status_code, 500)
+        self.assertIn('error inesperat', response.json()['error'].lower())
