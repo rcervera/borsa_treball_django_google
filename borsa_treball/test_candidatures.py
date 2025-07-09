@@ -378,7 +378,7 @@ class EditarCandidaturaAPITestCase(TestCase):
         self.assertIn('CV no pot superar', response.json()['errors']['cv_adjunt'])
 
         # Tipus no vàlid
-        arxiu_invalid = SimpleUploadedFile("cv.txt", b"Hola món", content_type="text/plain")
+        arxiu_invalid = SimpleUploadedFile("cv.txt", b"Hola mon", content_type="text/plain")
         response = self.client.post(self.url, {
             'carta_presentacio': 'Carta vàlida amb més de 50 caràcters.',
             'cv_adjunt': arxiu_invalid
