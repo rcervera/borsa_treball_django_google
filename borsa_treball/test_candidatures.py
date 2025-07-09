@@ -292,7 +292,7 @@ class EditarCandidaturaAPITestCase(TestCase):
             estudiant=self.estudiant,
             oferta=self.oferta,
             carta_presentacio='Carta inicial molt vàlida i llarga.',
-            estat='EN_PROCES',
+            estat='EP',  # EP = En procés
             cv_adjunt=self.cv_file
         )
         self.url = reverse('editar_candidatura_api', args=[self.candidatura.id])
@@ -342,7 +342,7 @@ class EditarCandidaturaAPITestCase(TestCase):
         """
         Verifica que només es poden editar candidatures en estat 'EN_PROCES'.
         """
-        self.candidatura.estat = 'ACCEPTADA'
+        self.candidatura.estat = 'PR'
         self.candidatura.save()
         self.client.login(email='edit@test.com', password='editpass123')
         response = self.client.post(self.url, {'carta_presentacio': 'Prova de carta.'})
