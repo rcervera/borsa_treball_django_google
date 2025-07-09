@@ -240,7 +240,7 @@ class AfegirCandidaturaAPITestCase(TestCase):
 
 
 
-
+@override_settings(MEDIA_ROOT=temp_dir)
 class EditarCandidaturaAPITestCase(TestCase):
     @classmethod
     def tearDownClass(cls):
@@ -287,7 +287,7 @@ class EditarCandidaturaAPITestCase(TestCase):
         )
 
         self.cv_file = SimpleUploadedFile("cv_nou.pdf", b"cv actualitzat", content_type="application/pdf")
-        
+
         self.candidatura = Candidatura.objects.create(
             estudiant=self.estudiant,
             oferta=self.oferta,

@@ -60,7 +60,7 @@
                                 <strong>Candidatura enviada</strong>
                                 <br><small>{{ candidatura_existent.data_candidatura|date:"d/m/Y H:i" }}</small>
                             </div>
-                            <a href="{% url 'editar_candidatura_estudiant' candidatura_existent.id %}" class="btn btn-outline-primary">
+                            <a href="{% url 'editar_candidatura_estudiant' candidatura_existent.id %}" class="btn btn-outline-primary rounded-pill btn-lg">
                                 <i class="bi bi-eye me-2"></i>Veure candidatura
                             </a>
                             {% else %}
