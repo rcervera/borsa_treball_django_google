@@ -69,7 +69,7 @@ class DescarregarCVCandidaturaTestCase(TestCase):
         self.candidatura = Candidatura.objects.create(
             estudiant=self.estudiant,
             oferta=self.oferta,
-            carta_presentacio='Carta de presentació prou extensa.',
+            carta_presentacio='Carta de presentació prou extensa.jlsddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddjsldddddddddddsddddddddd',
             estat='EP',
             cv_adjunt=self.cv_file
         )
