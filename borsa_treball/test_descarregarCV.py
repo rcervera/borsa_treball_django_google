@@ -75,7 +75,7 @@ class DescarregarCVCandidaturaTestCase(TestCase):
             cv_adjunt=self.cv_file
         )
 
-        self.url = reverse('descarregar_cv_candidatura', args=[self.candidatura.id])
+        self.url = reverse('descarregar_cv_candidatura_estudiant', args=[self.candidatura.id])
 
     def test_descarrega_cv_correctament(self):
         """
