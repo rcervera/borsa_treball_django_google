@@ -669,7 +669,7 @@ def afegir_candidatura_api(request, oferta_id):
         RegistreAuditoria.objects.create(
                 accio="Nova candidatura",
                 model_afectat="Candidatura",
-                descripcio=f"Candidatura a {oferta.titol} de l'empresa: {oferta.empresa.nom_comercial}).",
+                descripcio=f"Candidatura a {oferta.titol} de l'empresa: {oferta.empresa.nom_comercial}.",
                 usuari=request.user
         )
         
