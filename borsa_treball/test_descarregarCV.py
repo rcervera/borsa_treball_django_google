@@ -88,3 +88,70 @@ class DescarregarCVCandidaturaTestCase(TestCase):
         self.assertEqual(response['Content-Type'], 'application/pdf')
         self.assertIn('attachment; filename="CV_', response['Content-Disposition'])
         self.assertIn(b"Contingut del CV", response.content)
+
+    def test_redirigeix_si_no_autenticat(self):
+        """
+        Verifica que un usuari no autenticat és redirigit a la pàgina de login.
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.url.startswith('/login/'))
+
+    def test_404_si_candidatura_no_te_cv(self):
+        """
+        Verifica que es retorna un 404 si la candidatura no té cap CV adjunt.
+        """
+        self.candidatura.cv_adjunt = None
+        self.candidatura.save()
+
+        self.client.login(email='cv@test.com', password='cvpass123')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_404_si_fitxer_eliminat_del_disc(self):
+        """
+        Verifica que es retorna un 404 si el fitxer CV ha estat esborrat del disc.
+        """
+        # Elimina el fitxer del disc
+        file_path = self.candidatura.cv_adjunt.path
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+        self.client.login(email='cv@test.com', password='cvpass123')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_no_pot_descarregar_cv_duna_candidatura_dun_altre_estudiant(self):
+        """
+        Verifica que un estudiant no pot descarregar el CV d'una candidatura que no és seva.
+        """
+        # Nou estudiant que intentarà accedir al CV d'una altra persona
+        user_estrany = Usuari.objects.create_user(
+            email='altra@prova.com',
+            password='altrapass',
+            tipus='EST',
+            nom='Pau',
+            cognoms='Garcia'
+        )
+        Estudiant.objects.create(usuari=user_estrany, dni='77777777K')
+
+        self.client.login(email='altra@prova.com', password='altrapass')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_usuari_sense_perfil_estudiant_redirigit(self):
+        """
+        Verifica que un usuari autenticat però sense perfil d'estudiant és redirigit.
+        """
+        user_admin = Usuari.objects.create_user(
+            email='admin@prova.com',
+            password='adminpass',
+            tipus='ADM'
+        )
+
+        self.client.login(email='admin@prova.com', password='adminpass')
+        response = self.client.get(self.url)
+
+        # S'espera redirecció a 'index' → comprova si és un redirect 302
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.url.endswith(reverse('index')))
