@@ -112,14 +112,17 @@ class DescarregarCVCandidaturaTestCase(TestCase):
         """
         Verifica que es retorna un 404 si el fitxer CV ha estat esborrat del disc.
         """
-        # Elimina el fitxer del disc
         file_path = self.candidatura.cv_adjunt.path
         if os.path.exists(file_path):
             os.remove(file_path)
 
+        self.assertFalse(os.path.exists(file_path))  # Confirmació
+
         self.client.login(email='cv@test.com', password='cvpass123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
+
+
 
     def test_no_pot_descarregar_cv_duna_candidatura_dun_altre_estudiant(self):
         """
