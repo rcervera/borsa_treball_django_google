@@ -66,6 +66,7 @@ class DescarregarCVCandidaturaTestCase(TestCase):
 
         # Crear fitxer de CV i candidatura
         self.cv_file = SimpleUploadedFile("cv.pdf", b"Contingut del CV", content_type="application/pdf")
+        self.cv_file.seek(0)
         self.candidatura = Candidatura.objects.create(
             estudiant=self.estudiant,
             oferta=self.oferta,
