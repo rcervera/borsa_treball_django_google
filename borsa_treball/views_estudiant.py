@@ -794,7 +794,7 @@ def descarregar_cv_candidatura(request, candidatura_id):
     except Exception as e:
         #return HttpResponse(f'Error en descarregar el CV: {str(e)}')
         #messages.error(request, f'Error en descarregar el CV: {str(e)}')
-        return redirect('candidatures_oferta', oferta_id=candidatura.oferta.id)
+        return redirect('llista_candidatures_oferta', oferta_id=candidatura.oferta.id)
 
 # Vista per eliminar una candidatura d'un estudiant autenticat
 @login_required
