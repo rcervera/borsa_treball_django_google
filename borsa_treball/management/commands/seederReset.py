@@ -53,34 +53,34 @@ class Command(BaseCommand):
         for f in families:
             FamiliaProfessional.objects.create(codi=f['codi'], nom=f['nom'])
 
-        # Cicles (exemple abreujat — pots copiar els que necessitis de l'script original)
         cicles = [
             # Grau Mitjà (GM)
-            {'codi': 'CFPM AG10', 'familia': 'ADG', 'nom': 'gestió administrativa', 'grau': 'GM', 'durada': 2000},
-            {'codi': 'CFPM AG11', 'familia': 'ADG', 'nom': 'gestió administrativa (en l’àmbit jurídic)', 'grau': 'GM', 'durada': 2000},
-            {'codi': 'CFPM CM10', 'familia': 'COM', 'nom': 'activitats comercials', 'grau': 'GM', 'durada': 2000},
-            {'codi': 'CFPM SC10', 'familia': 'SSC', 'nom': 'atenció a persones en situació de dependència', 'grau': 'GM', 'durada': 2000},
-            {'codi': 'CFPM IC10', 'familia': 'IFC', 'nom': 'sistemes microinformàtics i xarxes', 'grau': 'GM', 'durada': 2000},
+            {'codi': 'CFPM AG10', 'familia': 'ADG', 'nom': 'CFGM Gestió administrativa', 'grau': 'GM', 'durada': 2000},
+            {'codi': 'CFPM AG11', 'familia': 'ADG', 'nom': 'CFGM Gestió administrativa (en l’àmbit jurídic)', 'grau': 'GM', 'durada': 2000},
+            {'codi': 'CFPM CM10', 'familia': 'COM', 'nom': 'CFGM Activitats comercials', 'grau': 'GM', 'durada': 2000},
+            {'codi': 'CFPM SC10', 'familia': 'SSC', 'nom': 'CFGM Atenció a persones en situació de dependència', 'grau': 'GM', 'durada': 2000},
+            {'codi': 'CFPM IC10', 'familia': 'IFC', 'nom': 'CFGM Sistemes microinformàtics i xarxes', 'grau': 'GM', 'durada': 2000},
 
             # Grau Superior (GS)
-            {'codi': 'CFPS AGB0', 'familia': 'ADG', 'nom': 'administració i finances', 'grau': 'GS', 'durada': 2000},
-            {'codi': 'CFPS AGA0', 'familia': 'ADG', 'nom': 'assistència a la direcció', 'grau': 'GS', 'durada': 2000},
-            {'codi': 'CFPS CMA0', 'familia': 'COM', 'nom': 'gestió de vendes i espais comercials', 'grau': 'GS', 'durada': 2000},
-            {'codi': 'CFPS CMD0', 'familia': 'COM', 'nom': 'màrqueting i publicitat', 'grau': 'GS', 'durada': 2000},
-            {'codi': 'CFPS CMC0', 'familia': 'COM', 'nom': 'gestió del transport i logística', 'grau': 'GS', 'durada': 2000},
-            {'codi': 'CFPS CMB0', 'familia': 'COM', 'nom': 'comerç internacional', 'grau': 'GS', 'durada': 2000},
-            {'codi': 'CFPS SCB0', 'familia': 'SSC', 'nom': 'educació infantil', 'grau': 'GS', 'durada': 2000},
-            {'codi': 'CFPS SCC0', 'familia': 'SSC', 'nom': 'integració social', 'grau': 'GS', 'durada': 2000},
-            {'codi': 'CFPS SCA0', 'familia': 'SSC', 'nom': 'animació sociocultural i turística', 'grau': 'GS', 'durada': 2000},
-            {'codi': 'CFPS ICA1', 'familia': 'IFC', 'nom': 'administració de sistemes informàtics en xarxa. perfil professional ciberseguretat', 'grau': 'GS', 'durada': 2000},
-            {'codi': 'CFPS ICA0', 'familia': 'IFC', 'nom': 'administració de sistemes informàtics en xarxa', 'grau': 'GS', 'durada': 2000},
-            {'codi': 'CFPS ICB0', 'familia': 'IFC', 'nom': 'desenvolupament d\'aplicacions multiplataforma', 'grau': 'GS', 'durada': 2000},
-            {'codi': 'CFPS ICC0', 'familia': 'IFC', 'nom': 'desenvolupament d\'aplicacions web', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS AGB0', 'familia': 'ADG', 'nom': 'CFGS Administració i finances', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS AGA0', 'familia': 'ADG', 'nom': 'CFGS Assistència a la direcció', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS CMA0', 'familia': 'COM', 'nom': 'CFGS Gestió de vendes i espais comercials', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS CMD0', 'familia': 'COM', 'nom': 'CFGS Màrqueting i publicitat', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS CMC0', 'familia': 'COM', 'nom': 'CFGS Gestió del transport i logística', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS CMB0', 'familia': 'COM', 'nom': 'CFGS Comerç internacional', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS SCB0', 'familia': 'SSC', 'nom': 'CFGS Educació infantil', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS SCC0', 'familia': 'SSC', 'nom': 'CFGS Integració social', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS SCA0', 'familia': 'SSC', 'nom': 'CFGS Animació sociocultural i turística', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS ICA1', 'familia': 'IFC', 'nom': 'CFGS Administració de sistemes informàtics en xarxa. perfil professional ciberseguretat', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS ICA0', 'familia': 'IFC', 'nom': 'CFGS Administració de sistemes informàtics en xarxa', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS ICB0', 'familia': 'IFC', 'nom': 'CFGS Desenvolupament d\'aplicacions multiplataforma', 'grau': 'GS', 'durada': 2000},
+            {'codi': 'CFPS ICC0', 'familia': 'IFC', 'nom': 'CFGS Desenvolupament d\'aplicacions web', 'grau': 'GS', 'durada': 2000},
 
             # Cursos d'Especialització
-            {'codi': 'CEFP IC01', 'familia': 'IFC', 'nom': 'curs d\'especialització en ciberseguretat en tecnologies de la informació', 'grau': 'GS', 'durada': 600},
-            {'codi': 'CEFP IC03', 'familia': 'IFC', 'nom': 'curs d\'especialització en intel·ligència artificial i big data', 'grau': 'GS', 'durada': 600},
+            {'codi': 'CEFP IC01', 'familia': 'IFC', 'nom': 'Curs d\'especialització en ciberseguretat en tecnologies de la informació', 'grau': 'GS', 'durada': 600},
+            {'codi': 'CEFP IC03', 'familia': 'IFC', 'nom': 'Curs d\'especialització en intel·ligència artificial i big data', 'grau': 'GS', 'durada': 600},
         ]
+
 
 
         for c in cicles:
