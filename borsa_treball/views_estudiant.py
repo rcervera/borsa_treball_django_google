@@ -22,7 +22,7 @@ from django.views.decorators.http import require_POST, require_http_methods
 # Imports locals (models)
 from .models import (
     Oferta, Empresa, Cicle, Candidatura, Estudiant, EstatCandidatura,
-    Funcio, NivellIdioma, CapacitatClau, Usuari, EstudiEstudiant
+    Funcio, NivellIdioma, CapacitatClau, RegistreAuditoria, Usuari, EstudiEstudiant
 )
 
 #
@@ -664,6 +664,15 @@ def afegir_candidatura_api(request, oferta_id):
             cv_adjunt=cv_adjunt,
             estat='EP'
         )
+
+        # Log audit 
+        RegistreAuditoria.objects.create(
+                accio="Nova candidatura",
+                model_afectat="Candidatura",
+                descripcio=f"Candidatura a {oferta.titol} de l'empresa: {oferta.empresa.nom_comercial}).",
+                usuari=request.user
+        )
+        
         return JsonResponse({'message': 'Candidatura enviada correctament!'}, status=201)
     except Exception as e:
         return JsonResponse({'error': f'Error inesperat en desar la candidatura: {str(e)}'}, status=500)
@@ -795,7 +804,7 @@ def descarregar_cv_candidatura(request, candidatura_id):
         raise Http404(f"No s'ha pogut accedir al fitxer: {e}")
        
 
-       
+
 
 # Vista per eliminar una candidatura d'un estudiant autenticat
 @login_required
