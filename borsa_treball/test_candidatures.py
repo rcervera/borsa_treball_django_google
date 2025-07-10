@@ -389,6 +389,7 @@ class EditarCandidaturaAPITestCase(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn('Format no vàlid', response.json()['errors']['cv_adjunt'])
 
+   
     @patch('borsa_treball.views.Candidatura.save')
     def test_error_en_guardar(self, mock_save):
         """
@@ -396,8 +397,15 @@ class EditarCandidaturaAPITestCase(TestCase):
         """
         mock_save.side_effect = Exception("Error inesperat")
         self.client.login(email='edit@test.com', password='editpass123')
+
+        # CV vàlid (cal reiniciar o recrear el fitxer per evitar "stream closed")
+        cv_file = SimpleUploadedFile("cv.pdf", b"Contingut valid", content_type="application/pdf")
+
         response = self.client.post(self.url, {
-            'carta_presentacio': 'Carta vàlida amb més de 50 caràcters.',
+            'carta_presentacio': 'Carta vàlida amb suficients caràcters per passar la validació.',
+            'cv_adjunt': cv_file
         })
+
+        print(response.json())  # Opcional per debug
         self.assertEqual(response.status_code, 500)
         self.assertIn('error inesperat', response.json()['error'].lower())
