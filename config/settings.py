@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_bootstrap5',
     'social_django',
+    'django_cleanup.apps.CleanupConfig', 
     'borsa_treball',
    
 ]
