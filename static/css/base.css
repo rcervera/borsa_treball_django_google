@@ -209,6 +209,7 @@ body {
         border-radius: 12px;
         transition: all 0.3s ease;
         border: 1px solid rgba(0,0,0,0.08) !important;
+        background-color: lightgray !important;
     }
     
    
