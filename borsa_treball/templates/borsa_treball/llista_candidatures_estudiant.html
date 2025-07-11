@@ -115,7 +115,7 @@
                                             </h5>
                                               <div class="d-flex align-items-center text-muted mb-2">                                        
                                                 <i class="bi bi-geo-alt me-2"></i>
-                                                <span>{{ oferta.lloc_treball }}</span>
+                                                <span>{{ candidatura.oferta.lloc_treball }}</span>
                                             </div>
 
                                             <div class="mb-2">
@@ -137,7 +137,7 @@
                                             </div>
                                             <!-- Descripció -->
                                             <p class="text-muted mb-3" style="line-height: 1.5;">
-                                                {{ oferta.descripcio|truncatewords:25 }}
+                                                {{ candidatura.oferta.descripcio|truncatewords:25 }}
                                             </p>
                                             <small class="text-muted">
                                                 <i class="bi bi-calendar me-1"></i>
