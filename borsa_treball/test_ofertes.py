@@ -29,7 +29,7 @@ class CrearOfertaAPITestCase(TestCase):
             tipus='EMP'
         )
         self.empresa = Empresa.objects.create(
-            user=self.user_empresa,
+            usuari=self.user_empresa,
             nom_comercial="Empresa de Prova, S.L.",
             cif="B12345678"
         )
