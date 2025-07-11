@@ -216,11 +216,11 @@
                             {% if oferta.cicles.exists %}
                             <div class="mb-3">
                                 <small class="text-muted d-block mb-1">
-                                    <i class="bi bi-mortarboard me-1"></i>Cicles formatius:
+                                    <i class="bi bi-mortarboard me-1"></i>Estudis:
                                 </small>
                                 <div class="d-flex flex-wrap">
                                     {% for cicle in oferta.cicles.all|slice:":2" %}
-                                    <span class="badge bg-info-subtle text-info me-1 mb-1">
+                                    <span class="badge badge-dark me-1 mb-1">
                                         {{ cicle.nom }}
                                     </span>
                                     {% endfor %}
