@@ -101,10 +101,10 @@
                         
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary rounded-pill">
-                                <i class="bi bi-search me-2"></i>Aplicar Filtres
+                                <i class="bi bi-search me-2"></i>Filtrar
                             </button>
                             <a href="{% url 'llista_ofertes_estudiant' %}" class="btn btn-outline-secondary rounded-pill">
-                                <i class="bi bi-x-circle me-2"></i>Netejar
+                                <i class="bi bi-arrow-clockwise me-2"></i>Netejar
                             </a>
                         </div>
                     </form>
@@ -118,7 +118,7 @@
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body p-4">
                     <div class="row align-items-center">
-                        <div class="col-md-6">
+                        <div class="col-md-8">
                             <h4 class="text-dark mb-2">
                                
                                 Ofertes Disponibles
@@ -127,23 +127,18 @@
                                 Troba la feina perfecta per al teu perfil professional
                             </p>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="row text-center">
                                 <div class="col-4">
                                     <div class="border-end">
-                                        <h5 class="text-primary mb-0">{{ total_ofertes }}</h5>
+                                        <h5 class="text-dark mb-0">{{ total_ofertes }}</h5>
                                         <small class="text-muted">Total ofertes</small>
                                     </div>
                                 </div>
+                               
                                 <div class="col-4">
-                                    <div class="border-end">
-                                        <h5 class="text-success mb-0">{{ ofertes_amb_candidatura }}</h5>
+                                        <h5 class="text-dark mb-0">{{ ofertes_amb_candidatura }}</h5>
                                         <small class="text-muted">Amb candidatura</small>
-                                    </div>
-                                </div>
-                                <div class="col-4">
-                                    <h5 class="text-warning mb-0">{{ ofertes_sense_candidatura }}</h5>
-                                    <small class="text-muted">Disponibles</small>
                                 </div>
                             </div>
                         </div>
@@ -266,7 +261,7 @@
                                         </a>
                                         <a href="{% url 'afegir_candidatura' oferta.id %}" 
                                         class="btn btn-primary btn-sm rounded-pill">
-                                            <i class="bi bi-send me-1"></i>Presentar Candidat
+                                            <i class="bi bi-send me-1"></i>Presentar Candidatura
                                         </a>
                                     </div>
 
