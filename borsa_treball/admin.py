@@ -106,7 +106,7 @@ class OfertaAdmin(admin.ModelAdmin):
     )
     search_fields = ('titol', 'empresa__nom_comercial', 'descripcio')
     list_filter = ('tipus_contracte', 'jornada', 'estat', 'data_publicacio')
-    filter_horizontal = ('cicles', 'capacitats_clau')
+    filter_horizontal = ('cicles')
     inlines = [
         FuncioInline,
         NivellIdiomaInline,
