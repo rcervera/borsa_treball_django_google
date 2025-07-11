@@ -839,7 +839,7 @@ def eliminar_candidatura_api(request, candidatura_id):
         )
     
     # Verificar que es pot eliminar segons el seu estat
-    if candidatura.estat not in [EstatCandidatura.EN_PROCES, EstatCandidatura.REBUTJADA]:
+    if candidatura.estat not in [EstatCandidatura.EN_PROCES]:
         return JsonResponse(
             {'error': 'No es pot eliminar aquesta candidatura en el seu estat actual.'},
             status=400 # Bad Request
