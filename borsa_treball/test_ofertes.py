@@ -66,7 +66,7 @@ class CrearOfertaAPITestCase(TestCase):
         )
 
         # 5. URL de l'API
-        self.url = reverse('crear_oferta_api')
+        self.url = reverse('afegir_oferta_api')
 
         # 6. Dades vàlides per a la petició (sense canvis)
         self.data_limit_futura = (timezone.now().date() + datetime.timedelta(days=30)).strftime('%Y-%m-%d')
