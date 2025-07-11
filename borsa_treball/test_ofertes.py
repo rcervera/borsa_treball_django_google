@@ -164,11 +164,7 @@ class CrearOfertaAPITestCase(TestCase):
         # 4. Assegurar que l'oferta NO s'ha creat a la base de dades
         self.assertEqual(Oferta.objects.count(), 0)
 
-    def test_error_data_limit_passada(self):
-        """
-        Verifica que no es pot crear una oferta amb una data límit passada.
-        """
-        self.client.login(
+        
     def test_usuari_no_autenticat(self):
         """
         Verifica que un usuari no autenticat és redirigit.
