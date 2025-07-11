@@ -503,7 +503,7 @@ class EliminarCandidaturaAPITestCase(TestCase):
         """
         Verifica que no es pot eliminar una candidatura que no està en procés.
         """
-        self.candidatura.estat = EstatCandidatura.ACCEPTADA
+        self.candidatura.estat = EstatCandidatura.REBUTJADA
         self.candidatura.save()
 
         self.client.login(email='estudiant@test.com', password='password123')
