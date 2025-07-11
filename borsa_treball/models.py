@@ -310,7 +310,7 @@ class Oferta(models.Model):
     salari = models.CharField(max_length=50, blank=True, null=True)
 
     cicles = models.ManyToManyField(Cicle, related_name='ofertes')
-    capacitats_clau = models.ManyToManyField(CapacitatClau, blank=True, related_name='ofertes')
+    # capacitats_clau = models.ManyToManyField(CapacitatClau, blank=True, related_name='ofertes')
 
     data_publicacio = models.DateField(auto_now_add=True)
         
@@ -324,11 +324,12 @@ class Oferta(models.Model):
 
    
     # Visible per l'empresa
-    visible = models.BooleanField(default=True, help_text="Controlat per l'empresa")
+    # visible = models.BooleanField(default=True, help_text="Controlat per l'empresa")
     # Activació per part del responsable de borsa
-    activa = models.BooleanField(default=False, help_text="Activat pel responsable de la borsa de treball")
+    # activa = models.BooleanField(default=False, help_text="Activat pel responsable de la borsa de treball")
 
-    tancada = models.BooleanField(default=False, verbose_name="Oferta tancada", help_text="Indica si l'oferta ha estat tancada (ja s'ha cobert la vacant, etc.)")
+    # tancada = models.BooleanField(default=False, verbose_name="Oferta tancada", help_text="Indica si l'oferta ha estat tancada (ja s'ha cobert la vacant, etc.)")
+    
     valoracio_empresa = models.TextField(blank=True, null=True, verbose_name="Valoració de l'Empresa", help_text="La valoració de l'empresa sobre el procés o els candidats.")
     valoracio_responsable = models.TextField(blank=True, null=True, verbose_name="Valoració del Responsable", help_text="La valoració del responsable de la borsa de treball sobre el procés.")
   
