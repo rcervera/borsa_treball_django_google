@@ -196,21 +196,7 @@
                                 {{ oferta.descripcio|truncatewords:25 }}
                             </p>
                             
-                            <!-- Badges informatius -->
-                            <div class="d-flex flex-wrap align-items-center mb-3">
-                                <span class="badge bg-primary me-2 mb-2">
-                                    {{ oferta.get_tipus_contracte_display }}
-                                </span>
-                                <span class="badge bg-secondary me-2 mb-2">
-                                    {{ oferta.get_jornada_display }}
-                                </span>
-                                {% if oferta.salari %}
-                                <span class="badge bg-success me-2 mb-2">
-                                    <i class="bi bi-currency-euro me-1"></i>
-                                    {{ oferta.salari }}
-                                </span>
-                                {% endif %}
-                            </div>
+                            
                             
                             <!-- Cicles formatius -->
                             {% if oferta.cicles.exists %}
