@@ -211,7 +211,11 @@ body {
         border: 1px solid rgba(0,0,0,0.08) !important;
         background-color: rgba(0,0,0,0.03) !important;
     }
-    
+  
+ .oferta-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+    }
    
 
 
@@ -226,9 +230,12 @@ body {
     font-size: 1.2rem;
 }
 
-  .candidatura-card {
+  .candidatura-card {     
+
         border-radius: 12px;
         transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.08) !important;
+        background-color: rgba(0,0,0,0.03) !important;
     }
     
     .candidatura-card:hover {
