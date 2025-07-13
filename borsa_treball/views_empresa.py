@@ -259,8 +259,6 @@ def crear_oferta_api(request):
 
             #if capacitats_ids:
             #    oferta.capacitats_clau.set(capacitats_ids)  
-
-
             
             for nom in capacitats:
                 if nom.strip():
@@ -785,9 +783,14 @@ def api_actualitzar_oferta(request, oferta_id):
 
             # Eliminar funcions antigues i afegir noves
             oferta.funcions.all().delete()
-            for descripcio_funcio in data.get("funcions", []):
-                if descripcio_funcio.strip():  # Validar que no sigui buit
-                    Funcio.objects.create(oferta=oferta, descripcio=descripcio_funcio.strip())
+            # for descripcio_funcio in data.get("funcions", []):
+            #    if descripcio_funcio.strip():  # Validar que no sigui buit
+            #        Funcio.objects.create(oferta=oferta, descripcio=descripcio_funcio.strip())
+
+            # Crear funcions
+            for ordre, desc in enumerate(data.get('funcions', []), start=1):
+                if desc.strip():
+                    Funcio.objects.create(oferta=oferta, descripcio=desc.strip(), ordre=ordre)
 
             # Actualitzar relacions many-to-many
             oferta.cicles.set(cicles_ids)
