@@ -37,8 +37,7 @@
                         
                         <div class="col-md-4 text-md-end">
                             {% if candidatura_existent %}
-                            <div class="mb-3">
-                                <i class="bi bi-check-circle me-2"></i>
+                            <div class="mb-3">                               
                                 <strong>Candidatura enviada</strong>
                                 <br><small>{{ candidatura_existent.data_candidatura|date:"d/m/Y H:i" }}</small>
                             </div>
@@ -79,7 +78,7 @@
                             </h5>
                             {% for funcio in oferta.funcions.all %}
                             <div class="d-flex align-items-start mb-3">
-                                <span class="badge bg-primary rounded-circle me-3" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                <span class="badge bg-secondary rounded-circle me-3" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
                                     {{ funcio.ordre }}
                                 </span>
                                 <p class="mb-0 text-dark">{{ funcio.descripcio }}</p>
@@ -191,7 +190,7 @@
                             </h5>
                             {% for cicle in oferta.cicles.all %}
                             <div class="d-flex align-items-center p-2 bg-light rounded mb-2">
-                                <i class="bi bi-check-circle text-success me-2"></i>
+                                <i class="bi bi-award text-dark me-2"></i>
                                 <div>
                                     <strong>{{ cicle.nom }}</strong>
                                     {% if cicle.grau %}<br><small class="text-muted">{{ cicle.grau }}</small>{% endif %}
@@ -211,7 +210,7 @@
                             </h5>
                             {% for idioma_obj in oferta.idiomes.all %} {# <-- Iterem sobre 'idiomes' #}
                             <div class="d-flex align-items-center p-2 bg-light rounded mb-2">
-                                <i class="bi bi-chat-left-text text-info me-2"></i>
+                                <i class="bi bi-chat-left-text text-dark me-2"></i>
                                 <div>
                                     <strong>{{ idioma_obj.idioma }}</strong> {# <-- Accés directe al camp 'idioma' #}
                                     {% if idioma_obj.nivell %}
