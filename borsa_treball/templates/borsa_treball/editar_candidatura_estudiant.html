@@ -128,7 +128,7 @@
     <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
         <div class="card-body p-4">
             <h5 class="text-secondary mb-3">
-                <i class="bi bi-briefcase me-2"></i>Resum de l'Oferta
+                <i class="bi bi-megaphone me-2"></i>Resum de l'Oferta
             </h5>
 
             <div class="mb-3">
@@ -160,35 +160,7 @@
                 </p>
             </div>
 
-            <div class="mb-3">
-                <div class="d-flex flex-wrap">
-                    <span class="badge bg-primary me-2 mb-2">
-                        {% if candidatura %}
-                            {{ candidatura.oferta.get_tipus_contracte_display }}
-                        {% else %}
-                            {{ oferta.get_tipus_contracte_display }}
-                        {% endif %}
-                    </span>
-                    <span class="badge bg-secondary me-2 mb-2">
-                        {% if candidatura %}
-                            {{ candidatura.oferta.get_jornada_display }}
-                        {% else %}
-                            {{ oferta.get_jornada_display }}
-                        {% endif %}
-                    </span>
-                    {% if candidatura and candidatura.oferta.salari %}
-                        <span class="badge bg-success mb-2">
-                            <i class="bi bi-currency-euro me-1"></i>
-                            {{ candidatura.oferta.salari }}
-                        </span>
-                    {% elif oferta.salari %}
-                        <span class="badge bg-success mb-2">
-                            <i class="bi bi-currency-euro me-1"></i>
-                            {{ oferta.salari }}
-                        </span>
-                    {% endif %}
-                </div>
-            </div>
+            
 
             <div class="border-top pt-3">
                 <div class="d-flex justify-content-between mb-2">
