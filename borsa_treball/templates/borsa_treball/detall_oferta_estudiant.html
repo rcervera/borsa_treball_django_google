@@ -148,7 +148,7 @@
                             <h5 class="text-primary mb-3">
                                 <i class="bi bi-info-circle me-2"></i>Informació
                             </h5>
-                            
+
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="text-muted">
@@ -165,16 +165,38 @@
                                     </strong>
                                 </div>
                                 {% if oferta.horari %}
-                                <div class="d-flex justify-content-between">
+                                <div class="d-flex justify-content-between mb-2">
                                     <span class="text-muted">
                                         <i class="bi bi-alarm me-2"></i>Horari
                                     </span>
                                     <strong>{{ oferta.horari }}</strong>
                                 </div>
                                 {% endif %}
+                                <!-- Informació addicional sense format badge -->
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Tipus de contracte</span>
+                                    <strong>{{ oferta.get_tipus_contracte_display }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Jornada</span>
+                                    <strong>{{ oferta.get_jornada_display }}</strong>
+                                </div>
+                                {% if oferta.salari %}
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted"><i class="bi bi-currency-euro me-2"></i>Salari</span>
+                                    <strong>{{ oferta.salari }}</strong>
+                                </div>
+                                {% endif %}
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted"><i class="bi bi-clock me-2"></i>Dies restants</span>
+                                    <strong class="{% if dies_restants <= 7 %}text-danger{% elif dies_restants <= 14 %}text-warning{% else %}text-success{% endif %}">
+                                        {{ dies_restants }} dies
+                                    </strong>
+                                </div>
                             </div>
                         </div>
                     </div>
+
                     
                     <!-- Cicles formatius -->
                     {% if oferta.cicles.exists %}
