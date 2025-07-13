@@ -61,7 +61,7 @@
                     <!-- Descripció -->
                     <div class="card shadow-sm border-0 mb-4">
                         <div class="card-body p-4">
-                            <h5 class="text-primary mb-3">
+                            <h5 class="text-dark mb-3">
                                 <i class="bi bi-file-text me-2"></i>Descripció de l'Oferta
                             </h5>
                             <div class="text-muted" style="line-height: 1.6;">
@@ -74,7 +74,7 @@
                     {% if oferta.funcions.exists %}
                     <div class="card shadow-sm border-0 mb-4">
                         <div class="card-body p-4">
-                            <h5 class="text-primary mb-3">
+                            <h5 class="text-dark mb-3">
                                 <i class="bi bi-list-task me-2"></i>Funcions del Càrrec
                             </h5>
                             {% for funcio in oferta.funcions.all %}
@@ -93,7 +93,7 @@
                     {% if oferta.requisits %}
                     <div class="card shadow-sm border-0 mb-4">
                         <div class="card-body p-4">
-                            <h5 class="text-primary mb-3">
+                            <h5 class="text-dark mb-3">
                                 <i class="bi bi-list-check me-2"></i>Requisits
                             </h5>
                             <div class="text-muted" style="line-height: 1.6;">
@@ -108,7 +108,7 @@
                      {% if oferta.capacitats.exists %}
                         <div class="card shadow-sm border-0 mb-4">
                             <div class="card-body p-4">
-                                <h5 class="text-primary mb-3">
+                                <h5 class="text-dark mb-3">
                                     <i class="bi bi-stars me-2"></i>Capacitats demanades
                                 </h5>
                                 {% for capacitat in oferta.capacitats.all %}
@@ -186,7 +186,7 @@
                     {% if oferta.cicles.exists %}
                     <div class="card shadow-sm border-0 mb-4">
                         <div class="card-body p-4">
-                            <h5 class="text-primary mb-3">
+                            <h5 class="text-dark mb-3">
                                 <i class="bi bi-mortarboard me-2"></i>Cicles Formatius
                             </h5>
                             {% for cicle in oferta.cicles.all %}
@@ -206,7 +206,7 @@
                     {% if oferta.idiomes.exists %} {# <-- Canviat a 'oferta.idiomes' #}
                     <div class="card shadow-sm border-0 mb-4">
                         <div class="card-body p-4">
-                            <h5 class="text-primary mb-3">
+                            <h5 class="text-dark mb-3">
                                 <i class="bi bi-translate me-2"></i>Idiomes
                             </h5>
                             {% for idioma_obj in oferta.idiomes.all %} {# <-- Iterem sobre 'idiomes' #}
