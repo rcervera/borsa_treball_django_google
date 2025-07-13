@@ -127,7 +127,7 @@
                     <!-- Informació ràpida -->
                     <div class="card shadow-sm border-0 mb-4">
                         <div class="card-body p-4">
-                            <h5 class="text-primary mb-3">
+                            <h5 class="text-dark mb-3">
                                 <i class="bi bi-info-circle me-2"></i>Informació
                             </h5>
 
@@ -136,25 +136,32 @@
                                     <span class="text-muted">
                                         <i class="bi bi-calendar-event me-2"></i>Publicada
                                     </span>
-                                    <strong>{{ oferta.data_publicacio|date:"d/m/Y" }}</strong>
+                                    <span>{{ oferta.data_publicacio|date:"d/m/Y" }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="text-muted">
                                         <i class="bi bi-clock me-2"></i>Data límit
                                     </span>
-                                    <strong class="{% if dies_restants <= 7 %}text-danger{% elif dies_restants <= 14 %}text-warning{% else %}text-success{% endif %}">
+                                    <span>
                                         {{ oferta.data_limit|date:"d/m/Y" }}
+                                    </span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted"><i class="bi bi-clock me-2"></i>Dies restants</span>
+                                    <strong class="{% if dies_restants <= 7 %}text-danger{% elif dies_restants <= 14 %}text-warning{% else %}text-success{% endif %}">
+                                        {{ dies_restants }} dies
                                     </strong>
                                 </div>
+
                                 {% if oferta.horari %}
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="text-muted">
                                         <i class="bi bi-alarm me-2"></i>Horari
                                     </span>
-                                    <strong>{{ oferta.horari }}</strong>
+                                    <span>{{ oferta.horari }}</span>
                                 </div>
                                 {% endif %}
-                                <!-- Informació addicional sense format badge -->
+                               
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="text-muted">Tipus de contracte</span>
                                     <strong>{{ oferta.get_tipus_contracte_display }}</strong>
@@ -169,12 +176,7 @@
                                     <strong>{{ oferta.salari }}</strong>
                                 </div>
                                 {% endif %}
-                                <div class="d-flex justify-content-between">
-                                    <span class="text-muted"><i class="bi bi-clock me-2"></i>Dies restants</span>
-                                    <strong class="{% if dies_restants <= 7 %}text-danger{% elif dies_restants <= 14 %}text-warning{% else %}text-success{% endif %}">
-                                        {{ dies_restants }} dies
-                                    </strong>
-                                </div>
+                                
                             </div>
                         </div>
                     </div>
