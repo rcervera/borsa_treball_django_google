@@ -624,7 +624,7 @@ def editar_oferta(request, oferta_id):
         'oferta': oferta,
         'cicles': Cicle.objects.all(),
         'cicles_agrupats_per_familia': cicles_agrupats_per_familia,
-        # 'capacitats': capacitats_disponibles,
+        'capacitats': CapacitatClau.objects.all(),
         'tipus_contracte_choices': Oferta.TIPUS_CONTRACTE,
         'jornada_choices': Oferta.JORNADA,
         'PUBLIC_DESTINATARI': Oferta.PUBLIC_DESTINATARI,
@@ -632,7 +632,7 @@ def editar_oferta(request, oferta_id):
         'data_limit_formatted': oferta.data_limit.strftime('%Y-%m-%d') if oferta.data_limit else '',
         'funcions_existents': funcions,
         'capacitats_lliures_existents': capacitats_lliures,
-        'capacitats_existents':  capacitats_existents,
+        #'capacitats_existents':  capacitats_existents,
         'cicles_existents': [
             {
                 'id': c['id'],
