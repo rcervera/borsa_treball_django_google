@@ -17,9 +17,9 @@
                         <div class="col-md-8">
                             <div class="d-flex align-items-center mb-3">
                                 <div class="me-3">
-                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" 
+                                    <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" 
                                          style="width: 60px; height: 60px;">
-                                        <i class="bi bi-briefcase text-white" style="font-size: 1.5rem;"></i>
+                                        <i class="bi bi-megaphone text-white" style="font-size: 1.5rem;"></i>
                                     </div>
                                 </div>
                                 <div>
@@ -32,30 +32,12 @@
                                 </div>
                             </div>
                             
-                            <!-- Badges -->
-                            <div class="d-flex flex-wrap align-items-center">
-                                <span class="badge bg-primary me-2 mb-2">
-                                    {{ oferta.get_tipus_contracte_display }}
-                                </span>
-                                <span class="badge bg-secondary me-2 mb-2">
-                                    {{ oferta.get_jornada_display }}
-                                </span>
-                                {% if oferta.salari %}
-                                <span class="badge bg-success me-2 mb-2">
-                                    <i class="bi bi-currency-euro me-1"></i>
-                                    {{ oferta.salari }}
-                                </span>
-                                {% endif %}
-                                <span class="badge bg-{% if dies_restants <= 7 %}danger{% elif dies_restants <= 14 %}warning{% else %}success{% endif %} me-2 mb-2">
-                                    <i class="bi bi-clock me-1"></i>
-                                    {{ dies_restants }} dies restants
-                                </span>
-                            </div>
+                           
                         </div>
                         
                         <div class="col-md-4 text-md-end">
                             {% if candidatura_existent %}
-                            <div class="alert alert-success mb-3">
+                            <div class="mb-3">
                                 <i class="bi bi-check-circle me-2"></i>
                                 <strong>Candidatura enviada</strong>
                                 <br><small>{{ candidatura_existent.data_candidatura|date:"d/m/Y H:i" }}</small>
