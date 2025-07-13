@@ -609,13 +609,13 @@ def editar_oferta(request, oferta_id):
 
     capacitats = CapacitatClau.objects.all()
 
-    capacitats_existents = list(oferta.capacitats_clau.values('id', 'nom', 'categoria'))
-    capacitats_existents_ids = set(capacitat['id'] for capacitat in capacitats_existents)
+    # capacitats_existents = list(oferta.capacitats_clau.values('id', 'nom', 'categoria'))
+    # capacitats_existents_ids = set(capacitat['id'] for capacitat in capacitats_existents)
 
-    capacitats_disponibles = [
-        capacitat for capacitat in capacitats
-        if capacitat.id not in capacitats_existents_ids
-    ]
+    # capacitats_disponibles = [
+    #    capacitat for capacitat in capacitats
+    #    if capacitat.id not in capacitats_existents_ids
+    # ]
 
     capacitats_lliures = list(oferta.capacitats.values_list('nom', flat=True))
     
@@ -624,7 +624,7 @@ def editar_oferta(request, oferta_id):
         'oferta': oferta,
         'cicles': Cicle.objects.all(),
         'cicles_agrupats_per_familia': cicles_agrupats_per_familia,
-        'capacitats': capacitats_disponibles,
+        # 'capacitats': capacitats_disponibles,
         'tipus_contracte_choices': Oferta.TIPUS_CONTRACTE,
         'jornada_choices': Oferta.JORNADA,
         'PUBLIC_DESTINATARI': Oferta.PUBLIC_DESTINATARI,
