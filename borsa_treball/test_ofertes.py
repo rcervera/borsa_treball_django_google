@@ -338,11 +338,15 @@ class CrearOfertaAPITestCase(TestCase):
         # titol (max=200), salari (max=250)
         text_llarg_titol = "A" * 250
         text_llarg_salari = "S" * 300
+        text_llarg_lloc_treball = "B" * 200  # Més llarg que el permès
+        text_llarg_horari = "H" * 300
 
         # 2. Modifiquem les dades vàlides amb els textos llargs
         data = self.valid_data.copy()
         data['titol'] = text_llarg_titol
         data['salari'] = text_llarg_salari
+        data['lloc_treball'] = text_llarg_lloc_treball
+        data['horari'] = text_llarg_horari 
 
         # 3. Realitzem la petició
         response = self.client.post(self.url, data=json.dumps(data), content_type='application/json')
@@ -361,3 +365,13 @@ class CrearOfertaAPITestCase(TestCase):
         # Comprovació del salari (esperem 50 caràcters)
         self.assertEqual(len(oferta_creada.salari), 250)
         self.assertEqual(oferta_creada.salari, "S" * 250)
+
+        # Comprovació del lloc de treball (esperem 100 caràcters)
+        self.assertEqual(len(oferta_creada.lloc_treball), 100)  
+        self.assertEqual(oferta_creada.lloc_treball, "B" * 100)
+        
+        # Comprovació de l'horari (esperem 250 caràcters)
+        self.assertEqual(len(oferta_creada.horari), 250)    
+        self.assertEqual(oferta_creada.horari, "H" * 250)
+
+
