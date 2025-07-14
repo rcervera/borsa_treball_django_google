@@ -29,19 +29,19 @@
                 <div class="row text-center">
                     <div class="col-3">
                         <div class="border-end">
-                            <h4 class="text-primary mb-0">{{ stats.total }}</h4>
+                            <h4 class="text-secondary mb-0">{{ stats.total }}</h4>
                             <small class="text-muted">Total</small>
                         </div>
                     </div>
                     <div class="col-2">
                         <div class="border-end">
-                            <h4 class="text-success mb-0">{{ stats.actives }}</h4>
+                            <h4 class="text-secondary mb-0">{{ stats.actives }}</h4>
                             <small class="text-muted">Actives</small>
                         </div>
                     </div>
                     <div class="col-2">
                         <div class="border-end">
-                            <h4 class="text-warning mb-0">{{ stats.caducades }}</h4>
+                            <h4 class="text-secondary mb-0">{{ stats.caducades }}</h4>
                             <small class="text-muted">Caducades</small>
                         </div>
                     </div>
@@ -52,7 +52,7 @@
                         </div>
                     </div>
                     <div class="col-3">
-                        <h4 class="text-danger mb-0">{{ stats.revisio }}</h4>
+                        <h4 class="text-secondary mb-0">{{ stats.revisio }}</h4>
                         <small class="text-muted">En revisió</small>
                     </div>
                 </div>
@@ -202,13 +202,13 @@
 
                                  <div class="col-4">
                                     <div class="border-end">
-                                         <h6 class="text-primary mb-0">{{ oferta.candidatures_count }}</h6>
+                                         <h6 class="text-dark mb-0">{{ oferta.candidatures_count }}</h6>
                                         <small class="text-muted">Candidatures</small>
                                     </div>
                                 </div>
                                
                                 <div class="col-4">
-                                    <h6 class="text-info mb-0">
+                                    <h6 class="text-dark mb-0">
                                         {% now "Y-m-d" as today %}
                                         {% if oferta.data_limit|date:"Y-m-d" >= today %}
                                             {{ oferta.data_limit|timeuntil }}

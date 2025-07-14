@@ -294,7 +294,7 @@ class Oferta(models.Model):
     
     # informació bàsica
     # camp obligatoris
-    titol = models.CharField(max_length=100)
+    titol = models.CharField(max_length=200)
     descripcio = models.TextField()
     numero_vacants = models.PositiveSmallIntegerField(default=1, verbose_name="Número vacants")
     data_limit = models.DateField()
@@ -304,10 +304,10 @@ class Oferta(models.Model):
     tipus_contracte = models.CharField(max_length=2, choices=TIPUS_CONTRACTE)
     jornada = models.CharField(max_length=2, choices=JORNADA)
     hores_setmanals = models.PositiveSmallIntegerField(blank=True,null=True,verbose_name="Hores setmanals", help_text="Només s'utilitza si la jornada és parcial")
-    horari = models.CharField(max_length=100,blank=True,null=True)
+    horari = models.CharField(max_length=250,blank=True,null=True)
     public_destinatari = models.CharField(max_length=3,blank=True,null=True, choices=PUBLIC_DESTINATARI,default='AMB', verbose_name="A qui va dirigida")
     experiencia = models.CharField(max_length=2,choices=EXPERIENCIA,blank=True,null=True,verbose_name="Experiència requerida")
-    salari = models.CharField(max_length=50, blank=True, null=True)
+    salari = models.CharField(max_length=250, blank=True, null=True)
 
     cicles = models.ManyToManyField(Cicle, related_name='ofertes')
     # capacitats_clau = models.ManyToManyField(CapacitatClau, blank=True, related_name='ofertes')
@@ -320,7 +320,7 @@ class Oferta(models.Model):
     # Camps optatius, de moment no es fan servir
     contacte_nom = models.CharField(max_length=100, blank=True,null=True)
     contacte_email = models.EmailField(blank=True,null=True)
-    contacte_telefon = models.CharField(max_length=15, blank=True,null=True)
+    contacte_telefon = models.CharField(max_length=25, blank=True,null=True)
 
    
     # Visible per l'empresa

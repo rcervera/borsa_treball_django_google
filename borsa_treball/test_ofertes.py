@@ -325,3 +325,39 @@ class CrearOfertaAPITestCase(TestCase):
         oferta_creada = Oferta.objects.first()
         self.assertEqual(oferta_creada.jornada, 'PA')
         self.assertEqual(oferta_creada.hores_setmanals, 20)
+
+    
+    def test_text_llarg_en_charfields_es_retalla_correctament(self):
+        """
+        Verifica que si s'envia text més llarg del permès per a un CharField,
+        aquest es retalla a la mida màxima del model en lloc de donar error.
+        """
+        self.client.login(email='empresa@test.com', password='password123')
+
+        # 1. Preparem textos més llargs que els límits dels camps del model
+        # titol (max=100), salari (max=50)
+        text_llarg_titol = "A" * 150
+        text_llarg_salari = "S" * 75
+
+        # 2. Modifiquem les dades vàlides amb els textos llargs
+        data = self.valid_data.copy()
+        data['titol'] = text_llarg_titol
+        data['salari'] = text_llarg_salari
+
+        # 3. Realitzem la petició
+        response = self.client.post(self.url, data=json.dumps(data), content_type='application/json')
+
+        # 4. Comprovem que la petició ha tingut èxit (codi 200)
+        self.assertEqual(response.status_code, 200, "La petició hauria de ser exitosa, no hauria de fallar per text llarg")
+        self.assertEqual(Oferta.objects.count(), 1, "S'hauria d'haver creat una oferta")
+        
+        # 5. Obtenim l'objecte creat i verifiquem que les dades s'han retallat
+        oferta_creada = Oferta.objects.first()
+
+        # Comprovació del títol (esperem 100 caràcters)
+        self.assertEqual(len(oferta_creada.titol), 100)
+        self.assertEqual(oferta_creada.titol, "A" * 100)
+
+        # Comprovació del salari (esperem 50 caràcters)
+        self.assertEqual(len(oferta_creada.salari), 50)
+        self.assertEqual(oferta_creada.salari, "S" * 50)

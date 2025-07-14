@@ -144,6 +144,7 @@ def crear_oferta_api(request):
 
     # Validacions amb variables locals
     titol = data.get('titol', '').strip()
+    titol = titol[:200]
     if not titol:
         errors['titol'] = "El títol és obligatori."
 
@@ -165,6 +166,7 @@ def crear_oferta_api(request):
         errors['jornada'] = "Jornada obligatòria."
 
     lloc_treball = data.get('lloc_treball', '').strip()
+    lloc_treball = lloc_treball[:100]
     if not lloc_treball:
         errors['lloc_treball'] = "Lloc de treball obligatori."
 
@@ -173,8 +175,9 @@ def crear_oferta_api(request):
     experiencia = data.get('experiencia', '').strip()
     requisits = data.get('requisits', '').strip()
     horari = data.get('horari', '').strip()
+    horari = horari[:250] 
     salari = data.get('salari', '').strip()
-    
+    salari = salari[:250]
     visible = data.get('visible', True)
 
     # Validació numero_vacants
