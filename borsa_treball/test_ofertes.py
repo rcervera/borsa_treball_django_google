@@ -516,3 +516,107 @@ class ActualitzarOfertaAPITestCase(TestCase):
         self.assertEqual(len(self.oferta.salari), 250)
         self.assertEqual(len(self.oferta.lloc_treball), 100)
         self.assertEqual(len(self.oferta.horari), 250)
+
+def test_actualitzar_funcions_capacitats_idiomes_i_cicles(self):
+    """
+    Verifica que les funcions, capacitats, idiomes i cicles es substitueixen correctament
+    durant l'actualització de l'oferta.
+    """
+    self.client.login(email='empresa@test.com', password='password123')
+
+    # Cicle i relacions inicials (abans de l’actualització)
+    self.oferta.funcions.create(descripcio="Funció antiga", ordre=1)
+    CapacitatOferta.objects.create(oferta=self.oferta, nom="Capacitat antiga")
+    NivellIdioma.objects.create(oferta=self.oferta, idioma="Francès", nivell="baix")
+
+    # Afegim un altre cicle
+    cicle_nou = Cicle.objects.create(
+        familia=self.familia,
+        codi="ASIX",
+        nom="Administració de Sistemes",
+        grau="GS",
+        durada=2000
+    )
+
+    self.oferta.cicles.set([self.cicle, cicle_nou])
+
+    # Verificació prèvia
+    self.assertEqual(self.oferta.funcions.count(), 1)
+    self.assertEqual(self.oferta.capacitats.count(), 1)
+    self.assertEqual(self.oferta.idiomes.count(), 1)
+    self.assertEqual(self.oferta.cicles.count(), 2)
+
+    # Nous valors (substitució completa)
+    dades_noves = self.dades_actualitzades.copy()
+    dades_noves['funcions'] = ["Nova funció 1", "Nova funció 2"]
+    dades_noves['capacitatsLliures'] = ["Organització", "Creativitat"]
+    dades_noves['idiomes'] = [{"idioma": "Anglès", "nivell": "alt"}]
+    dades_noves['cicles'] = [cicle_nou.id]  # només el nou
+
+    response = self.client.put(
+        self.url,
+        data=json.dumps(dades_noves),
+        content_type='application/json'
+    )
+    self.assertEqual(response.status_code, 200)
+    self.assertTrue(response.json()['success'])
+
+    self.oferta.refresh_from_db()
+
+    # Verificacions posteriors
+    self.assertEqual(self.oferta.funcions.count(), 2)
+    funcions = list(self.oferta.funcions.order_by('ordre').values_list('descripcio', flat=True))
+    self.assertEqual(funcions, ["Nova funció 1", "Nova funció 2"])
+
+    self.assertEqual(self.oferta.capacitats.count(), 2)
+    noms_capacitats = set(self.oferta.capacitats.values_list('nom', flat=True))
+    self.assertEqual(noms_capacitats, {"Organització", "Creativitat"})
+
+    self.assertEqual(self.oferta.idiomes.count(), 1)
+    idioma = self.oferta.idiomes.first()
+    self.assertEqual((idioma.idioma, idioma.nivell), ("Anglès", "alt"))
+
+    self.assertEqual(self.oferta.cicles.count(), 1)
+    self.assertEqual(self.oferta.cicles.first().id, cicle_nou.id)
+
+def test_ordre_de_funcions_es_manté_correctament(self):
+    """
+    Verifica que les funcions es desen amb l'ordre correcte durant l'actualització.
+    """
+    self.client.login(email='empresa@test.com', password='password123')
+
+    # Funcions inicials antigues (que seran eliminades)
+    self.oferta.funcions.create(descripcio="Funció antiga 1", ordre=1)
+    self.oferta.funcions.create(descripcio="Funció antiga 2", ordre=2)
+
+    # Noves funcions a actualitzar
+    noves_funcions = [
+        "Analitzar requeriments",
+        "Dissenyar arquitectura",
+        "Implementar funcionalitats",
+        "Realitzar proves",
+        "Documentar el projecte"
+    ]
+
+    dades = self.dades_actualitzades.copy()
+    dades['funcions'] = noves_funcions
+
+    response = self.client.put(
+        self.url,
+        data=json.dumps(dades),
+        content_type='application/json'
+    )
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTrue(response.json()['success'])
+
+    self.oferta.refresh_from_db()
+    funcions_desa = list(self.oferta.funcions.order_by('ordre'))
+
+    # Comprovar que es guarden totes les funcions noves
+    self.assertEqual(len(funcions_desa), len(noves_funcions))
+
+    # Comprovar l'ordre de cada funció
+    for i, funcio in enumerate(funcions_desa):
+        self.assertEqual(funcio.ordre, i + 1)
+        self.assertEqual(funcio.descripcio, noves_funcions[i])
