@@ -688,6 +688,7 @@ def editar_oferta(request, oferta_id):
     return render(request, 'borsa_treball/formulari_oferta_empresa.html', context)
 
 
+
 @require_http_methods(["PUT"])
 @login_required
 def api_actualitzar_oferta(request, oferta_id):
@@ -706,166 +707,28 @@ def api_actualitzar_oferta(request, oferta_id):
     except json.JSONDecodeError:
         return JsonResponse({'success': False, 'message': 'Dades JSON no vàlides'}, status=400)
 
-    # Validar camps
-    errors = {}
-    
-    # Validació títol
-    titol = data.get('titol', '').strip()
-    if not titol:
-        errors['titol'] = "El títol és obligatori."
-
-    # Validació data límit
-    data_limit = data.get('data_limit')
-    error_data = validar_data(data_limit)  
-    if error_data:
-        errors['data_limit'] = error_data
-
-    # Validació descripció
-    descripcio = data.get('descripcio', '').strip()
-    if not descripcio:
-        errors['descripcio'] = "La descripció és obligatòria."
-
-    # Validació tipus contracte
-    tipus_contracte = data.get('tipus_contracte', '').strip()
-    if not tipus_contracte:
-        errors['tipus_contracte'] = "Tipus de contracte obligatori."
-
-    # Validació jornada
-    jornada = data.get('jornada', '').strip()
-    if not jornada:
-        errors['jornada'] = "Jornada obligatòria."
-
-    # Validació lloc treball
-    lloc_treball = data.get('lloc_treball', '').strip()
-    if not lloc_treball:
-        errors['lloc_treball'] = "Lloc de treball obligatori."
-
-    
-
-    # Camps opcionals amb validació de format
-    destinatari = data.get('destinatari', 'AMB').strip()
-    experiencia = data.get('experiencia', '').strip()
-    requisits = data.get('requisits', '').strip()
-    horari = data.get('horari', '').strip()
-    salari = data.get('salari', '').strip()
-
-    # Validació numero_vacants
-    numero_vacants = data.get('numero_vacants')
-    vacants_valor = None
-    if numero_vacants is None or str(numero_vacants).strip() == '':
-        errors['numero_vacants'] = "Cal indicar el nombre de vacants."
-    else:
-        try:
-            vacants_valor = int(numero_vacants)
-            if vacants_valor <= 0:
-                errors['numero_vacants'] = "El nombre de vacants ha de ser positiu."
-        except ValueError:
-            errors['numero_vacants'] = "El valor ha de ser un número enter."
-
-    # Validació hores si jornada parcial
-    hores = data.get('hores')
-    hores_valor = None
-    if jornada == 'PA':
-        if hores is None or str(hores).strip() == '':
-            errors['hores'] = "Has d'indicar el nombre d'hores si la jornada és parcial."
-        else:
-            try:
-                hores_valor = int(hores)
-                if hores_valor <= 0:
-                    errors['hores'] = "El nombre d'hores ha de ser positiu."
-            except ValueError:
-                errors['hores'] = "El valor d'hores ha de ser un número enter."
-
-    
-    # Validació cicles amb verificació d'existència
-    cicles_ids = data.get('cicles', [])
-    if not cicles_ids:
-        errors['cicles'] = "Has de seleccionar almenys un cicle."
-    else:
-        try:
-            # Verificar que tots els cicles existeixen
-            cicles_existents = Cicle.objects.filter(id__in=cicles_ids).count()
-            if cicles_existents != len(cicles_ids):
-                errors['cicles'] = "Alguns cicles seleccionats no existeixen."
-        except Exception as e:
-            errors['cicles'] = "Error validant els cicles seleccionats."
-
-    
-    
-
+    errors, dades = validar_dades_oferta(data)
     if errors:
         return JsonResponse({'success': False, 'errors': errors}, status=400)
 
-    # Actualització amb transacció
     try:
         with transaction.atomic():
-            # ASSIGNACIÓ VALORS VALIDATS
-            oferta.titol = titol
-            oferta.data_limit = data_limit if data_limit and data_limit.strip() else None
-            oferta.numero_vacants = vacants_valor  
-            oferta.descripcio = descripcio
-            oferta.tipus_contracte = tipus_contracte
-            oferta.jornada = jornada
-            oferta.hores_setmanals = hores_valor  
-            oferta.horari = horari
-            oferta.salari = salari
-            oferta.requisits = requisits
-            oferta.lloc_treball = lloc_treball
-            oferta.public_destinatari = destinatari
-            oferta.experiencia = experiencia                     
-            oferta.numero_vacants = vacants_valor
-
-            # Validació del model abans de desar
-            oferta.full_clean()
+            omplir_oferta(oferta, dades, empresa, request.user)
             oferta.save()
-
-            # Eliminar funcions antigues i afegir noves
-            oferta.funcions.all().delete()
-            # for descripcio_funcio in data.get("funcions", []):
-            #    if descripcio_funcio.strip():  # Validar que no sigui buit
-            #        Funcio.objects.create(oferta=oferta, descripcio=descripcio_funcio.strip())
-
-            # Crear funcions
-            for ordre, desc in enumerate(data.get('funcions', []), start=1):
-                if desc.strip():
-                    Funcio.objects.create(oferta=oferta, descripcio=desc.strip(), ordre=ordre)
-
-            # Actualitzar relacions many-to-many
-            oferta.cicles.set(cicles_ids)
-            
-            # oferta.capacitats_clau.set(capacitats_ids)
-
-            # Esborra les antigues capacitats lliures (del model CapacitatOferta)
-            oferta.capacitats.all().delete()
-
-            # Afegeix les noves
-            capacitats = data.get("capacitatsLliures", [])
-            for nom in capacitats:
-                if nom.strip():
-                    CapacitatOferta.objects.create(oferta=oferta, nom=nom.strip())
-                      
-              
-
-            # Eliminar idiomes antics i afegir nous
-            oferta.idiomes.all().delete()
-            for idioma_data in data.get("idiomes", []):
-                idioma_nom = idioma_data.get("idioma", "").strip()
-                nivell = idioma_data.get("nivell", "").strip()
-                if idioma_nom and nivell:  # Validar que no siguin buits
-                    oferta.idiomes.create(idioma=idioma_nom, nivell=nivell)
+            actualitzar_relacions_oferta(oferta, data)
 
     except ValidationError as e:
         return JsonResponse({
-            'success': False, 
+            'success': False,
             'message': 'Error de validació de dades del model Oferta',
             'errors': e.message_dict if hasattr(e, 'message_dict') else {'general': str(e)}
         }, status=400)
-    except Exception as e:
+    except Exception:
         return JsonResponse({
-            'success': False, 
+            'success': False,
             'message': 'Error actualitzant l\'oferta'
         }, status=500)
-    
+
     return JsonResponse({'success': True, 'message': 'Oferta actualitzada correctament'})
 
 

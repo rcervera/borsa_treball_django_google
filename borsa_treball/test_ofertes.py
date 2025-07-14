@@ -375,3 +375,144 @@ class CrearOfertaAPITestCase(TestCase):
         self.assertEqual(oferta_creada.horari, "H" * 250)
 
 
+class ActualitzarOfertaAPITestCase(TestCase):
+
+    def setUp(self):
+        """
+        Prepara un entorn de prova amb usuari empresa, una oferta i cicles associats.
+        """
+        self.client = Client()
+
+        self.user = Usuari.objects.create_user(
+            email='empresa@test.com',
+            password='password123',
+            tipus='EMP'
+        )
+        self.empresa = Empresa.objects.create(
+            usuari=self.user,
+            nom_comercial="Empresa Prova",
+            cif="B12345678"
+        )
+
+        self.familia = FamiliaProfessional.objects.create(codi="IFC", nom="Informàtica")
+        self.cicle = Cicle.objects.create(
+            familia=self.familia,
+            codi="DAW",
+            nom="Desenvolupament Web",
+            grau="GS",
+            durada=2000
+        )
+
+        self.oferta = Oferta.objects.create(
+            empresa=self.empresa,
+            titol="Oferta inicial",
+            descripcio="Descripció inicial",
+            data_limit=timezone.now().date() + datetime.timedelta(days=10),
+            tipus_contracte="PR",
+            jornada="CO",
+            lloc_treball="Barcelona",
+            numero_vacants=1,
+            estat='RV'
+        )
+        self.oferta.cicles.add(self.cicle)
+
+        self.url = reverse('api_actualitzar_oferta', args=[self.oferta.id])
+
+        self.dades_actualitzades = {
+            "titol": "Oferta actualitzada",
+            "descripcio": "Nova descripció.",
+            "data_limit": (timezone.now().date() + datetime.timedelta(days=30)).strftime('%Y-%m-%d'),
+            "tipus_contracte": "IN",
+            "jornada": "PA",
+            "hores": 25,
+            "lloc_treball": "Girona",
+            "numero_vacants": 3,
+            "cicles": [self.cicle.id],
+            "destinatari": "EST",
+            "experiencia": "SE",
+            "requisits": "Coneixements de Python.",
+            "horari": "Matins",
+            "salari": "20000€/any",
+            "capacitatsLliures": ["Comunicació", "Adaptabilitat"],
+            "funcions": ["Desenvolupament web", "Gestió de base de dades"],
+            "idiomes": [
+                {"idioma": "Anglès", "nivell": "mig"},
+                {"idioma": "Català", "nivell": "alt"}
+            ]
+        }
+
+    def test_actualitzar_oferta_correctament(self):
+        """
+        Verifica que una oferta es pot actualitzar correctament amb dades vàlides.
+        """
+        self.client.login(email='empresa@test.com', password='password123')
+
+        response = self.client.put(
+            self.url,
+            data=json.dumps(self.dades_actualitzades),
+            content_type='application/json'
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data['success'])
+
+        self.oferta.refresh_from_db()
+        self.assertEqual(self.oferta.titol, self.dades_actualitzades['titol'])
+        self.assertEqual(self.oferta.jornada, 'PA')
+        self.assertEqual(self.oferta.hores_setmanals, 25)
+        self.assertEqual(self.oferta.numero_vacants, 3)
+        self.assertEqual(self.oferta.capacitats.count(), 2)
+        self.assertEqual(self.oferta.funcions.count(), 2)
+        self.assertEqual(self.oferta.idiomes.count(), 2)
+
+    def test_error_si_no_autenticat(self):
+        """
+        Verifica que un usuari no autenticat no pot actualitzar una oferta.
+        """
+        response = self.client.put(self.url, data=json.dumps(self.dades_actualitzades), content_type='application/json')
+        self.assertEqual(response.status_code, 302)  # redirecció a login
+
+    def test_error_si_jornada_parcial_sense_hores(self):
+        """
+        Verifica que es retorna un error si la jornada és parcial i no s'especifica el nombre d'hores.
+        """
+        self.client.login(email='empresa@test.com', password='password123')
+        data = self.dades_actualitzades.copy()
+        data.pop('hores')
+
+        response = self.client.put(self.url, data=json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('hores', response.json()['errors'])
+
+    def test_error_si_titol_buit(self):
+        """
+        Verifica que es retorna un error si el títol és buit.
+        """
+        self.client.login(email='empresa@test.com', password='password123')
+        data = self.dades_actualitzades.copy()
+        data['titol'] = ""
+
+        response = self.client.put(self.url, data=json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('titol', response.json()['errors'])
+
+    def test_actualitzacio_retalla_camps_llargs(self):
+        """
+        Verifica que els camps de text massa llargs són retallats a la mida permesa pel model.
+        """
+        self.client.login(email='empresa@test.com', password='password123')
+        data = self.dades_actualitzades.copy()
+        data['titol'] = "X" * 300  # límit 200
+        data['salari'] = "S" * 300  # límit 250
+        data['lloc_treball'] = "L" * 200  # límit 100
+        data['horari'] = "H" * 300  # límit 250
+
+        response = self.client.put(self.url, data=json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+
+        self.oferta.refresh_from_db()
+        self.assertEqual(len(self.oferta.titol), 200)
+        self.assertEqual(len(self.oferta.salari), 250)
+        self.assertEqual(len(self.oferta.lloc_treball), 100)
+        self.assertEqual(len(self.oferta.horari), 250)
