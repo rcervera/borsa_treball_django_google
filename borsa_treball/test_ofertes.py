@@ -279,7 +279,7 @@ class CrearOfertaAPITestCase(TestCase):
         # Comprovacions
         self.assertEqual(response.status_code, 400)
         errors = response.json().get('errors', {})
-        self.assertEqual(errors.get('hores'), "El nombre d'hores ha de ser positiu.")
+        self.assertEqual(errors.get('hores'), "Cal indicar un nombre d'hores positiu si la jornada és parcial.")
         self.assertEqual(Oferta.objects.count(), 0)
 
 # ---
@@ -300,7 +300,7 @@ class CrearOfertaAPITestCase(TestCase):
         # Comprovacions
         self.assertEqual(response.status_code, 400)
         errors = response.json().get('errors', {})
-        self.assertEqual(errors.get('hores'), "El valor d'hores ha de ser un número enter.")
+        self.assertEqual(errors.get('hores'), "Cal indicar un nombre d'hores positiu si la jornada és parcial.")
         self.assertEqual(Oferta.objects.count(), 0)
 
 # ---
