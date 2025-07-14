@@ -183,3 +183,145 @@ class CrearOfertaAPITestCase(TestCase):
         self.assertFalse(response_data['success'])
         self.assertIn('error', response_data)
         self.assertEqual(Oferta.objects.count(), 0)
+
+    def test_creacio_correcta_de_capacitats_funcions_i_idiomes(self):
+        """
+        Verifica que les capacitats, funcions i idiomes es desen correctament
+        a la base de dades i estan associats a la nova oferta.
+        """
+        # 1. Iniciar sessió i enviar les dades
+        self.client.login(email='empresa@test.com', password='password123')
+        
+        # self.valid_data ja conté dades per a aquests camps
+        response = self.client.post(
+            self.url,
+            data=json.dumps(self.valid_data),
+            content_type='application/json'
+        )
+
+        # 2. Comprovar que la petició ha estat un èxit
+        self.assertEqual(response.status_code, 200, "La petició hauria de ser exitosa")
+        self.assertTrue(Oferta.objects.exists(), "S'hauria d'haver creat una oferta")
+        
+        # Obtenim l'oferta que acabem de crear
+        oferta = Oferta.objects.first()
+
+        # 3. Comprovar les Capacitats Clau (capacitatsLliures) 
+        self.assertEqual(oferta.capacitats.count(), 2, "S'haurien d'haver creat 2 capacitats")
+        
+        # Obtenim els noms de les capacitats guardades
+        noms_capacitats_desades = set(oferta.capacitats.values_list('nom', flat=True))
+        noms_capacitats_esperades = set(self.valid_data['capacitatsLliures'])
+        
+        self.assertEqual(noms_capacitats_desades, noms_capacitats_esperades, "Els noms de les capacitats no coincideixen")
+
+        # 4. Comprovar les Funcions i el seu ordre 
+        self.assertEqual(oferta.funcions.count(), 2, "S'haurien d'haver creat 2 funcions")
+        
+        # Obtenim les funcions ordenades per l'atribut 'ordre'
+        funcions_desades = oferta.funcions.all() # El model ja té ordering = ['ordre']
+        
+        # Comprovar la primera funció
+        self.assertEqual(funcions_desades[0].descripcio, self.valid_data['funcions'][0])
+        self.assertEqual(funcions_desades[0].ordre, 1, "L'ordre de la primera funció hauria de ser 1")
+        
+        # Comprovar la segona funció
+        self.assertEqual(funcions_desades[1].descripcio, self.valid_data['funcions'][1])
+        self.assertEqual(funcions_desades[1].ordre, 2, "L'ordre de la segona funció hauria de ser 2")
+
+        # 5. Comprovar els Idiomes i els seus nivells 
+        self.assertEqual(oferta.idiomes.count(), 2, "S'haurien d'haver creat 2 nivells d'idioma")
+        
+        # Obtenim els idiomes guardats com a tuples (idioma, nivell)
+        idiomes_desats = set(oferta.idiomes.values_list('idioma', 'nivell'))
+        
+        # Creem el conjunt esperat a partir de les dades enviades
+        idiomes_esperats = set(
+            (item['idioma'], item['nivell']) for item in self.valid_data['idiomes']
+        )
+        
+        self.assertEqual(idiomes_desats, idiomes_esperats, "Els idiomes i nivells desats no coincideixen")
+
+def test_error_jornada_parcial_quan_falten_les_hores(self):
+        """
+        Verifica que es retorna un error si la jornada és parcial i no s'indiquen les hores.
+        """
+        self.client.login(email='empresa@test.com', password='password123')
+        
+        # Preparem les dades: jornada parcial sense camp 'hores'
+        data = self.valid_data.copy()
+        data['jornada'] = 'PA'
+        data.pop('hores', None) # Ens assegurem que el camp 'hores' no existeix
+
+        response = self.client.post(self.url, data=json.dumps(data), content_type='application/json')
+
+        # Comprovacions
+        self.assertEqual(response.status_code, 400)
+        errors = response.json().get('errors', {})
+        self.assertEqual(errors.get('hores'), "Has d'indicar el nombre d'hores si la jornada és parcial.")
+        self.assertEqual(Oferta.objects.count(), 0)
+
+# ---
+
+def test_error_jornada_parcial_amb_hores_no_positives(self):
+        """
+        Verifica l'error si la jornada és parcial i les hores són zero o negatives.
+        """
+        self.client.login(email='empresa@test.com', password='password123')
+        
+        # Preparem les dades: jornada parcial amb hores a zero
+        data = self.valid_data.copy()
+        data['jornada'] = 'PA'
+        data['hores'] = 0
+
+        response = self.client.post(self.url, data=json.dumps(data), content_type='application/json')
+
+        # Comprovacions
+        self.assertEqual(response.status_code, 400)
+        errors = response.json().get('errors', {})
+        self.assertEqual(errors.get('hores'), "El nombre d'hores ha de ser positiu.")
+        self.assertEqual(Oferta.objects.count(), 0)
+
+# ---
+
+def test_error_jornada_parcial_amb_hores_no_numeriques(self):
+        """
+        Verifica l'error si la jornada és parcial i les hores no són un número.
+        """
+        self.client.login(email='empresa@test.com', password='password123')
+        
+        # Preparem les dades: jornada parcial amb hores com a text
+        data = self.valid_data.copy()
+        data['jornada'] = 'PA'
+        data['hores'] = 'vint' # Valor no numèric
+
+        response = self.client.post(self.url, data=json.dumps(data), content_type='application/json')
+
+        # Comprovacions
+        self.assertEqual(response.status_code, 400)
+        errors = response.json().get('errors', {})
+        self.assertEqual(errors.get('hores'), "El valor d'hores ha de ser un número enter.")
+        self.assertEqual(Oferta.objects.count(), 0)
+
+# ---
+
+def test_exit_jornada_parcial_amb_hores_correctes(self):
+        """
+        Verifica que l'oferta es crea correctament amb jornada parcial i hores vàlides.
+        """
+        self.client.login(email='empresa@test.com', password='password123')
+
+        # Preparem les dades: jornada parcial amb hores correctes
+        data = self.valid_data.copy()
+        data['jornada'] = 'PA'
+        data['hores'] = 20
+
+        response = self.client.post(self.url, data=json.dumps(data), content_type='application/json')
+        
+        # Comprovacions
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Oferta.objects.count(), 1)
+        
+        oferta_creada = Oferta.objects.first()
+        self.assertEqual(oferta_creada.jornada, 'PA')
+        self.assertEqual(oferta_creada.hores_setmanals, 20)
