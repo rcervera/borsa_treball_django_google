@@ -158,7 +158,7 @@ class CrearOfertaAPITestCase(TestCase):
         self.assertEqual(errors.get('tipus_contracte'), "Tipus de contracte obligatori.")
         self.assertEqual(errors.get('jornada'), "Jornada obligatòria.")
         self.assertEqual(errors.get('lloc_treball'), "Lloc de treball obligatori.")
-        self.assertEqual(errors.get('numero_vacants'), "Cal indicar el nombre de vacants.")
+        self.assertEqual(errors.get('numero_vacants'), "Cal indicar un nombre d'hores positiu si la jornada és parcial.")
         self.assertEqual(errors.get('cicles'), "Has de seleccionar almenys un cicle.")
 
         # 4. Assegurar que l'oferta NO s'ha creat a la base de dades
@@ -258,7 +258,7 @@ class CrearOfertaAPITestCase(TestCase):
         # Comprovacions
         self.assertEqual(response.status_code, 400)
         errors = response.json().get('errors', {})
-        self.assertEqual(errors.get('hores'), "Has d'indicar el nombre d'hores si la jornada és parcial.")
+        self.assertEqual(errors.get('hores'), "Cal indicar un nombre d'hores positiu si la jornada és parcial.")
         self.assertEqual(Oferta.objects.count(), 0)
 
 # ---
@@ -369,7 +369,7 @@ class CrearOfertaAPITestCase(TestCase):
         # Comprovació del lloc de treball (esperem 100 caràcters)
         self.assertEqual(len(oferta_creada.lloc_treball), 100)  
         self.assertEqual(oferta_creada.lloc_treball, "B" * 100)
-        
+
         # Comprovació de l'horari (esperem 250 caràcters)
         self.assertEqual(len(oferta_creada.horari), 250)    
         self.assertEqual(oferta_creada.horari, "H" * 250)

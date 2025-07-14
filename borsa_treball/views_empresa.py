@@ -178,6 +178,8 @@ def validar_dades_oferta(data):
     except (ValueError, TypeError):
         errors['numero_vacants'] = "Cal indicar un nombre de vacants positiu."
 
+      
+
     hores = data.get('hores')
     hores_valor = None
     if jornada == 'PA':
