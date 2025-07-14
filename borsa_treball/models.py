@@ -210,7 +210,7 @@ class CapacitatClau(models.Model):
 
 class CapacitatOferta(models.Model):
     oferta = models.ForeignKey('Oferta', on_delete=models.CASCADE, related_name='capacitats')
-    nom = models.CharField(max_length=100, help_text="Nom de la capacitat clau (lliure o suggerida)")
+    nom = models.CharField(max_length=200, help_text="Nom de la capacitat clau (lliure o suggerida)")
   
     class Meta:       
         verbose_name = "Capacitat clau de l'oferta"
