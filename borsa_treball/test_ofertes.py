@@ -158,7 +158,7 @@ class CrearOfertaAPITestCase(TestCase):
         self.assertEqual(errors.get('tipus_contracte'), "Tipus de contracte obligatori.")
         self.assertEqual(errors.get('jornada'), "Jornada obligatòria.")
         self.assertEqual(errors.get('lloc_treball'), "Lloc de treball obligatori.")
-        self.assertEqual(errors.get('numero_vacants'), "Cal indicar un nombre d'hores positiu si la jornada és parcial.")
+        self.assertEqual(errors.get('numero_vacants'), "Cal indicar un nombre de vacants positiu.")
         self.assertEqual(errors.get('cicles'), "Has de seleccionar almenys un cicle.")
 
         # 4. Assegurar que l'oferta NO s'ha creat a la base de dades
