@@ -242,7 +242,7 @@ class CrearOfertaAPITestCase(TestCase):
         
         self.assertEqual(idiomes_desats, idiomes_esperats, "Els idiomes i nivells desats no coincideixen")
 
-def test_error_jornada_parcial_quan_falten_les_hores(self):
+    def test_error_jornada_parcial_quan_falten_les_hores(self):
         """
         Verifica que es retorna un error si la jornada és parcial i no s'indiquen les hores.
         """
@@ -263,7 +263,7 @@ def test_error_jornada_parcial_quan_falten_les_hores(self):
 
 # ---
 
-def test_error_jornada_parcial_amb_hores_no_positives(self):
+    def test_error_jornada_parcial_amb_hores_no_positives(self):
         """
         Verifica l'error si la jornada és parcial i les hores són zero o negatives.
         """
@@ -284,7 +284,7 @@ def test_error_jornada_parcial_amb_hores_no_positives(self):
 
 # ---
 
-def test_error_jornada_parcial_amb_hores_no_numeriques(self):
+    def test_error_jornada_parcial_amb_hores_no_numeriques(self):
         """
         Verifica l'error si la jornada és parcial i les hores no són un número.
         """
@@ -305,7 +305,7 @@ def test_error_jornada_parcial_amb_hores_no_numeriques(self):
 
 # ---
 
-def test_exit_jornada_parcial_amb_hores_correctes(self):
+    def test_exit_jornada_parcial_amb_hores_correctes(self):
         """
         Verifica que l'oferta es crea correctament amb jornada parcial i hores vàlides.
         """
