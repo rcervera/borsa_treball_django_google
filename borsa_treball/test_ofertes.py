@@ -335,9 +335,9 @@ class CrearOfertaAPITestCase(TestCase):
         self.client.login(email='empresa@test.com', password='password123')
 
         # 1. Preparem textos més llargs que els límits dels camps del model
-        # titol (max=100), salari (max=50)
-        text_llarg_titol = "A" * 150
-        text_llarg_salari = "S" * 75
+        # titol (max=200), salari (max=250)
+        text_llarg_titol = "A" * 250
+        text_llarg_salari = "S" * 300
 
         # 2. Modifiquem les dades vàlides amb els textos llargs
         data = self.valid_data.copy()
@@ -355,9 +355,9 @@ class CrearOfertaAPITestCase(TestCase):
         oferta_creada = Oferta.objects.first()
 
         # Comprovació del títol (esperem 100 caràcters)
-        self.assertEqual(len(oferta_creada.titol), 100)
-        self.assertEqual(oferta_creada.titol, "A" * 100)
+        self.assertEqual(len(oferta_creada.titol), 200)
+        self.assertEqual(oferta_creada.titol, "A" * 200)
 
         # Comprovació del salari (esperem 50 caràcters)
-        self.assertEqual(len(oferta_creada.salari), 50)
-        self.assertEqual(oferta_creada.salari, "S" * 50)
+        self.assertEqual(len(oferta_creada.salari), 250)
+        self.assertEqual(oferta_creada.salari, "S" * 250)
