@@ -333,6 +333,8 @@ class Oferta(models.Model):
     valoracio_empresa = models.TextField(blank=True, null=True, verbose_name="Valoració de l'Empresa", help_text="La valoració de l'empresa sobre el procés o els candidats.")
     valoracio_responsable = models.TextField(blank=True, null=True, verbose_name="Valoració del Responsable", help_text="La valoració del responsable de la borsa de treball sobre el procés.")
   
+    data_tancament = models.DateField(blank=True, null=True)
+
     @property
     def es_caducada(self):
         if self.data_limit:

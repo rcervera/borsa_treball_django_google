@@ -156,11 +156,11 @@ def registre_empresa(request):
     email = data.get('email', '').strip()
     password1 = data.get('password1', '')
     password2 = data.get('password2', '')
-    nom = data.get('nom', '').strip()
-    cognoms = data.get('cognoms', '').strip()
+    nom = data.get('nom', '').strip()[:255]
+    cognoms = data.get('cognoms', '').strip()[:255]
     cif = data.get('cif', '').strip().upper()
-    nom_comercial = data.get('nom_comercial', '').strip()
-    rao_social = data.get('rao_social', '').strip()
+    nom_comercial = data.get('nom_comercial', '').strip()[:150]
+    rao_social = data.get('rao_social', '').strip()[:150]
     sector_id = data.get('sector')
     telefon = data.get('telefon', '').strip()
     terms = data.get('terms', '').strip()
@@ -328,8 +328,8 @@ def registre_estudiant(request):
     email = data.get('email', '').strip()
     password1 = data.get('password1', '')
     password2 = data.get('password2', '')
-    nom = data.get('nom', '').strip()
-    cognoms = data.get('cognoms', '').strip()
+    nom = data.get('nom', '').strip()[:255]
+    cognoms = data.get('cognoms', '').strip()[:255]
     dni = data.get('dni', '').strip()
     telefon = data.get('telefon', '').strip()
     

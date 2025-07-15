@@ -775,11 +775,11 @@ def api_editar_perfil_empresa(request):
 
     errors = {} # Diccionari per emmagatzemar errors per camp
    
-    nom_comercial = request.POST.get('nom_comercial', '').strip()
+    nom_comercial = request.POST.get('nom_comercial', '').strip()[:150]
     if not nom_comercial:
         errors.setdefault('nom_comercial', []).append('El nom comercial és obligatori.')
     
-    rao_social = request.POST.get('rao_social', '').strip()
+    rao_social = request.POST.get('rao_social', '').strip()[:150]
     if not rao_social:
         errors.setdefault('rao_social', []).append('La raó social és obligatòria.')
 
@@ -800,7 +800,7 @@ def api_editar_perfil_empresa(request):
     if telefon and not re.match(r'^\+?[0-9\s\-\(\)]{1,15}$', telefon):
         errors.setdefault('telefon', []).append('El telèfon no té un format vàlid (pot incloure "+" al principi, números, espais, guions i parèntesis; màxim 15 caràcters).')
 
-    email_contacte = request.POST.get('email_contacte', '').strip()
+    email_contacte = request.POST.get('email_contacte', '').strip()[:254]
     # Email de contacte no és obligatori
     if email_contacte:
         try:
@@ -828,7 +828,7 @@ def api_editar_perfil_empresa(request):
         except Sector.DoesNotExist:
             errors.setdefault('sector', []).append('El sector seleccionat no és vàlid.')
     
-    web = request.POST.get('web', '').strip()
+    web = request.POST.get('web', '').strip()[:200]
     # Web no és obligatori 
     if web and not web.startswith(('http://', 'https://')):
         web = 'https://' + web
@@ -873,11 +873,11 @@ def api_editar_perfil_usuari(request):
     errors = {} # Diccionari per emmagatzemar errors per camp
 
     # Neteja i validació dels camps de l'Usuari
-    nom = request.POST.get('nom', '').strip()
+    nom = request.POST.get('nom', '').strip()[:255]
     if not nom:
         errors.setdefault('nom', []).append('El nom és obligatori.')
     
-    cognoms = request.POST.get('cognoms', '').strip()
+    cognoms = request.POST.get('cognoms', '').strip()[:255]
     if not cognoms:
         errors.setdefault('cognoms', []).append('Els cognoms són obligatoris.')
     
