@@ -75,6 +75,37 @@ body {
 }
 
 
+/* Botó operació principal */
+.principal-btn {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border: none;
+            border-radius: 50px;
+            padding: 0.8rem 1.5rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            white-space: nowrap;
+            min-width: 180px;
+            height: 50px;
+}
+
+.principal-btn:hover {
+            transform: translateY(-3px);
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            color: white;
+}
+
+.principal-btn i {
+            margin-right: 0.5rem;    
+}
+
+
+
 .sidebar {
             position: fixed;
             top: 0;
