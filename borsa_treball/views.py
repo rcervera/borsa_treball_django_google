@@ -488,46 +488,18 @@ def registre_estudiant(request):
         }, status=500) # 500 Internal Server Error
     
 
+
+from .utils import resposta_descarrega_cv
 @login_required
 @staff_member_required
 def descarregar_cv_candidatura_admin(request, candidatura_id):
-    """
-    Vista per descarregar el CV d'una candidatura.
-    """
-       
-    # Obtenir la candidatura i verificar permisos
-    candidatura = get_object_or_404(Candidatura, id=candidatura_id)
-    
-    if not candidatura.cv_adjunt:
-        raise Http404("CV no trobat")
-    
-    try:
-        # Obtenir el fitxer
-        file_path = candidatura.cv_adjunt.path
-        
-        if not os.path.exists(file_path):
-            raise Http404("Fitxer no trobat")
-        
-        # Determinar el tipus MIME
-        content_type, _ = mimetypes.guess_type(file_path)
-        if content_type is None:
-            content_type = 'application/octet-stream'
-        
-        # Crear la resposta
-        with open(file_path, 'rb') as f:
-            response = HttpResponse(f.read(), content_type=content_type)
-            
-        # Nom del fitxer per la descàrrega
-        filename = f"CV_{candidatura.estudiant.usuari.get_full_name()}_{candidatura.oferta.titol}.pdf"
-        filename = filename.replace(' ', '_').replace(',', '')
-        
-        response['Content-Disposition'] = f'attachment; filename="{filename}"'
-        return response
-        
-    except Exception as e:
-        messages.error(request, f'Error en descarregar el CV: {str(e)}')
-        return redirect('llista_candidatures_oferta', oferta_id=candidatura.oferta.id)
-    
+     # Obtenir la candidatura i verificar permisos
+    candidatura = get_object_or_404(Candidatura, id=candidatura_id)    
+    return resposta_descarrega_cv(candidatura)
+
+
+
+
 
 @require_POST
 @login_required
