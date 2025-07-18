@@ -108,8 +108,7 @@ def index(request):
 
             # Total Active Offers (visible, active, AND NOT EXPIRED)
             active_offers_queryset = Oferta.objects.filter(
-                visible=True,
-                activa=True,
+                estat='AC',                
                 data_limit__gte=today # This is the crucial change for the index view stats
             )
             context['total_ofertes_actives'] = active_offers_queryset.count()
