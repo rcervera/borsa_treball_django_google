@@ -7,6 +7,11 @@ import os
 import time  
 import uuid
 
+from .storages import PrivateStorage
+
+private_storage = PrivateStorage()
+
+
 class UsuariManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -407,10 +412,12 @@ class Candidatura(models.Model):
     )
     cv_adjunt = models.FileField(
         upload_to=curriculum_upload_path,
+        storage=private_storage,
         blank=True,
         null=True,
         verbose_name='CV adjunt'
     )
+    
     altres_adjunts = models.FileField(
         upload_to='private/candidatures/adjunts/',
         blank=True,

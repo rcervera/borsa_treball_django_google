@@ -6,3 +6,5 @@ class PrivateMediaStorage(FileSystemStorage):
         kwargs['location'] = settings.PRIVATE_MEDIA_ROOT
         kwargs['base_url'] = settings.PRIVATE_MEDIA_URL
         super().__init__(*args, **kwargs)
+
+
