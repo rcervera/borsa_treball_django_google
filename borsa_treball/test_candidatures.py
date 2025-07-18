@@ -15,7 +15,7 @@ from borsa_treball.models import EstatCandidatura, Usuari, Estudiant, Empresa, S
 # i evita problemes de permisos.
 temp_dir = tempfile.mkdtemp()
 
-@override_settings(MEDIA_ROOT=temp_dir)
+@override_settings(PRIVATE_MEDIA_ROOT=temp_dir)
 class AfegirCandidaturaAPITestCase(TestCase):
     """
     Conjunt de proves per a l'endpoint de l'API afegir_candidatura_api,
@@ -240,7 +240,7 @@ class AfegirCandidaturaAPITestCase(TestCase):
 
 
 
-@override_settings(MEDIA_ROOT=temp_dir)
+@override_settings(PRIVATE_MEDIA_ROOT=temp_dir)
 class EditarCandidaturaAPITestCase(TestCase):
     @classmethod
     def tearDownClass(cls):
@@ -413,7 +413,7 @@ class EditarCandidaturaAPITestCase(TestCase):
 
 
 
-@override_settings(MEDIA_ROOT=temp_dir)
+@override_settings(PRIVATE_MEDIA_ROOT=temp_dir)
 class EliminarCandidaturaAPITestCase(TestCase):
     @classmethod
     def tearDownClass(cls):
