@@ -7,9 +7,9 @@ import os
 import time  
 import uuid
 
-from .storages import PrivateStorage
+from .storages import PrivateMediaStorage
 
-private_storage = PrivateStorage()
+private_storage = PrivateMediaStorage()
 
 
 class UsuariManager(BaseUserManager):
