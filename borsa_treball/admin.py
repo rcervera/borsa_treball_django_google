@@ -73,7 +73,7 @@ class CapacitatOfertaInline(admin.TabularInline):
 class OfertaInline(admin.TabularInline):
     model = Oferta
     extra = 0
-    fields = ('titol', 'tipus_contracte', 'jornada', 'data_limit', 'activa', 'visible')
+    fields = ('titol', 'tipus_contracte', 'jornada', 'data_limit', 'data_publicacio', 'estat')
     readonly_fields = ('data_publicacio',)
     show_change_link = True
     

@@ -454,30 +454,30 @@ class Candidatura(models.Model):
     
 
 
-class Noticia(models.Model):
-    DESTINATARIS = [
-        ('TOTHOM', 'Tothom'),
-        ('ESTUDIANTS', 'Estudiants'),
-        ('EMPRESES', 'Empreses'),
-    ]
+    class Noticia(models.Model):
+        DESTINATARIS = [
+            ('TOTHOM', 'Tothom'),
+            ('ESTUDIANTS', 'Estudiants'),
+            ('EMPRESES', 'Empreses'),
+        ]
 
-    titol = models.CharField(max_length=200)
-    descripcio = models.TextField()
-    cos = models.TextField()
-    url = models.URLField(blank=True, null=True)
-    imatge = models.ImageField(upload_to='noticies/imatges/', blank=True, null=True)
-    document = models.FileField(upload_to='noticies/documents/', blank=True, null=True)
-    destinatari = models.CharField(max_length=10, choices=DESTINATARIS, default='TOTHOM')
-    data_publicacio = models.DateTimeField(default=timezone.now)
-    visible = models.BooleanField(default=True)
+        titol = models.CharField(max_length=200)
+        descripcio = models.TextField()
+        cos = models.TextField()
+        url = models.URLField(blank=True, null=True)
+        imatge = models.ImageField(upload_to='noticies/imatges/', blank=True, null=True)
+        document = models.FileField(upload_to='noticies/documents/', blank=True, null=True)
+        destinatari = models.CharField(max_length=10, choices=DESTINATARIS, default='TOTHOM')
+        data_publicacio = models.DateTimeField(default=timezone.now)
+        visible = models.BooleanField(default=True)
 
-    def __str__(self):
-        return self.titol
-    
-    class Meta:
-        verbose_name = "Notícia"
-        verbose_name_plural = "Notícies"
-        ordering = ['-data_publicacio']
+        def __str__(self):
+            return self.titol
+        
+        class Meta:
+            verbose_name = "Notícia"
+            verbose_name_plural = "Notícies"
+            ordering = ['-data_publicacio']
 
 
 
