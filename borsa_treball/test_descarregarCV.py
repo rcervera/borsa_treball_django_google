@@ -18,10 +18,7 @@ temp_dir = tempfile.mkdtemp()
 
 
 class DescarregarCVCandidaturaTestCase(TestCase):
-    @classmethod
-    def tearDown(self):
-        shutil.rmtree(self.temp_dir, ignore_errors=True)
-
+   
     def setUp(self):
         self.client = Client()
         self.temp_dir = tempfile.mkdtemp()
@@ -87,6 +84,11 @@ class DescarregarCVCandidaturaTestCase(TestCase):
         )
 
         self.url = reverse('descarregar_cv_candidatura_estudiant', args=[self.candidatura.id])
+
+     
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir, ignore_errors=True)
+
 
     def test_descarrega_cv_correctament(self):
         """
