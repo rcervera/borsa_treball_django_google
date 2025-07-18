@@ -31,10 +31,14 @@ class AfegirCandidaturaAPITestCase(TestCase):
         Configuració inicial per a totes les proves. S'executa abans de cada test.
         """
         self.client = Client()
-
         self.temp_dir = tempfile.mkdtemp()
-        
-        # Sobreescriu el storage del camp "cv_adjunt" del model per apuntar al nou storage
+
+        # Assigna el setting manualment abans de cridar el storage
+        override = override_settings(PRIVATE_MEDIA_ROOT=self.temp_dir)
+        override.enable()
+        self.addCleanup(override.disable)  # Això s'assegura que després del test es restauren els settings
+
+        # Sobreescriu el storage
         Candidatura._meta.get_field('cv_adjunt').storage = PrivateMediaStorage(
             location=self.temp_dir,
             base_url="/private_temp/"
