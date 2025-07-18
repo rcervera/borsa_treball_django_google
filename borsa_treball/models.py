@@ -454,7 +454,7 @@ class Candidatura(models.Model):
     
 
 
-    class Noticia(models.Model):
+class Noticia(models.Model):
         DESTINATARIS = [
             ('TOTHOM', 'Tothom'),
             ('ESTUDIANTS', 'Estudiants'),
