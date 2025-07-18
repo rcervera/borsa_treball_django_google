@@ -15,7 +15,7 @@ from borsa_treball.models import Usuari, Estudiant, Empresa, Sector, Oferta, Can
 # i evita problemes de permisos.
 temp_dir = tempfile.mkdtemp()
 
-@override_settings(MEDIA_ROOT=temp_dir)
+@override_settings(PRIVATE_MEDIA_ROOT=temp_dir)
 
 class DescarregarCVCandidaturaTestCase(TestCase):
     @classmethod
