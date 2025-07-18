@@ -253,13 +253,27 @@ class AfegirCandidaturaAPITestCase(TestCase):
 
 
 
-@override_settings(PRIVATE_MEDIA_ROOT=temp_dir)
+# @override_settings(PRIVATE_MEDIA_ROOT=temp_dir)
 class EditarCandidaturaAPITestCase(TestCase):
     @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(temp_dir, ignore_errors=True)
-        super().tearDownClass()
+    def setUpClass(cls):
+        super().setUpClass()
+        # Crea el directori temporal i guarda'l a la classe
+        cls.temp_dir = tempfile.mkdtemp()
 
+        # Aplica el patch a settings.PRIVATE_MEDIA_ROOT
+        cls.patch_private_root = patch(
+            'borsa_treball.storages.settings.PRIVATE_MEDIA_ROOT',
+            new=cls.temp_dir
+        )
+        cls.patch_private_root.start()
+
+    @classmethod
+    def tearDownClass(cls):
+        # Para el patch i elimina la carpeta temporal
+        cls.patch_private_root.stop()
+        shutil.rmtree(cls.temp_dir, ignore_errors=True)
+        super().tearDownClass()
     def setUp(self):
         """
         Configura un estudiant, una empresa, una oferta i una candidatura editable.
@@ -426,11 +440,26 @@ class EditarCandidaturaAPITestCase(TestCase):
 
 
 
-@override_settings(PRIVATE_MEDIA_ROOT=temp_dir)
+# @override_settings(PRIVATE_MEDIA_ROOT=temp_dir)
 class EliminarCandidaturaAPITestCase(TestCase):
     @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        # Crea el directori temporal i guarda'l a la classe
+        cls.temp_dir = tempfile.mkdtemp()
+
+        # Aplica el patch a settings.PRIVATE_MEDIA_ROOT
+        cls.patch_private_root = patch(
+            'borsa_treball.storages.settings.PRIVATE_MEDIA_ROOT',
+            new=cls.temp_dir
+        )
+        cls.patch_private_root.start()
+
+    @classmethod
     def tearDownClass(cls):
-        shutil.rmtree(temp_dir, ignore_errors=True)
+        # Para el patch i elimina la carpeta temporal
+        cls.patch_private_root.stop()
+        shutil.rmtree(cls.temp_dir, ignore_errors=True)
         super().tearDownClass()
 
     def setUp(self):
