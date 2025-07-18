@@ -9,22 +9,33 @@ from unittest.mock import patch
 
 # Canvia 'borsa_treball' pel nom real de la teva aplicació si fos diferent
 from borsa_treball.models import Usuari, Estudiant, Empresa, Sector, Oferta, Candidatura
+from borsa_treball.storages import PrivateMediaStorage
 
 # Sobreescrivim la configuració de MEDIA_ROOT per a les proves.
 # Això crea una carpeta temporal per als fitxers pujats durant els tests
 # i evita problemes de permisos.
 temp_dir = tempfile.mkdtemp()
 
-@override_settings(PRIVATE_MEDIA_ROOT=temp_dir)
 
 class DescarregarCVCandidaturaTestCase(TestCase):
     @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(temp_dir, ignore_errors=True)
-        super().tearDownClass()
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir, ignore_errors=True)
 
     def setUp(self):
         self.client = Client()
+        self.temp_dir = tempfile.mkdtemp()
+
+        # Assigna el setting manualment abans de cridar el storage
+        override = override_settings(PRIVATE_MEDIA_ROOT=self.temp_dir)
+        override.enable()
+        self.addCleanup(override.disable)  # Això s'assegura que després del test es restauren els settings
+
+        # Sobreescriu el storage
+        Candidatura._meta.get_field('cv_adjunt').storage = PrivateMediaStorage(
+            location=self.temp_dir,
+            base_url="/private_temp/"
+        )
 
         # Crear usuari estudiant
         self.user_estudiant = Usuari.objects.create_user(
