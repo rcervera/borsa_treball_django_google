@@ -10,26 +10,39 @@ from unittest.mock import patch
 # Canvia 'borsa_treball' pel nom real de la teva aplicació si fos diferent
 from borsa_treball.models import EstatCandidatura, Usuari, Estudiant, Empresa, Sector, Oferta, Candidatura
 
+from borsa_treball.storages import PrivateMediaStorage
+
 # Sobreescrivim la configuració de MEDIA_ROOT per a les proves.
 # Això crea una carpeta temporal per als fitxers pujats durant els tests
 # i evita problemes de permisos.
 temp_dir = tempfile.mkdtemp()
 
-@override_settings(PRIVATE_MEDIA_ROOT=temp_dir)
+# @patch('borsa_treball.storages.settings.PRIVATE_MEDIA_ROOT', new=tempfile.mkdtemp())
 class AfegirCandidaturaAPITestCase(TestCase):
     """
     Conjunt de proves per a l'endpoint de l'API afegir_candidatura_api,
     adaptat a un model d'usuari personalitzat i amb correccions d'errors.
     """
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        # Crea el directori temporal i guarda'l a la classe
+        cls.temp_dir = tempfile.mkdtemp()
+
+        # Aplica el patch a settings.PRIVATE_MEDIA_ROOT
+        cls.patch_private_root = patch(
+            'borsa_treball.storages.settings.PRIVATE_MEDIA_ROOT',
+            new=cls.temp_dir
+        )
+        cls.patch_private_root.start()
 
     @classmethod
     def tearDownClass(cls):
-        """
-        S'executa un cop al final de totes les proves de la classe.
-        Esborra la carpeta temporal creada per a MEDIA_ROOT.
-        """
-        shutil.rmtree(temp_dir, ignore_errors=True)
+        # Para el patch i elimina la carpeta temporal
+        cls.patch_private_root.stop()
+        shutil.rmtree(cls.temp_dir, ignore_errors=True)
         super().tearDownClass()
+
 
     def setUp(self):
         """
