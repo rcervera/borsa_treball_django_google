@@ -246,9 +246,6 @@ class AfegirCandidaturaAPITestCase(TestCase):
 
 # @override_settings(PRIVATE_MEDIA_ROOT=temp_dir)
 class EditarCandidaturaAPITestCase(TestCase):
-    
-
-
 
     def setUp(self):
         """
