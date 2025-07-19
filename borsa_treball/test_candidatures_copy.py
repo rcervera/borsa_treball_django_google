@@ -23,11 +23,7 @@ class AfegirCandidaturaAPITestCase(TestCase):
     Conjunt de proves per a l'endpoint de l'API afegir_candidatura_api,
     adaptat a un model d'usuari personalitzat i amb correccions d'errors.
     """
-   
-    def tearDown(self):
-        shutil.rmtree(self.temp_dir, ignore_errors=True)
-
-
+      
     def setUp(self):
         """
         Configuració inicial per a totes les proves. S'executa abans de cada test.
@@ -119,6 +115,10 @@ class AfegirCandidaturaAPITestCase(TestCase):
             'carta_presentacio': 'Aquesta és una carta de presentació prou llarga per passar la validació inicial i demostrar el meu interès.',
             'cv_adjunt': self.cv_file,
         }
+
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir, ignore_errors=True)
+
 
     def test_creacio_candidatura_exitosa(self):
         """
@@ -248,8 +248,6 @@ class AfegirCandidaturaAPITestCase(TestCase):
 class EditarCandidaturaAPITestCase(TestCase):
     
 
-    def tearDown(self):
-        shutil.rmtree(self.temp_dir, ignore_errors=True)
 
 
     def setUp(self):
@@ -309,6 +307,9 @@ class EditarCandidaturaAPITestCase(TestCase):
         )
         self.url = reverse('editar_candidatura_api', args=[self.candidatura.id])
         
+
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir, ignore_errors=True)
 
     def test_edicio_correcta(self):
         """
@@ -428,8 +429,7 @@ class EditarCandidaturaAPITestCase(TestCase):
 # @override_settings(PRIVATE_MEDIA_ROOT=temp_dir)
 class EliminarCandidaturaAPITestCase(TestCase):
    
-    def tearDown(self):
-        shutil.rmtree(self.temp_dir, ignore_errors=True)
+    
 
     def setUp(self):
         self.client = Client()
@@ -478,6 +478,9 @@ class EliminarCandidaturaAPITestCase(TestCase):
             cv_adjunt=self.cv_file
         )
         self.url = reverse('eliminar_candidatura_api', args=[self.candidatura.id])
+
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir, ignore_errors=True)
 
     def test_eliminacio_correcta(self):
         """
