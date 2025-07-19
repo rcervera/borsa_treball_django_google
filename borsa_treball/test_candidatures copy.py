@@ -23,19 +23,7 @@ class AfegirCandidaturaAPITestCase(TestCase):
     Conjunt de proves per a l'endpoint de l'API afegir_candidatura_api,
     adaptat a un model d'usuari personalitzat i amb correccions d'errors.
     """
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        # Crea el directori temporal i guarda'l a la classe
-        cls.temp_dir = tempfile.mkdtemp()
-
-        # Aplica el patch a settings.PRIVATE_MEDIA_ROOT
-        cls.patch_private_root = patch(
-            'borsa_treball.storages.settings.PRIVATE_MEDIA_ROOT',
-            new=cls.temp_dir
-        )
-        cls.patch_private_root.start()
-
+   
     def tearDown(self):
         shutil.rmtree(self.temp_dir, ignore_errors=True)
 
@@ -258,18 +246,7 @@ class AfegirCandidaturaAPITestCase(TestCase):
 
 # @override_settings(PRIVATE_MEDIA_ROOT=temp_dir)
 class EditarCandidaturaAPITestCase(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        # Crea el directori temporal i guarda'l a la classe
-        cls.temp_dir = tempfile.mkdtemp()
-
-        # Aplica el patch a settings.PRIVATE_MEDIA_ROOT
-        cls.patch_private_root = patch(
-            'borsa_treball.storages.settings.PRIVATE_MEDIA_ROOT',
-            new=cls.temp_dir
-        )
-        cls.patch_private_root.start()
+    
 
     def tearDown(self):
         shutil.rmtree(self.temp_dir, ignore_errors=True)
@@ -450,19 +427,7 @@ class EditarCandidaturaAPITestCase(TestCase):
 
 # @override_settings(PRIVATE_MEDIA_ROOT=temp_dir)
 class EliminarCandidaturaAPITestCase(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        # Crea el directori temporal i guarda'l a la classe
-        cls.temp_dir = tempfile.mkdtemp()
-
-        # Aplica el patch a settings.PRIVATE_MEDIA_ROOT
-        cls.patch_private_root = patch(
-            'borsa_treball.storages.settings.PRIVATE_MEDIA_ROOT',
-            new=cls.temp_dir
-        )
-        cls.patch_private_root.start()
-
+   
     def tearDown(self):
         shutil.rmtree(self.temp_dir, ignore_errors=True)
 
