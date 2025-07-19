@@ -425,3 +425,118 @@ class EditarCandidaturaAPITestCase(TestCase):
         self.assertIn('error inesperat', response.json()['error'].lower())
 
 
+
+class EliminarCandidaturaAPITestCase(TestCase):  
+    
+
+    def setUp(self):
+        self.client = Client()
+        self.temp_dir = tempfile.mkdtemp()
+
+        # Assigna el setting manualment abans de cridar el storage
+        override = override_settings(PRIVATE_MEDIA_ROOT=self.temp_dir)
+        override.enable()
+        self.addCleanup(override.disable)  # Això s'assegura que després del test es restauren els settings
+
+
+        # Estudiant amb candidatura
+        self.user_estudiant = Usuari.objects.create_user(
+            email='estudiant@test.com', password='password123', tipus='EST', nom='Anna', cognoms='Pou'
+        )
+        self.estudiant = Estudiant.objects.create(usuari=self.user_estudiant, dni='11223344Z')
+
+        self.user_empresa = Usuari.objects.create_user(
+            email='empresa@test.com', password='password123', tipus='EMP'
+        )
+        self.sector = Sector.objects.create(nom='Salut')
+        self.empresa = Empresa.objects.create(
+            usuari=self.user_empresa,
+            cif='B00000000',
+            nom_comercial='SalutTech',
+            rao_social='SalutTech SL',
+            sector=self.sector
+        )
+        self.oferta = Oferta.objects.create(
+            empresa=self.empresa,
+            titol='Infermer/a',
+            descripcio='Treball assistencial',
+            estat='AC',
+            data_limit=date(2025, 12, 31),
+            lloc_treball='Hospital',
+            tipus_contracte='IN',
+            jornada='CO'
+        )
+        self.cv_file = SimpleUploadedFile("cv.pdf", b"CV eliminacio", content_type="application/pdf")
+
+        self.candidatura = Candidatura.objects.create(
+            estudiant=self.estudiant,
+            oferta=self.oferta,
+            carta_presentacio='Carta de prova per eliminació.',
+            estat=EstatCandidatura.EN_PROCES,
+            cv_adjunt=self.cv_file
+        )
+        self.url = reverse('eliminar_candidatura_api', args=[self.candidatura.id])
+
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir, ignore_errors=True)
+
+    def test_eliminacio_correcta(self):
+        """
+        Verifica que una candidatura es pot eliminar correctament si està en procés.
+        """
+        self.client.login(email='estudiant@test.com', password='password123')
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['message'], 'Candidatura eliminada correctament.')
+        self.assertFalse(Candidatura.objects.filter(id=self.candidatura.id).exists())
+
+    def test_usuari_no_autenticat(self):
+        """
+        Verifica que un usuari no autenticat és redirigit al login.
+        """
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.url.startswith('/login/'))
+
+    def test_usuari_sense_perfil_estudiant(self):
+        """
+        Verifica que un usuari autenticat però sense perfil d'estudiant no pot eliminar.
+        """
+        usuari_admin = Usuari.objects.create_user(email='admin@test.com', password='admin123', tipus='ADM')
+        self.client.login(email='admin@test.com', password='admin123')
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 403)
+        self.assertIn('Accés denegat', response.json()['error'])
+
+    def test_candidatura_no_existeix(self):
+        """
+        Verifica que s'obté un 404 si la candidatura no existeix o no és del mateix estudiant.
+        """
+        self.client.login(email='estudiant@test.com', password='password123')
+        url_inexistent = reverse('eliminar_candidatura_api', args=[9999])
+        response = self.client.post(url_inexistent)
+        self.assertEqual(response.status_code, 404)
+        self.assertIn('Candidatura no trobada', response.json()['error'])
+
+    def test_no_es_pot_eliminar_si_estat_no_en_proces(self):
+        """
+        Verifica que no es pot eliminar una candidatura que no està en procés.
+        """
+        self.candidatura.estat = EstatCandidatura.REBUTJADA
+        self.candidatura.save()
+
+        self.client.login(email='estudiant@test.com', password='password123')
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('No es pot eliminar', response.json()['error'])
+
+    @patch('borsa_treball.views.Candidatura.delete')
+    def test_error_en_eliminar(self, mock_delete):
+        """
+        Verifica que es gestiona correctament un error intern durant l'eliminació.
+        """
+        mock_delete.side_effect = Exception("Error simulat de base de dades")
+        self.client.login(email='estudiant@test.com', password='password123')
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 500)
+        self.assertIn('Error intern', response.json()['error'])
