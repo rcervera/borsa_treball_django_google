@@ -36,12 +36,8 @@ class AfegirCandidaturaAPITestCase(TestCase):
         )
         cls.patch_private_root.start()
 
-    @classmethod
-    def tearDownClass(cls):
-        # Para el patch i elimina la carpeta temporal
-        cls.patch_private_root.stop()
-        shutil.rmtree(cls.temp_dir, ignore_errors=True)
-        super().tearDownClass()
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir, ignore_errors=True)
 
 
     def setUp(self):
@@ -49,6 +45,13 @@ class AfegirCandidaturaAPITestCase(TestCase):
         Configuració inicial per a totes les proves. S'executa abans de cada test.
         """
         self.client = Client()
+        self.temp_dir = tempfile.mkdtemp()
+
+        # Assigna el setting manualment abans de cridar el storage
+        override = override_settings(PRIVATE_MEDIA_ROOT=self.temp_dir)
+        override.enable()
+        self.addCleanup(override.disable)  # Això s'assegura que després del test es restauren els settings
+
 
         # --- Creació d'usuaris amb el model personalitzat ---
         # 1. Usuari que és un estudiant
@@ -268,17 +271,22 @@ class EditarCandidaturaAPITestCase(TestCase):
         )
         cls.patch_private_root.start()
 
-    @classmethod
-    def tearDownClass(cls):
-        # Para el patch i elimina la carpeta temporal
-        cls.patch_private_root.stop()
-        shutil.rmtree(cls.temp_dir, ignore_errors=True)
-        super().tearDownClass()
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir, ignore_errors=True)
+
+
     def setUp(self):
         """
         Configura un estudiant, una empresa, una oferta i una candidatura editable.
         """
         self.client = Client()
+        self.temp_dir = tempfile.mkdtemp()
+
+        # Assigna el setting manualment abans de cridar el storage
+        override = override_settings(PRIVATE_MEDIA_ROOT=self.temp_dir)
+        override.enable()
+        self.addCleanup(override.disable)  # Això s'assegura que després del test es restauren els settings
+
 
         self.user_estudiant = Usuari.objects.create_user(
             email='edit@test.com',
@@ -455,15 +463,18 @@ class EliminarCandidaturaAPITestCase(TestCase):
         )
         cls.patch_private_root.start()
 
-    @classmethod
-    def tearDownClass(cls):
-        # Para el patch i elimina la carpeta temporal
-        cls.patch_private_root.stop()
-        shutil.rmtree(cls.temp_dir, ignore_errors=True)
-        super().tearDownClass()
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir, ignore_errors=True)
 
     def setUp(self):
         self.client = Client()
+        self.temp_dir = tempfile.mkdtemp()
+
+        # Assigna el setting manualment abans de cridar el storage
+        override = override_settings(PRIVATE_MEDIA_ROOT=self.temp_dir)
+        override.enable()
+        self.addCleanup(override.disable)  # Això s'assegura que després del test es restauren els settings
+
 
         # Estudiant amb candidatura
         self.user_estudiant = Usuari.objects.create_user(
