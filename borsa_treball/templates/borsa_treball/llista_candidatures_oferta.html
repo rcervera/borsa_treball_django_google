@@ -49,25 +49,25 @@
                         <div class="row text-center">
                             <div class="col-6 mb-2">
                                 <div class="p-2 bg-light rounded">
-                                    <h4 class="text-primary mb-0">{{ stats.total }}</h4>
+                                    <h4 class="text-secondary mb-0">{{ stats.total }}</h4>
                                     <small class="text-muted">Total candidatures</small>
                                 </div>
                             </div>
                             <div class="col-6 mb-2">
                                 <div class="p-2 bg-light rounded">
-                                    <h4 class="text-success mb-0">{{ stats.contratades }}</h4>
+                                    <h4 class="text-secondary mb-0">{{ stats.contratades }}</h4>
                                     <small class="text-muted">Contratades</small>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="p-2 bg-light rounded">
-                                    <h4 class="text-info mb-0">{{ stats.preseleccionades }}</h4>
+                                    <h4 class="text-secondary mb-0">{{ stats.preseleccionades }}</h4>
                                     <small class="text-muted">Preseleccionades</small>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="p-2 bg-light rounded">
-                                    <h4 class="text-warning mb-0">{{ stats.entrevistes }}</h4>
+                                    <h4 class="text-secondary mb-0">{{ stats.entrevistes }}</h4>
                                     <small class="text-muted">Entrevistes</small>
                                 </div>
                             </div>
@@ -275,6 +275,26 @@
                 </div>
             </div>
         {% endif %}
+
+        <!-- Tancament de l'oferta -->
+        <div class="card shadow-lg border-0 mt-4 mb-4">
+            <div class="card-body p-4">
+                <h5 class="card-title mb-3">Gestió de l'Oferta</h5>
+                <div class="mb-3">
+                    <label for="valoracioEmpresa" class="form-label">Valoració de l'Empresa (obligatori per tancar)</label>
+                    <textarea class="form-control" id="valoracioEmpresa" rows="4" placeholder="Escriu aquí la teva valoració sobre el procés de selecció i els candidats..."></textarea>
+                    <div id="valoracioError" class="text-danger mt-1" style="display: none;">La valoració és obligatòria per tancar l'oferta.</div>
+                </div>
+                <button id="toggleOfferStatusBtn" class="btn btn-primary btn-lg w-100" disabled>
+                    <i class="bi bi-lock me-2"></i>
+                    Tancar Oferta
+                </button>
+                <small class="text-muted mt-2 d-block text-center" id="offerStatusHint">
+                    Per tancar l'oferta, totes les candidatures han d'estar en estat "Contractada" o "Rebutjada" i la valoració ha de ser omplerta.
+                </small>
+            </div>
+        </div>
+
     </div>
 </div>
 
