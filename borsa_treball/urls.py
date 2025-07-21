@@ -66,6 +66,7 @@ urlpatterns = [
     path('candidatures/<int:candidatura_id>/eliminar_api/', views_estudiant.eliminar_candidatura_api, name='eliminar_candidatura_api'),
 
     path('ofertes/<int:oferta_id>/candidatures/', views_empresa.candidatures_oferta, name='llista_candidatures_oferta'),
+    path('api/ofertes/<int:oferta_id>/candidatures/', views_empresa.api_candidatures_oferta, name='api_candidatures_oferta'),
     path('candidatures/<int:candidatura_id>/carta/',views_empresa.veure_carta_presentacio, name='veure_carta_presentacio'),
     path('candidatures/<int:candidatura_id>/cv/', views_empresa.descarregar_cv_candidatura, name='descarregar_cv_candidatura'),
     path('candidatures/<int:candidatura_id>/canviar-estat/', views_empresa.canviar_estat_candidatura, name='canviar_estat_candidatura'),

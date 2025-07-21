@@ -530,6 +530,77 @@ def toggle_visibilitat_oferta(request, oferta_id):
 
 
 #
+#  TANCAR/OBRIR OFERTA: API 
+#
+
+@login_required
+@require_http_methods(["POST"])
+def toggle_tancament_oferta(request, oferta_id):
+    """
+    Vista per canviar l'estat de l'oferta: AC (activa) a TC (tancada) o viceversa,
+    i desar la valoració si es tanca.
+    """
+    try:
+        empresa = request.user.empresa
+    except Empresa.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'No tens permisos per realitzar aquesta acció.'
+        }, status=403)
+            
+    try:
+        oferta = Oferta.objects.get(id=oferta_id, empresa=empresa)
+    except Oferta.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Oferta no trobada'}, status=404)
+            
+    try:
+        data = json.loads(request.body)
+        new_estat = data.get('estat')
+        valoracio = data.get('valoracio', '').strip() # Get valoracio, default to empty string and strip whitespace
+
+        if new_estat == 'TC': # If the new state is 'Tancada'
+            if not valoracio:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'La valoració és obligatòria per tancar l\'oferta.'
+                }, status=400) # Bad Request
+            oferta.estat = 'TC'
+            oferta.valoracio = valoracio # Save the valoracio
+            status_text = "tancada"
+        elif new_estat == 'AC': # If the new state is 'Activa' (re-opening)
+            oferta.estat = 'AC'
+            oferta.valoracio = '' # Clear valoracio when re-opening
+            status_text = "activa"
+        else:
+            return JsonResponse({
+                'success': False,
+                'error': 'Estat no vàlid proporcionat.'
+            }, status=400)
+
+        oferta.save()
+                
+        return JsonResponse({
+            'success': True,
+            'message': f'L\'oferta "{oferta.titol}" ara és {status_text}.',
+            'estat': oferta.estat,
+            'oferta_id': oferta.id,
+            'valoracio': oferta.valoracio # Return the updated valoracio
+        })
+            
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'error': 'Format de petició JSON invàlid.'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': f'Error en canviar l\'estat de l\'oferta: {str(e)}'
+        }, status=500)
+
+
+
+#
 #   ELIMINAR OFERTA
 #     
 
@@ -937,88 +1008,188 @@ def eliminar_perfil_empresa(request):
 #
 # --------------------------------------------------------------------------------------------------------
 
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.utils import timezone
+from django.db.models import Q, Count # Encara necessaris per a les estadístiques si es calculen aquí
+# Assuming EstatCandidatura, Oferta, Empresa are imported from your models.py
+# from .models import EstatCandidatura, Oferta, Empresa
+
+
+
 @login_required
 def candidatures_oferta(request, oferta_id):
     """
-    Vista per veure les candidatures d'una oferta específica.
+    Vista per renderitzar la pàgina de candidatures d'una oferta específica.
+    Les candidatures es carregaran dinàmicament via API.
     """
     try:
         empresa = request.user.empresa
     except Empresa.DoesNotExist:
         messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
         return redirect('index')
-    
+            
     # Obtenir l'oferta i verificar que pertany a l'empresa
     oferta = get_object_or_404(Oferta, id=oferta_id, empresa=empresa)
-    
+        
+    # Filtres inicials (per inicialitzar els controls del frontend)
+    estat_filtre = request.GET.get('estat', '')
+    cerca = request.GET.get('cerca', '')
+    ordenar = request.GET.get('ordenar', '-data_candidatura')
+        
+    # Estadístiques: Es mantenen aquí per a la càrrega inicial de la capçalera.
+    # El JavaScript té una funció `updateStats` que les pot actualitzar
+    # després de cada càrrega de dades de l'API si cal.
+    stats = oferta.candidatures.filter(activa=True).aggregate(
+        total=Count('id'),
+        rebutjades=Count('id', filter=Q(estat='RE')),
+        en_proces=Count('id', filter=Q(estat='EP')),
+        preseleccionades=Count('id', filter=Q(estat='PS')),
+        entrevistes=Count('id', filter=Q(estat='EV')),
+        contratades=Count('id', filter=Q(estat='CO')),
+    )
+        
+    # Calcular dies restants
+    today = timezone.now().date()
+    dies_restants = (oferta.data_limit - today).days if oferta.data_limit and oferta.data_limit > today else 0
+        
+    context = {
+        'oferta': oferta,
+        # 'candidatures': candidatures_page, # Aquests ja NO es passen al context
+        'stats': stats,
+        'dies_restants': dies_restants,
+        'estat_filtre': estat_filtre, # Per inicialitzar el select de filtre
+        'cerca': cerca,             # Per inicialitzar el camp de cerca
+        'ordenar': ordenar,         # Per inicialitzar el select d'ordenació
+        'estats_choices': EstatCandidatura.choices, # Per omplir el select de filtre d'estat
+        'today': today,
+    }
+        
+    return render(request, 'borsa_treball/llista_candidatures_oferta.html', context)
+
+
+@login_required
+@require_GET # Ensure this view only accepts GET requests
+def api_candidatures_oferta(request, oferta_id):
+    """
+    Vista API per obtenir les candidatures d'una oferta específica en format JSON.
+    """
+    try:
+        empresa = request.user.empresa
+    except Empresa.DoesNotExist:
+        # For API, return JSON error instead of redirecting with messages
+        return JsonResponse({
+            'success': False,
+            'error': 'No tens permisos per accedir a aquesta pàgina.'
+        }, status=403)
+            
+    oferta = get_object_or_404(Oferta, id=oferta_id, empresa=empresa)
+        
     # Filtres
     estat_filtre = request.GET.get('estat', '')
     cerca = request.GET.get('cerca', '')
     ordenar = request.GET.get('ordenar', '-data_candidatura')
-    
-    # Obtenir candidatures i filtrar per 'activa=True'
-   
+        
     candidatures = oferta.candidatures.select_related('estudiant', 'estudiant__usuari').filter(activa=True)
-   
-    
+        
     # Aplicar filtres
     if estat_filtre:
         candidatures = candidatures.filter(estat=estat_filtre)
-    
     if cerca:
         candidatures = candidatures.filter(
             Q(estudiant__usuari__nom__icontains=cerca) |
             Q(estudiant__usuari__cognoms__icontains=cerca) |
-            Q(estudiant__usuari__email__icontains=cerca)          
+            Q(estudiant__usuari__email__icontains=cerca) 
         )
-    
+        
     # Ordenar
     if ordenar == 'nom':
         candidatures = candidatures.order_by('estudiant__usuari__nom', 'estudiant__usuari__cognoms')
     elif ordenar == 'estat':
         candidatures = candidatures.order_by('estat', '-data_candidatura')
     elif ordenar == 'puntuacio':
-        # Cal tenir en compte que si `puntuacio` és null, es posarà al principi/final segons el SGBD.
-        # Podries voler ordenar els nuls al final si és el cas.
+        # Considerar ordenar nuls al final si és necessari per la teva base de dades
         candidatures = candidatures.order_by('-puntuacio', '-data_candidatura')
     else:
         candidatures = candidatures.order_by('-data_candidatura')
-    
+        
     # Paginació
     paginator = Paginator(candidatures, 10)
-    page_number = request.GET.get('page')
+    page_number = request.GET.get('page', 1) # Default to page 1
     candidatures_page = paginator.get_page(page_number)
-    
+        
     # Estadístiques
-    
-    stats = oferta.candidatures.filter(activa=True).aggregate( 
+    stats = oferta.candidatures.filter(activa=True).aggregate(
         total=Count('id'),
-        rebutjades=Count('id', filter=Q(estat=EstatCandidatura.REBUTJADA)),
-        en_proces=Count('id', filter=Q(estat=EstatCandidatura.EN_PROCES)),
-        preseleccionades=Count('id', filter=Q(estat=EstatCandidatura.PRESELECCIONADA)),
-        entrevistes=Count('id', filter=Q(estat=EstatCandidatura.ENTREVISTA)),
-        contratades=Count('id', filter=Q(estat=EstatCandidatura.CONTRATADA)),
+        rebutjades=Count('id', filter=Q(estat='RE')), # Use string values for choices
+        en_proces=Count('id', filter=Q(estat='EP')),
+        preseleccionades=Count('id', filter=Q(estat='PS')),
+        entrevistes=Count('id', filter=Q(estat='EV')),
+        contratades=Count('id', filter=Q(estat='CO')),
     )
-    
+        
     # Calcular dies restants
     today = timezone.now().date()
-    dies_restants = (oferta.data_limit - today).days if oferta.data_limit and oferta.data_limit > today else 0 
-   
+    dies_restants = (oferta.data_limit - today).days if oferta.data_limit and oferta.data_limit > today else 0
     
-    context = {
-        'oferta': oferta,
-        'candidatures': candidatures_page,
+    # Preparar les dades de les candidatures per a JSON
+    candidatures_data = []
+    for candidatura in candidatures_page.object_list:
+        candidatures_data.append({
+            'id': candidatura.id,
+            'estat': candidatura.estat,
+            'estat_display': candidatura.get_estat_display(), # Get human-readable status
+            'data_candidatura': candidatura.data_candidatura.isoformat(), # ISO format for JS
+            'data_candidatura_timesince': (timezone.now() - candidatura.data_candidatura).total_seconds(), # Seconds for frontend calculation
+            'cv_adjunt': bool(candidatura.cv_adjunt), # Convert to boolean
+            'carta_presentacio': bool(candidatura.carta_presentacio), # Convert to boolean
+            'puntuacio': candidatura.puntuacio,
+            'notes': candidatura.notes,
+            'estudiant': {
+                'id': candidatura.estudiant.id,
+                'nom_complet': candidatura.estudiant.usuari.get_full_name(),
+                'email': candidatura.estudiant.usuari.email,
+                'inicials': f"{candidatura.estudiant.usuari.nom[0]}{candidatura.estudiant.usuari.cognoms[0]}" if candidatura.estudiant.usuari.nom and candidatura.estudiant.usuari.cognoms else '',
+            }
+        })
+
+    # Preparar les dades de paginació
+    pagination_data = {
+        'current_page': candidatures_page.number,
+        'num_pages': paginator.num_pages,
+        'has_next': candidatures_page.has_next(),
+        'has_previous': candidatures_page.has_previous(),
+        'start_index': candidatures_page.start_index,
+        'end_index': candidatures_page.end_index,
+        'total_count': paginator.count,
+    }
+
+    # Preparar les opcions d'estat per als selects del frontend
+    estats_choices_data = [{'value': choice[0], 'label': choice[1]} for choice in EstatCandidatura.choices]
+
+    # Retornar totes les dades en un sol JSON
+    return JsonResponse({
+        'success': True,
+        'oferta': {
+            'id': oferta.id,
+            'titol': oferta.titol,
+            'descripcio': oferta.descripcio,
+            'lloc_treball': oferta.lloc_treball,
+            'data_publicacio': oferta.data_publicacio.isoformat(),
+            'data_limit': oferta.data_limit.isoformat() if oferta.data_limit else None,
+            'estat': oferta.estat,
+            'valoracio': oferta.valoracio,
+        },
+        'candidatures': candidatures_data,
         'stats': stats,
         'dies_restants': dies_restants,
         'estat_filtre': estat_filtre,
         'cerca': cerca,
         'ordenar': ordenar,
-        'estats_choices': EstatCandidatura.choices,
-        'today': today,
-    }
-    
-    return render(request, 'borsa_treball/llista_candidatures_oferta.html', context)
-
+        'estats_choices': estats_choices_data,
+        'pagination': pagination_data,
+    })
 
 @login_required
 def veure_carta_presentacio(request, candidatura_id):

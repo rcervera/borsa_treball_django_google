@@ -13,7 +13,6 @@
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <div class="d-flex align-items-center mb-3">
-                            
                             <div>
                                 <h2 class="h4 text-dark mb-1">{{ oferta.titol }}</h2>
                                 <small class="text-muted">{{ oferta.descripcio }}</small>
@@ -22,14 +21,13 @@
                                     <span>{{ oferta.lloc_treball }}</span>
                                     <span class="mx-2">•</span>
                                     <i class="bi bi-calendar-event me-2"></i>
-                                    <span>Publicada {{ oferta.data_publicacio}}</span>
+                                    <span>Publicada {{ oferta.data_publicacio|date:"d/m/Y" }}</span>
                                 </div>
                             </div>
                         </div>
                         
                         <!-- Badges d'informació -->
                         <div class="d-flex flex-wrap align-items-center">
-                            
                             {% if dies_restants > 0 %}
                             <span class="badge bg-{% if dies_restants <= 7 %}danger{% elif dies_restants <= 14 %}warning{% else %}success{% endif %} me-2 mb-2">
                                 <i class="bi bi-clock me-1"></i>
@@ -45,44 +43,42 @@
                     </div>
                     
                     <div class="col-md-4">
-                        <!-- Estadístiques ràpides -->
+                        <!-- Estadístiques ràpides (actualitzades per JS) -->
                         <div class="row text-center">
                             <div class="col-6 mb-2">
                                 <div class="p-2 bg-light rounded">
-                                    <h4 class="text-secondary mb-0">{{ stats.total }}</h4>
+                                    <h4 class="text-secondary mb-0" id="stat-total">{{ stats.total }}</h4>
                                     <small class="text-muted">Total candidatures</small>
                                 </div>
                             </div>
                             <div class="col-6 mb-2">
                                 <div class="p-2 bg-light rounded">
-                                    <h4 class="text-secondary mb-0">{{ stats.contratades }}</h4>
-                                    <small class="text-muted">Contratades</small>
+                                    <h4 class="text-secondary mb-0" id="stat-contratades">{{ stats.contratades }}</h4>
+                                    <small class="text-muted">Contractades</small>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="p-2 bg-light rounded">
-                                    <h4 class="text-secondary mb-0">{{ stats.preseleccionades }}</h4>
+                                    <h4 class="text-secondary mb-0" id="stat-preseleccionades">{{ stats.preseleccionades }}</h4>
                                     <small class="text-muted">Preseleccionades</small>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="p-2 bg-light rounded">
-                                    <h4 class="text-secondary mb-0">{{ stats.entrevistes }}</h4>
+                                    <h4 class="text-secondary mb-0" id="stat-entrevistes">{{ stats.entrevistes }}</h4>
                                     <small class="text-muted">Entrevistes</small>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                
             </div>
         </div>
 
         <!-- Filtres i cerca -->
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-body p-3">
-                <form method="get" class="row g-3 align-items-end">
+                <form class="row g-3 align-items-end" id="filter-form">
                     <div class="col-md-3">
                         <label for="cerca" class="form-label">Cercar candidat</label>
                         <div class="input-group">
@@ -116,7 +112,7 @@
                             <option value="-data_candidatura" {% if ordenar == '-data_candidatura' %}selected{% endif %}>Data (més recent)</option>
                             <option value="nom" {% if ordenar == 'nom' %}selected{% endif %}>Nom</option>
                             <option value="estat" {% if ordenar == 'estat' %}selected{% endif %}>Estat</option>
-                            
+                            <option value="puntuacio" {% if ordenar == 'puntuacio' %}selected{% endif %}>Puntuació</option>
                         </select>
                     </div>
                     
@@ -124,164 +120,38 @@
                         <button type="submit" class="btn btn-primary w-50 rounded-pill" title="Aplicar filtres">
                             <i class="bi bi-funnel me-2"></i>
                         </button>
-                        <a href="{% url 'llista_candidatures_oferta' oferta.id %}" class="btn btn-outline-secondary btn-sm ms-2" title="Netejar filtres">
+                        <a href="#" id="clear-filters-btn" class="btn btn-outline-secondary btn-sm ms-2" title="Netejar filtres">
                             <i class="bi bi-arrow-clockwise"></i>
                         </a>
                     </div>
                     
                     <div class="col-md-2 text-end">
-                        <small class="text-muted">
-                            {{ candidatures.start_index }}-{{ candidatures.end_index }} de {{ candidatures.paginator.count }}
+                        <small class="text-muted" id="pagination-count-text">
+                            <!-- Aquest text s'actualitzarà amb JS -->
                         </small>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Llista de candidatures -->
-        {% if candidatures %}
-            <div class="row">
-                {% for candidatura in candidatures %}
-                <div class="col-12 mb-3">
-                    <div class="card shadow-sm border-0 candidatura-card">
-                        <div class="card-body p-4">
-                            <div class="row align-items-center">
-                                <!-- Informació del candidat -->
-                                <div class="col-md-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="me-3">
-                                            <div class="avatar-circle bg-primary text-white d-flex align-items-center justify-content-center">
-                                                {{ candidatura.estudiant.usuari.nom.0 }}{{ candidatura.estudiant.usuari.cognoms.0 }}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-1 text-dark">
-                                                {{ candidatura.estudiant.usuari.get_full_name }}
-                                            </h6>
-                                            
-                                            
-                                            <small class="text-muted">
-                                                <i class="bi bi-envelope me-1"></i>
-                                                {{ candidatura.estudiant.usuari.email }}
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Estat i data -->
-                                <div class="col-md-2">
-                                    <div class="mb-2">
-                                        <select class="form-select  estat-select" 
-                                                data-candidatura-id="{{ candidatura.id }}"
-                                                data-estat-actual="{{ candidatura.estat }}">
-                                            {% for value, label in estats_choices %}
-                                            <option value="{{ value }}" {% if candidatura.estat == value %}selected{% endif %}>
-                                                {{ label }}
-                                            </option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    <small class="text-muted">
-                                        <i class="bi bi-clock me-1"></i>
-                                        {{ candidatura.data_candidatura|timesince }} enrere
-                                    </small>
-                                </div>
-                                
-                                
-                                <!-- Accions -->
-                                <div class="col-md-4">
-                                    <div class="d-flex flex-wrap gap-2 justify-content-end">
-                                        {% if candidatura.cv_adjunt %}
-                                        <a href="{% url 'descarregar_cv_candidatura' candidatura.id %}" 
-                                           class="btn btn-sm btn-outline-primary" 
-                                           title="Descarregar CV">
-                                            <i class="bi bi-download"></i>
-                                        </a>
-                                        {% endif %}
-                                        
-                                        {% if candidatura.carta_presentacio %}
-                                        <button class="btn btn-sm btn-outline-info" 
-                                                onclick="veureCarta({{ candidatura.id }})"
-                                                title="Veure carta de presentació">
-                                            <i class="bi bi-envelope-open"></i>
-                                        </button>
-                                        {% endif %}
-                                        
-                                       
-                                        
-                                        
-                                    </div>
-                                    
-                                    
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            
-            <!-- Paginació -->
-            {% if candidatures.has_other_pages %}
-            <nav aria-label="Paginació candidatures">
-                <ul class="pagination justify-content-center">
-                    {% if candidatures.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ candidatures.previous_page_number }}{% if cerca %}&cerca={{ cerca }}{% endif %}{% if estat_filtre %}&estat={{ estat_filtre }}{% endif %}{% if ordenar %}&ordenar={{ ordenar }}{% endif %}">
-                            <i class="bi bi-chevron-left"></i>
-                        </a>
-                    </li>
-                    {% endif %}
-                    
-                    {% for num in candidatures.paginator.page_range %}
-                    {% if candidatures.number == num %}
-                    <li class="page-item active">
-                        <span class="page-link">{{ num }}</span>
-                    </li>
-                    {% elif num > candidatures.number|add:'-3' and num < candidatures.number|add:'3' %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ num }}{% if cerca %}&cerca={{ cerca }}{% endif %}{% if estat_filtre %}&estat={{ estat_filtre }}{% endif %}{% if ordenar %}&ordenar={{ ordenar }}{% endif %}">{{ num }}</a>
-                    </li>
-                    {% endif %}
-                    {% endfor %}
-                    
-                    {% if candidatures.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ candidatures.next_page_number }}{% if cerca %}&cerca={{ cerca }}{% endif %}{% if estat_filtre %}&estat={{ estat_filtre }}{% endif %}{% if ordenar %}&ordenar={{ ordenar }}{% endif %}">
-                            <i class="bi bi-chevron-right"></i>
-                        </a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </nav>
-            {% endif %}
-        {% else %}
-            <!-- Estat buit -->
-            <div class="card shadow-sm border-0">
-                <div class="card-body text-center py-5">
-                    <i class="bi bi-people text-muted" style="font-size: 4rem;"></i>
-                    <h4 class="text-muted mt-3">No hi ha candidatures</h4>
-                    {% if estat_filtre or cerca %}
-                    <p class="text-muted">No s'han trobat candidatures amb els filtres aplicats.</p>
-                    <a href="{% url 'llista_candidatures_oferta' oferta.id %}" class="btn btn-outline-primary">
-                        <i class="bi bi-x-lg me-2"></i>Netejar filtres
-                    </a>
-                    {% else %}
-                    <p class="text-muted">Encara no hi ha candidatures per aquesta oferta.</p>
-                    <a href="{% url 'editar_oferta' oferta.id %}" class="btn btn-outline-primary">
-                        <i class="bi bi-arrow-left me-2"></i>Tornar a l'oferta
-                    </a>
-                    {% endif %}
-                </div>
-            </div>
-        {% endif %}
+        <!-- Llista de candidatures (carregada per JS) -->
+        <div class="row" id="candidatures-list-container">
+            <!-- Les candidatures es renderitzaran aquí amb JavaScript -->
+        </div>
+        
+        <!-- Paginació (carregada per JS) -->
+        <nav aria-label="Paginació candidatures" id="pagination-nav" style="display: none;">
+            <ul class="pagination justify-content-center">
+                <!-- Els controls de paginació es renderitzaran aquí amb JavaScript -->
+            </ul>
+        </nav>
 
-        <!-- Tancament de l'oferta -->
+        <!-- Secció per tancar/reobrir oferta -->
         <div class="card shadow-lg border-0 mt-4 mb-4">
             <div class="card-body p-4">
-                <h5 class="card-title mb-3">Tancament de l'Oferta</h5>
+                <h5 class="card-title mb-3">Gestió de l'Oferta</h5>
                 <div class="mb-3">
-                    <label for="valoracioEmpresa" class="form-label">Valoració *</label>
+                    <label for="valoracioEmpresa" class="form-label">Valoració de l'Empresa (obligatori per tancar)</label>
                     <textarea class="form-control" id="valoracioEmpresa" rows="4" placeholder="Escriu aquí la teva valoració sobre el procés de selecció i els candidats..."></textarea>
                     <div id="valoracioError" class="text-danger mt-1" style="display: none;">La valoració és obligatòria per tancar l'oferta.</div>
                 </div>
@@ -375,125 +245,446 @@
 
 
 <script>
-let candidaturaActual = null;
-
+// --- Variables globals per mantenir l'estat ---
 const ofertaId = {{ oferta.id }};
-let ofertaEstat = "{{ oferta.estat }}"; 
-const ofertaValoracio = "{{ oferta.valoracio_empresa |default:'' }}"; 
+let ofertaEstat = "{{ oferta.estat }}"; // 'AC' (Activa) o 'TC' (Tancada)
+let ofertaValoracio = "{{ oferta.valoracio|default:'' }}"; // Valoració actual de l'oferta
 
+let currentPage = 1;
+let currentSearch = "{{ cerca }}";
+let currentEstatFiltre = "{{ estat_filtre }}";
+let currentOrdenar = "{{ ordenar }}";
+
+// --- Elements del DOM per a la gestió de l'oferta ---
 const valoracioTextarea = document.getElementById('valoracioEmpresa');
 const valoracioError = document.getElementById('valoracioError');
 const toggleOfferStatusBtn = document.getElementById('toggleOfferStatusBtn');
 const offerStatusHint = document.getElementById('offerStatusHint');
 
-// Canviar estat de candidatura
-document.addEventListener('DOMContentLoaded', function() {
-    const estatSelects = document.querySelectorAll('.estat-select');
+// --- Funcions auxiliars ---
+
+// Funció per obtenir el CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Funció per mostrar notificacions toast
+function mostrarNotificacio(missatge, tipus) {
+    const toastContainer = document.getElementById('toast-container') || createToastContainer();
     
-    estatSelects.forEach(select => {
-        select.addEventListener('change', function() {
-            const candidaturaId = this.dataset.candidaturaId;
-            const nouEstat = this.value;
-            const estatActual = this.dataset.estatActual;
-            
-            if (nouEstat === estatActual) return;
-            
-            // Mostrar loading
-            this.disabled = true;
-            
-            fetch(`/candidatures/${candidaturaId}/canviar-estat/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': getCookie('csrftoken'),
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `estat=${nouEstat}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    this.dataset.estatActual = nouEstat;                    
-                    // Mostrar notificació
-                    mostrarNotificacio(data.message, 'success');
-                    updateOfferToggleButton(); // Re-evaluate the offer button state after candidature status changes
-                } else {
-                    // Revertir el canvi
-                    this.value = estatActual;
-                    mostrarNotificacio(data.error || 'Error en canviar l\'estat', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                this.value = estatActual;
-                mostrarNotificacio('Error de connexió', 'error');
-            })
-            .finally(() => {
-                this.disabled = false;
-            });
+    const toastId = 'toast-' + Date.now();
+    const toastHtml = `
+        <div id="${toastId}" class="toast align-items-center text-white bg-${tipus === 'success' ? 'success' : tipus === 'error' ? 'danger' : 'info'} border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-${tipus === 'success' ? 'check-circle' : tipus === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+                    ${missatge}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    
+    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+    
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement, { delay: 5000 });
+    toast.show();
+    
+    toastElement.addEventListener('hidden.bs.toast', function() {
+        this.remove();
+    });
+}
+
+// Funció per crear el contenidor de toasts si no existeix
+function createToastContainer() {
+    const container = document.createElement('div');
+    container.id = 'toast-container';
+    container.className = 'toast-container position-fixed top-0 end-0 p-3';
+    container.style.zIndex = '1055';
+    document.body.appendChild(container);
+    return container;
+}
+
+// Funció per calcular el "timesince" al frontend
+function formatTimeSince(seconds) {
+    if (seconds < 60) return `${Math.floor(seconds)} segons enrere`;
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} minuts enrere`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hores enrere`;
+    const days = Math.floor(hours / 24);
+    return `${days} dies enrere`;
+}
+
+// --- Lògica de la gestió de l'oferta ---
+
+// Funció per comprovar si totes les candidatures estan en un estat final
+function areAllCandidaturesFinal() {
+    const estatSelects = document.querySelectorAll('.estat-select');
+    if (estatSelects.length === 0) {
+        return true; // Si no hi ha candidatures, es considera "final" per tancar l'oferta
+    }
+    let allFinal = true;
+    for (let i = 0; i < estatSelects.length; i++) {
+        const select = estatSelects[i];
+        const currentStatus = select.value;
+        if (currentStatus !== 'CO' && currentStatus !== 'RE') { // 'CO' = Contractada, 'RE' = Rebutjada
+            allFinal = false;
+            break;
+        }
+    }
+    return allFinal;
+}
+
+// Funció per actualitzar l'estat i el text del botó de l'oferta
+function updateOfferToggleButton() {
+    const valoracionFilled = valoracioTextarea.value.trim().length > 0;
+    const allCandidaturesFinal = areAllCandidaturesFinal();
+
+    if (ofertaEstat === 'TC') { // 'TC' = Tancada
+        toggleOfferStatusBtn.textContent = 'Re-obrir Oferta';
+        toggleOfferStatusBtn.classList.remove('btn-primary');
+        toggleOfferStatusBtn.classList.add('btn-warning');
+        toggleOfferStatusBtn.disabled = false; // Sempre es pot re-obrir
+        valoracioTextarea.disabled = true; // Deshabilitar textarea quan l'oferta està tancada
+        valoracioError.style.display = 'none';
+        offerStatusHint.textContent = 'L\'oferta està tancada. Pots re-obrir-la en qualsevol moment.';
+        if (ofertaValoracio && valoracioTextarea.value === '') {
+            valoracioTextarea.value = ofertaValoracio;
+        }
+    } else { // 'AC' = Activa
+        toggleOfferStatusBtn.textContent = 'Tancar Oferta';
+        toggleOfferStatusBtn.classList.remove('btn-warning');
+        toggleOfferStatusBtn.classList.add('btn-primary');
+        valoracioTextarea.disabled = false; // Habilitar textarea quan l'oferta està oberta
+        
+        if (valoracionFilled && allCandidaturesFinal) {
+            toggleOfferStatusBtn.disabled = false;
+            valoracioError.style.display = 'none';
+            offerStatusHint.textContent = 'Totes les condicions per tancar l\'oferta es compleixen.';
+        } else {
+            toggleOfferStatusBtn.disabled = true;
+            if (!valoracionFilled) {
+                valoracioError.style.display = 'block';
+                offerStatusHint.textContent = 'La valoració és obligatòria per tancar l\'oferta.';
+            } else {
+                valoracioError.style.display = 'none';
+                offerStatusHint.textContent = 'Per tancar l\'oferta, totes les candidatures han d\'estar en estat "Contractada" o "Rebutjada".';
+            }
+        }
+    }
+}
+
+// --- Lògica de càrrega i renderització de candidatures ---
+
+// Funció principal per carregar les candidatures
+async function loadCandidatures() {
+    const url = `/api/ofertes/${ofertaId}/candidatures/?page=${currentPage}&cerca=${currentSearch}&estat=${currentEstatFiltre}&ordenar=${currentOrdenar}`;
+
+    const candidaturesListContainer = document.getElementById('candidatures-list-container');
+    if (candidaturesListContainer) {
+        candidaturesListContainer.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Carregant...</span></div><p class="mt-2 text-muted">Carregant candidatures...</p></div>';
+    }
+    
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.success) {
+            // Actualitzar l'estat global de l'oferta i el botó
+            ofertaEstat = data.oferta.estat;
+            ofertaValoracio = data.oferta.valoracio || '';
+            updateOfferToggleButton();
+
+            // Actualitzar estadístiques
+            updateStats(data.stats);
+
+            // Renderitzar la llista de candidatures
+            renderCandidatures(data.candidatures, data.estats_choices);
+
+            // Renderitzar la paginació
+            renderPagination(data.pagination);
+
+            // Actualitzar el text de "X de Y"
+            const countTextElement = document.getElementById('pagination-count-text');
+            if (countTextElement) {
+                countTextElement.textContent = `${data.pagination.start_index}-${data.pagination.end_index} de ${data.pagination.total_count}`;
+            }
+
+            // Si no hi ha candidatures, mostrar l'estat buit
+            if (data.candidatures.length === 0) {
+                renderEmptyState(data.estat_filtre || data.cerca);
+            }
+
+            // Re-inicialitzar els event listeners per als nous selects d'estat
+            attachEstatSelectListeners();
+
+        } else {
+            mostrarNotificacio(data.error || 'Error en carregar les candidatures', 'error');
+            if (candidaturesListContainer) {
+                candidaturesListContainer.innerHTML = `<div class="text-center py-5 text-danger"><i class="bi bi-exclamation-triangle" style="font-size: 4rem;"></i><h4 class="mt-3">Error</h4><p>${data.error || 'No s\'han pogut carregar les candidatures.'}</p></div>`;
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarNotificacio('Error de connexió al servidor', 'error');
+        if (candidaturesListContainer) {
+            candidaturesListContainer.innerHTML = `<div class="text-center py-5 text-danger"><i class="bi bi-exclamation-triangle" style="font-size: 4rem;"></i><h4 class="mt-3">Error de connexió</h4><p>No s'ha pogut connectar amb el servidor.</p></div>`;
+        }
+    }
+}
+
+// Funció per renderitzar les candidatures al DOM
+function renderCandidatures(candidatures, estatsChoices) {
+    const container = document.getElementById('candidatures-list-container');
+    if (!container) return;
+
+    container.innerHTML = ''; // Netejar contingut existent
+    if (candidatures.length === 0) {
+        return; // L'estat buit es gestionarà per renderEmptyState
+    }
+
+    const row = document.createElement('div');
+    row.className = 'row';
+
+    candidatures.forEach(candidatura => {
+        const col = document.createElement('div');
+        col.className = 'col-12 mb-3';
+        col.innerHTML = `
+            <div class="card shadow-sm border-0 candidatura-card">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <div class="avatar-circle bg-primary text-white d-flex align-items-center justify-content-center">
+                                        ${candidatura.estudiant.inicials}
+                                    </div>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 text-dark">
+                                        ${candidatura.estudiant.nom_complet}
+                                    </h6>
+                                    <small class="text-muted">
+                                        <i class="bi bi-envelope me-1"></i>
+                                        ${candidatura.estudiant.email}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="mb-2">
+                                <select class="form-select estat-select" 
+                                        data-candidatura-id="${candidatura.id}"
+                                        data-estat-actual="${candidatura.estat}">
+                                    ${estatsChoices.map(choice => `
+                                        <option value="${choice.value}" ${candidatura.estat === choice.value ? 'selected' : ''}>
+                                            ${choice.label}
+                                        </option>
+                                    `).join('')}
+                                </select>
+                            </div>
+                            <small class="text-muted">
+                                <i class="bi bi-clock me-1"></i>
+                                ${formatTimeSince(candidatura.data_candidatura_timesince)}
+                            </small>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex flex-wrap gap-2 justify-content-end">
+                                ${candidatura.cv_adjunt ? `
+                                <a href="/candidatures/${candidatura.id}/descarregar-cv/" 
+                                   class="btn btn-sm btn-outline-primary" 
+                                   title="Descarregar CV">
+                                    <i class="bi bi-download"></i>
+                                </a>` : ''}
+                                ${candidatura.carta_presentacio ? `
+                                <button class="btn btn-sm btn-outline-info" 
+                                        onclick="veureCarta(${candidatura.id})"
+                                        title="Veure carta de presentació">
+                                    <i class="bi bi-envelope-open"></i>
+                                </button>` : ''}
+                                <button class="btn btn-sm btn-outline-secondary" 
+                                        onclick="editarNotes(${candidatura.id}, \`${candidatura.notes || ''}\`, '${candidatura.puntuacio || ''}')"
+                                        title="Editar notes i puntuació">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-success" 
+                                        onclick="contactarCandidatura(${candidatura.id})"
+                                        title="Contactar candidat">
+                                    <i class="bi bi-chat-dots"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        row.appendChild(col);
+    });
+    container.appendChild(row);
+}
+
+// Funció per renderitzar l'estat buit
+function renderEmptyState(hasFilters) {
+    const container = document.getElementById('candidatures-list-container');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-people text-muted" style="font-size: 4rem;"></i>
+                <h4 class="text-muted mt-3">No hi ha candidatures</h4>
+                ${hasFilters ? `
+                <p class="text-muted">No s'han trobat candidatures amb els filtres aplicats.</p>
+                <button onclick="clearFiltersAndLoad()" class="btn btn-outline-primary">
+                    <i class="bi bi-x-lg me-2"></i>Netejar filtres
+                </button>` : `
+                <p class="text-muted">Encara no hi ha candidatures per aquesta oferta.</p>
+                <a href="{% url 'editar_oferta' oferta.id %}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left me-2"></i>Tornar a l'oferta
+                </a>`}
+            </div>
+        </div>
+    `;
+}
+
+// Funció per netejar filtres i recarregar
+function clearFiltersAndLoad() {
+    currentSearch = '';
+    currentEstatFiltre = '';
+    currentOrdenar = '-data_candidatura';
+    currentPage = 1;
+    document.getElementById('cerca').value = '';
+    document.getElementById('estat').value = '';
+    document.getElementById('ordenar').value = '-data_candidatura';
+    loadCandidatures();
+}
+
+// Funció per actualitzar les estadístiques a la capçalera
+function updateStats(stats) {
+    document.getElementById('stat-total').textContent = stats.total;
+    document.getElementById('stat-contratades').textContent = stats.contratades;
+    document.getElementById('stat-preseleccionades').textContent = stats.preseleccionades;
+    document.getElementById('stat-entrevistes').textContent = stats.entrevistes;
+}
+
+// Funció per renderitzar la paginació
+function renderPagination(pagination) {
+    const paginationNav = document.getElementById('pagination-nav');
+    const ul = paginationNav.querySelector('.pagination');
+    ul.innerHTML = ''; // Netejar paginació existent
+
+    if (pagination.num_pages <= 1) {
+        paginationNav.style.display = 'none';
+        return;
+    }
+    paginationNav.style.display = 'block';
+
+    // Botó "Anterior"
+    if (pagination.has_previous) {
+        const li = document.createElement('li');
+        li.className = 'page-item';
+        li.innerHTML = `<a class="page-link" href="#" data-page="${pagination.current_page - 1}"><i class="bi bi-chevron-left"></i></a>`;
+        ul.appendChild(li);
+    }
+
+    // Números de pàgina
+    for (let i = 1; i <= pagination.num_pages; i++) {
+        // Mostrar fins a 2 pàgines abans i 2 després de la pàgina actual, més la primera i l'última
+        if (i === 1 || i === pagination.num_pages || (i >= pagination.current_page - 2 && i <= pagination.current_page + 2)) {
+            const li = document.createElement('li');
+            li.className = `page-item ${i === pagination.current_page ? 'active' : ''}`;
+            li.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`;
+            ul.appendChild(li);
+        } else if (i === pagination.current_page - 3 || i === pagination.current_page + 3) {
+            // Afegir elipsis
+            const li = document.createElement('li');
+            li.className = 'page-item disabled';
+            li.innerHTML = `<span class="page-link">...</span>`;
+            ul.appendChild(li);
+        }
+    }
+
+    // Botó "Següent"
+    if (pagination.has_next) {
+        const li = document.createElement('li');
+        li.className = 'page-item';
+        li.innerHTML = `<a class="page-link" href="#" data-page="${pagination.current_page + 1}"><i class="bi bi-chevron-right"></i></a>`;
+        ul.appendChild(li);
+    }
+
+    // Afegir event listeners als botons de paginació
+    ul.querySelectorAll('.page-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            currentPage = parseInt(this.dataset.page);
+            loadCandidatures();
         });
     });
+}
 
-    // Initial check for the offer toggle button when the page loads
-    updateOfferToggleButton();
+// Funció per adjuntar event listeners als selects d'estat (després de renderitzar)
+function attachEstatSelectListeners() {
+    const estatSelects = document.querySelectorAll('.estat-select');
+    estatSelects.forEach(select => {
+        select.removeEventListener('change', handleEstatChange); // Evitar duplicats
+        select.addEventListener('change', handleEstatChange);
+    });
+}
 
-    // Listen for changes in the textarea to enable/disable the button
-    valoracioTextarea.addEventListener('input', updateOfferToggleButton);
-
-    // Event listener for the main offer toggle button
-    toggleOfferStatusBtn.addEventListener('click', function() {
-        const newOfferStatus = ofertaEstat === 'Tancada' ? 'Oberta' : 'Tancada';
-        const valoracio = valoracioTextarea.value.trim();
-
-        // Client-side validation for valoracio when closing
-        if (newOfferStatus === 'Tancada' && valoracio.length === 0) {
-            mostrarNotificacio('La valoració és obligatòria per tancar l\'oferta.', 'error');
-            valoracioError.style.display = 'block';
-            return;
-        } else {
-            valoracioError.style.display = 'none';
-        }
-
-        // Show loading state on the button
-        const originalText = toggleOfferStatusBtn.innerHTML;
-        toggleOfferStatusBtn.innerHTML = `<i class="bi bi-hourglass-split me-2"></i>${newOfferStatus === 'Tancada' ? 'Tancant...' : 'Re-obrint...'}`;
-        toggleOfferStatusBtn.disabled = true;
-
-        fetch(`/ofertes/${ofertaId}/toggle-estat/`, { // This is a placeholder for your new API endpoint
+// Handler per al canvi d'estat de candidatura
+async function handleEstatChange() {
+    const candidaturaId = this.dataset.candidaturaId;
+    const nouEstat = this.value;
+    const estatActual = this.dataset.estatActual;
+    
+    if (nouEstat === estatActual) return;
+    
+    this.disabled = true;
+    
+    try {
+        const response = await fetch(`/candidatures/${candidaturaId}/canviar-estat/`, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': getCookie('csrftoken'),
-                'Content-Type': 'application/json', // Use JSON for body
+                'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: JSON.stringify({
-                estat: newOfferStatus,
-                valoracio: newOfferStatus === 'Tancada' ? valoracio : '' // Send valoracio only when closing, clear when reopening
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                ofertaEstat = newOfferStatus; // Update local state of the offer
-                mostrarNotificacio(data.message, 'success');
-                // If offer is reopened, clear the textarea
-                if (ofertaEstat === 'Oberta') {
-                    valoracioTextarea.value = '';
-                }
-            } else {
-                mostrarNotificacio(data.error || 'Error en canviar l\'estat de l\'oferta', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            mostrarNotificacio('Error de connexió', 'error');
-        })
-        .finally(() => {
-            toggleOfferStatusBtn.innerHTML = originalText; // Restore original icon/text
-            updateOfferToggleButton(); // Re-evaluate button state after API call
+            body: `estat=${nouEstat}`
         });
-    });
+        const data = await response.json();
 
+        if (data.success) {
+            this.dataset.estatActual = nouEstat;
+            mostrarNotificacio(data.message, 'success');
+            updateOfferToggleButton(); // Re-avaluar l'estat del botó de l'oferta
+            // Opcional: recarregar les candidatures per si el canvi d'estat afecta els filtres
+            // loadCandidatures(); 
+        } else {
+            this.value = estatActual;
+            mostrarNotificacio(data.error || 'Error en canviar l\'estat', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        this.value = estatActual;
+        mostrarNotificacio('Error de connexió', 'error');
+    } finally {
+        this.disabled = false;
+    }
+}
 
-});
+// --- Funcions per modals (existents, amb petites adaptacions) ---
 
 // Veure carta de presentació
 function veureCarta(candidaturaId) {
@@ -517,6 +708,8 @@ function veureCarta(candidaturaId) {
     });
 }
 
+let candidaturaActual = null; // Variable global per a la candidatura que s'està editant
+
 // Editar notes
 function editarNotes(candidaturaId, notesActuals, puntuacioActual) {
     candidaturaActual = candidaturaId;
@@ -529,51 +722,44 @@ function editarNotes(candidaturaId, notesActuals, puntuacioActual) {
 }
 
 // Guardar notes
-document.getElementById('notesForm').addEventListener('submit', function(e) {
+document.getElementById('notesForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
     if (!candidaturaActual) return;
     
     const formData = new FormData(this);
     
-    // Mostrar loading
     const submitBtn = this.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Guardant...';
     submitBtn.disabled = true;
     
-    fetch(`/candidatures/${candidaturaActual}/notes/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken'),
-        },
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
+    try {
+        const response = await fetch(`/candidatures/${candidaturaActual}/notes/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: formData
+        });
+        const data = await response.json();
+
         if (data.success) {
             mostrarNotificacio(data.message, 'success');
-            
-            // Tancar modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('notesModal'));
             modal.hide();
-            
-            // Actualitzar la pàgina per mostrar els canvis
-            setTimeout(() => {
-                location.reload();
-            }, 1000);
+            // Recarregar les candidatures per reflectir les notes/puntuació actualitzades
+            loadCandidatures(); 
         } else {
             mostrarNotificacio(data.error || 'Error en guardar les notes', 'error');
         }
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('Error:', error);
         mostrarNotificacio('Error de connexió', 'error');
-    })
-    .finally(() => {
+    } finally {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
-    });
+    }
 });
 
 // Contactar candidatura (placeholder)
@@ -581,122 +767,94 @@ function contactarCandidatura(candidaturaId) {
     mostrarNotificacio('Funcionalitat de contacte en desenvolupament', 'info');
 }
 
-// Exportar candidatures (placeholder)
-function exportarCandidatures() {
-    mostrarNotificacio('Funcionalitat d\'exportació en desenvolupament', 'info');
-}
 
-// Funcions auxiliars
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
+// --- Inicialització al carregar el DOM ---
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Carregar les candidatures inicials
+    loadCandidatures();
+
+    // 2. Configurar el formulari de filtres
+    const filterForm = document.getElementById('filter-form');
+    if (filterForm) {
+        filterForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Evitar la recàrrega de la pàgina
+            currentSearch = document.getElementById('cerca').value;
+            currentEstatFiltre = document.getElementById('estat').value;
+            currentOrdenar = document.getElementById('ordenar').value;
+            currentPage = 1; // Tornar a la primera pàgina en aplicar filtres
+            loadCandidatures();
+        });
+
+        // Event listener per al botó de netejar filtres
+        const clearFiltersBtn = document.getElementById('clear-filters-btn');
+        if (clearFiltersBtn) {
+            clearFiltersBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                clearFiltersAndLoad();
+            });
         }
     }
-    return cookieValue;
-}
 
-function mostrarNotificacio(missatge, tipus) {
-    // Crear notificació toast
-    const toastContainer = document.getElementById('toast-container') || createToastContainer();
-    
-    const toastId = 'toast-' + Date.now();
-    const toastHtml = `
-        <div id="${toastId}" class="toast align-items-center text-white bg-${tipus === 'success' ? 'success' : tipus === 'error' ? 'danger' : 'info'} border-0" role="alert">
-            <div class="d-flex">
-                <div class="toast-body">
-                    <i class="bi bi-${tipus === 'success' ? 'check-circle' : tipus === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
-                    ${missatge}
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>
-    `;
-    
-    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
-    
-    const toastElement = document.getElementById(toastId);
-    const toast = new bootstrap.Toast(toastElement, { delay: 5000 });
-    toast.show();
-    
-    // Eliminar el toast del DOM després que es tanqui
-    toastElement.addEventListener('hidden.bs.toast', function() {
-        this.remove();
-    });
-}
+    // 3. Configurar la secció de gestió de l'oferta
+    // Inicialitzar l'estat del botó de l'oferta
+    updateOfferToggleButton();
 
-function createToastContainer() {
-    const container = document.createElement('div');
-    container.id = 'toast-container';
-    container.className = 'toast-container position-fixed top-0 end-0 p-3';
-    container.style.zIndex = '1055';
-    document.body.appendChild(container);
-    return container;
-}
+    // Listen for changes in the textarea to enable/disable the button
+    valoracioTextarea.addEventListener('input', updateOfferToggleButton);
 
-// Function to check if all candidatures are in a final state
-function areAllCandidaturesFinal() {
-    const estatSelects = document.querySelectorAll('.estat-select');
-    if (estatSelects.length === 0) {
-        // If there are no candidatures, it's considered "final" for closing purposes
-        return true;
-    }
-    let allFinal = true;
-    for (let i = 0; i < estatSelects.length; i++) {
-        const select = estatSelects[i];
-        const currentStatus = select.value; // Use select.value as it reflects the current state
-        if (currentStatus !== 'CO' && currentStatus !== 'RJ') {
-            allFinal = false;
-            break; // Exit early if one is not final
-        }
-    }
-    return allFinal;
-}
+    // Event listener per al botó principal de canvi d'estat de l'oferta
+    toggleOfferStatusBtn.addEventListener('click', async function() {
+        const newOfferStatus = ofertaEstat === 'TC' ? 'AC' : 'TC'; // 'AC' for Activa, 'TC' for Tancada
+        const valoracio = valoracioTextarea.value.trim();
 
-// Function to update the button state and text
-function updateOfferToggleButton() {
-    const valoracionFilled = valoracioTextarea.value.trim().length > 0;
-    const allCandidaturesFinal = areAllCandidaturesFinal();
-
-    if (ofertaEstat === 'Tancada') {
-        toggleOfferStatusBtn.textContent = 'Re-obrir Oferta';
-        toggleOfferStatusBtn.classList.remove('btn-primary');
-        toggleOfferStatusBtn.classList.add('btn-warning');
-        toggleOfferStatusBtn.disabled = false; // Always allow reopening
-        valoracioTextarea.disabled = true; // Disable textarea when offer is closed
-        valoracioError.style.display = 'none';
-        offerStatusHint.textContent = 'L\'oferta està tancada. Pots re-obrir-la en qualsevol moment.';
-        // Pre-fill valoracio if offer is closed and valoracio exists
-        if (ofertaValoracio && valoracioTextarea.value === '') { // Only pre-fill if not already typed
-            valoracioTextarea.value = ofertaValoracio;
-        }
-    } else {
-        toggleOfferStatusBtn.textContent = 'Tancar Oferta';
-        toggleOfferStatusBtn.classList.remove('btn-warning');
-        toggleOfferStatusBtn.classList.add('btn-primary');
-        valoracioTextarea.disabled = false; // Enable textarea when offer is open
-        
-        if (valoracionFilled && allCandidaturesFinal) {
-            toggleOfferStatusBtn.disabled = false;
-            valoracioError.style.display = 'none';
-            offerStatusHint.textContent = 'Totes les condicions per tancar l\'oferta es compleixen.';
+        // Validació client-side per la valoració quan es tanca
+        if (newOfferStatus === 'TC' && valoracio.length === 0) {
+            mostrarNotificacio('La valoració és obligatòria per tancar l\'oferta.', 'error');
+            valoracioError.style.display = 'block';
+            return;
         } else {
-            toggleOfferStatusBtn.disabled = true;
-            if (!valoracionFilled) {
-                valoracioError.style.display = 'block';
-                offerStatusHint.textContent = 'La valoració és obligatòria per tancar l\'oferta.';
-            } else {
-                valoracioError.style.display = 'none';
-                offerStatusHint.textContent = 'Per tancar l\'oferta, totes les candidatures han d\'estar en estat "Contractada" o "Rebutjada".';
-            }
+            valoracioError.style.display = 'none';
         }
-    }
-}
+
+        // Mostrar estat de càrrega al botó
+        const originalText = toggleOfferStatusBtn.innerHTML;
+        toggleOfferStatusBtn.innerHTML = `<i class="bi bi-hourglass-split me-2"></i>${newOfferStatus === 'TC' ? 'Tancant...' : 'Re-obrint...'}`;
+        toggleOfferStatusBtn.disabled = true;
+
+        try {
+            const response = await fetch(`/ofertes/${ofertaId}/toggle-estat/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    estat: newOfferStatus,
+                    valoracio: newOfferStatus === 'TC' ? valoracio : ''
+                })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                ofertaEstat = newOfferStatus; // Actualitzar l'estat local de l'oferta
+                mostrarNotificacio(data.message, 'success');
+                // Si l'oferta es re-obre, netejar la textarea
+                if (ofertaEstat === 'AC') {
+                    valoracioTextarea.value = '';
+                }
+                // Actualitzar la valoració de l'oferta si s'ha tancat
+                ofertaValoracio = data.valoracio || ''; // Assegurar que s'actualitza amb el valor retornat
+            } else {
+                mostrarNotificacio(data.error || 'Error en canviar l\'estat de l\'oferta', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            mostrarNotificacio('Error de connexió', 'error');
+        } finally {
+            toggleOfferStatusBtn.innerHTML = originalText;
+            updateOfferToggleButton(); // Re-avaluar l'estat del botó després de la crida API
+        }
+    });
+});
 </script>
 {% endblock %}
