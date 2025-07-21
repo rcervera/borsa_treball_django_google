@@ -279,9 +279,9 @@
         <!-- Tancament de l'oferta -->
         <div class="card shadow-lg border-0 mt-4 mb-4">
             <div class="card-body p-4">
-                <h5 class="card-title mb-3">Gestió de l'Oferta</h5>
+                <h5 class="card-title mb-3">Tancament de l'Oferta</h5>
                 <div class="mb-3">
-                    <label for="valoracioEmpresa" class="form-label">Valoració de l'Empresa (obligatori per tancar)</label>
+                    <label for="valoracioEmpresa" class="form-label">Valoració *</label>
                     <textarea class="form-control" id="valoracioEmpresa" rows="4" placeholder="Escriu aquí la teva valoració sobre el procés de selecció i els candidats..."></textarea>
                     <div id="valoracioError" class="text-danger mt-1" style="display: none;">La valoració és obligatòria per tancar l'oferta.</div>
                 </div>
@@ -377,6 +377,15 @@
 <script>
 let candidaturaActual = null;
 
+const ofertaId = {{ oferta.id }};
+let ofertaEstat = "{{ oferta.estat }}"; 
+const ofertaValoracio = "{{ oferta.valoracio_empresa |default:'' }}"; 
+
+const valoracioTextarea = document.getElementById('valoracioEmpresa');
+const valoracioError = document.getElementById('valoracioError');
+const toggleOfferStatusBtn = document.getElementById('toggleOfferStatusBtn');
+const offerStatusHint = document.getElementById('offerStatusHint');
+
 // Canviar estat de candidatura
 document.addEventListener('DOMContentLoaded', function() {
     const estatSelects = document.querySelectorAll('.estat-select');
@@ -423,6 +432,67 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+
+    // Initial check for the offer toggle button when the page loads
+    updateOfferToggleButton();
+
+    // Listen for changes in the textarea to enable/disable the button
+    valoracioTextarea.addEventListener('input', updateOfferToggleButton);
+
+    // Event listener for the main offer toggle button
+    toggleOfferStatusBtn.addEventListener('click', function() {
+        const newOfferStatus = ofertaEstat === 'Tancada' ? 'Oberta' : 'Tancada';
+        const valoracio = valoracioTextarea.value.trim();
+
+        // Client-side validation for valoracio when closing
+        if (newOfferStatus === 'Tancada' && valoracio.length === 0) {
+            mostrarNotificacio('La valoració és obligatòria per tancar l\'oferta.', 'error');
+            valoracioError.style.display = 'block';
+            return;
+        } else {
+            valoracioError.style.display = 'none';
+        }
+
+        // Show loading state on the button
+        const originalText = toggleOfferStatusBtn.innerHTML;
+        toggleOfferStatusBtn.innerHTML = `<i class="bi bi-hourglass-split me-2"></i>${newOfferStatus === 'Tancada' ? 'Tancant...' : 'Re-obrint...'}`;
+        toggleOfferStatusBtn.disabled = true;
+
+        fetch(`/ofertes/${ofertaId}/toggle-estat/`, { // This is a placeholder for your new API endpoint
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json', // Use JSON for body
+            },
+            body: JSON.stringify({
+                estat: newOfferStatus,
+                valoracio: newOfferStatus === 'Tancada' ? valoracio : '' // Send valoracio only when closing, clear when reopening
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                ofertaEstat = newOfferStatus; // Update local state of the offer
+                mostrarNotificacio(data.message, 'success');
+                // If offer is reopened, clear the textarea
+                if (ofertaEstat === 'Oberta') {
+                    valoracioTextarea.value = '';
+                }
+            } else {
+                mostrarNotificacio(data.error || 'Error en canviar l\'estat de l\'oferta', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarNotificacio('Error de connexió', 'error');
+        })
+        .finally(() => {
+            toggleOfferStatusBtn.innerHTML = originalText; // Restore original icon/text
+            updateOfferToggleButton(); // Re-evaluate button state after API call
+        });
+    });
+
+    
 });
 
 // Veure carta de presentació
@@ -568,6 +638,65 @@ function createToastContainer() {
     container.style.zIndex = '1055';
     document.body.appendChild(container);
     return container;
+}
+
+// Function to check if all candidatures are in a final state
+function areAllCandidaturesFinal() {
+    const estatSelects = document.querySelectorAll('.estat-select');
+    if (estatSelects.length === 0) {
+        // If there are no candidatures, it's considered "final" for closing purposes
+        return true;
+    }
+    let allFinal = true;
+    for (let i = 0; i < estatSelects.length; i++) {
+        const select = estatSelects[i];
+        const currentStatus = select.value; // Use select.value as it reflects the current state
+        if (currentStatus !== 'CO' && currentStatus !== 'RJ') {
+            allFinal = false;
+            break; // Exit early if one is not final
+        }
+    }
+    return allFinal;
+}
+
+// Function to update the button state and text
+function updateOfferToggleButton() {
+    const valoracionFilled = valoracioTextarea.value.trim().length > 0;
+    const allCandidaturesFinal = areAllCandidaturesFinal();
+
+    if (ofertaEstat === 'Tancada') {
+        toggleOfferStatusBtn.textContent = 'Re-obrir Oferta';
+        toggleOfferStatusBtn.classList.remove('btn-primary');
+        toggleOfferStatusBtn.classList.add('btn-warning');
+        toggleOfferStatusBtn.disabled = false; // Always allow reopening
+        valoracioTextarea.disabled = true; // Disable textarea when offer is closed
+        valoracioError.style.display = 'none';
+        offerStatusHint.textContent = 'L\'oferta està tancada. Pots re-obrir-la en qualsevol moment.';
+        // Pre-fill valoracio if offer is closed and valoracio exists
+        if (ofertaValoracio && valoracioTextarea.value === '') { // Only pre-fill if not already typed
+            valoracioTextarea.value = ofertaValoracio;
+        }
+    } else {
+        toggleOfferStatusBtn.textContent = 'Tancar Oferta';
+        toggleOfferStatusBtn.classList.remove('btn-warning');
+        toggleOfferStatusBtn.classList.add('btn-primary');
+        valoracioTextarea.disabled = false; // Enable textarea when offer is open
+        
+        if (valoracionFilled && allCandidaturesFinal) {
+            toggleOfferStatusBtn.disabled = false;
+            valoracioError.style.display = 'none';
+            offerStatusHint.textContent = 'Totes les condicions per tancar l\'oferta es compleixen.';
+        } else {
+            toggleOfferStatusBtn.disabled = true;
+            if (!valoracionFilled) {
+                valoracioError.style.display = 'block';
+                offerStatusHint.textContent = 'La valoració és obligatòria per tancar l\'oferta.';
+            } else {
+                valoracioError.style.display = 'none';
+                offerStatusHint.textContent = 'Per tancar l\'oferta, totes les candidatures han d\'estar en estat "Contractada" o "Rebutjada".';
+            }
+        }
+    }
 }
 </script>
 {% endblock %}
