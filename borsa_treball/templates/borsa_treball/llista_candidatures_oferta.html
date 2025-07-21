@@ -412,10 +412,10 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    this.dataset.estatActual = nouEstat;
-                    
+                    this.dataset.estatActual = nouEstat;                    
                     // Mostrar notificació
                     mostrarNotificacio(data.message, 'success');
+                    updateOfferToggleButton(); // Re-evaluate the offer button state after candidature status changes
                 } else {
                     // Revertir el canvi
                     this.value = estatActual;
@@ -492,7 +492,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    
+
 });
 
 // Veure carta de presentació
