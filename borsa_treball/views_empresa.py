@@ -1044,10 +1044,10 @@ def candidatures_oferta(request, oferta_id):
     # després de cada càrrega de dades de l'API si cal.
     stats = oferta.candidatures.filter(activa=True).aggregate(
         total=Count('id'),
-        rebutjades=Count('id', filter=Q(estat='RE')),
+        rebutjades=Count('id', filter=Q(estat='RJ')),
         en_proces=Count('id', filter=Q(estat='EP')),
-        preseleccionades=Count('id', filter=Q(estat='PS')),
-        entrevistes=Count('id', filter=Q(estat='EV')),
+        preseleccionades=Count('id', filter=Q(estat='PR')),
+        entrevistes=Count('id', filter=Q(estat='EN')),
         contratades=Count('id', filter=Q(estat='CO')),
     )
         
@@ -1123,10 +1123,10 @@ def api_candidatures_oferta(request, oferta_id):
     # Estadístiques
     stats = oferta.candidatures.filter(activa=True).aggregate(
         total=Count('id'),
-        rebutjades=Count('id', filter=Q(estat='RE')), # Use string values for choices
+        rebutjades=Count('id', filter=Q(estat='RJ')), # Use string values for choices
         en_proces=Count('id', filter=Q(estat='EP')),
-        preseleccionades=Count('id', filter=Q(estat='PS')),
-        entrevistes=Count('id', filter=Q(estat='EV')),
+        preseleccionades=Count('id', filter=Q(estat='PR')),
+        entrevistes=Count('id', filter=Q(estat='EN')),
         contratades=Count('id', filter=Q(estat='CO')),
     )
         
