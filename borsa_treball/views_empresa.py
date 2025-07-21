@@ -1146,7 +1146,7 @@ def api_candidatures_oferta(request, oferta_id):
             'cv_adjunt': bool(candidatura.cv_adjunt), # Convert to boolean
             'carta_presentacio': bool(candidatura.carta_presentacio), # Convert to boolean           
             'estudiant': {
-                'id': candidatura.estudiant.id,
+               
                 'nom_complet': candidatura.estudiant.usuari.get_full_name(),
                 'email': candidatura.estudiant.usuari.email,
                 'inicials': f"{candidatura.estudiant.usuari.nom[0]}{candidatura.estudiant.usuari.cognoms[0]}" if candidatura.estudiant.usuari.nom and candidatura.estudiant.usuari.cognoms else '',
