@@ -124,7 +124,7 @@ class Command(BaseCommand):
             )
 
             oferta.cicles.set(random.sample(cicles, k=1))
-            oferta.capacitats_clau.set(random.sample(capacitats, k=3))
+           
 
             CapacitatOferta.objects.create(oferta=oferta, nom='Creativitat')
             Funcio.objects.create(oferta=oferta, descripcio='Tasques bàsiques relacionades', ordre=1)
