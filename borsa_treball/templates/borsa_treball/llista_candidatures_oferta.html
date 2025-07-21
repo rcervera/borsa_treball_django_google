@@ -586,6 +586,8 @@ function updateStats(stats) {
     document.getElementById('stat-contratades').textContent = stats.contratades;
     document.getElementById('stat-preseleccionades').textContent = stats.preseleccionades;
     document.getElementById('stat-entrevistes').textContent = stats.entrevistes;
+    document.getElementById('stat-en_proces').textContent = stats.en_proces;
+    document.getElementById('stat-rebutjades').textContent = stats.rebutjades;
 }
 
 // Funció per renderitzar la paginació
@@ -679,6 +681,8 @@ async function handleEstatChange() {
             updateOfferToggleButton(); // Re-avaluar l'estat del botó de l'oferta
             // Opcional: recarregar les candidatures per si el canvi d'estat afecta els filtres
             // loadCandidatures(); 
+            // Actualitzar estadístiques
+            updateStats(data.stats);
             console.log(data)
         } else {
             this.value = estatActual;
