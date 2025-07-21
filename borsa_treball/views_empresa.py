@@ -18,11 +18,12 @@ from django.db import transaction
 from django.db.models import Q, Count, Prefetch
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+
 from django.utils import timezone
 from django.utils.dateparse import parse_date
 
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods, require_POST
+from django.views.decorators.http import require_http_methods, require_POST, require_GET
 
 # Imports locals
 from .models import (
