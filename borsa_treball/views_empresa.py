@@ -1116,7 +1116,7 @@ def api_candidatures_oferta(request, oferta_id):
         candidatures = candidatures.order_by('-data_candidatura')
         
     # Paginació
-    paginator = Paginator(candidatures, 10)
+    paginator = Paginator(candidatures, 4)
     page_number = request.GET.get('page', 1) # Default to page 1
     candidatures_page = paginator.get_page(page_number)
         
