@@ -1178,7 +1178,7 @@ def api_candidatures_oferta(request, oferta_id):
             'data_publicacio': oferta.data_publicacio.isoformat(),
             'data_limit': oferta.data_limit.isoformat() if oferta.data_limit else None,
             'estat': oferta.estat,
-            'valoracio': oferta.valoracio,
+            'valoracio': oferta.valoracio_empresa,
         },
         'candidatures': candidatures_data,
         'stats': stats,
