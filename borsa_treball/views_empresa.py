@@ -1247,21 +1247,23 @@ def canviar_estat_candidatura(request, candidatura_id):
     if nou_estat not in [choice[0] for choice in EstatCandidatura.choices]:
         return JsonResponse({'success': False, 'error': 'Estat no vàlid'})
     
-    # Estadístiques
-    oferta = candidatura.oferta
-    stats = oferta.candidatures.filter(activa=True).aggregate(
-        total=Count('id'),
-        rebutjades=Count('id', filter=Q(estat='RE')), # Use string values for choices
-        en_proces=Count('id', filter=Q(estat='EP')),
-        preseleccionades=Count('id', filter=Q(estat='PS')),
-        entrevistes=Count('id', filter=Q(estat='EV')),
-        contratades=Count('id', filter=Q(estat='CO')),
-    )
+    
 
 
     try:
         candidatura.estat = nou_estat
         candidatura.save()
+
+        # Estadístiques
+        oferta = candidatura.oferta
+        stats = oferta.candidatures.filter(activa=True).aggregate(
+        total=Count('id'),
+        rebutjades=Count('id', filter=Q(estat='RJ')), # Use string values for choices
+        en_proces=Count('id', filter=Q(estat='EP')),
+        preseleccionades=Count('id', filter=Q(estat='PR')),
+        entrevistes=Count('id', filter=Q(estat='EN')),
+        contratades=Count('id', filter=Q(estat='CO')),
+    )
         
         return JsonResponse({
             'success': True,
