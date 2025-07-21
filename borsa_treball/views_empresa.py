@@ -1144,9 +1144,7 @@ def api_candidatures_oferta(request, oferta_id):
             'data_candidatura': candidatura.data_candidatura.isoformat(), # ISO format for JS
             'data_candidatura_timesince': (timezone.now() - candidatura.data_candidatura).total_seconds(), # Seconds for frontend calculation
             'cv_adjunt': bool(candidatura.cv_adjunt), # Convert to boolean
-            'carta_presentacio': bool(candidatura.carta_presentacio), # Convert to boolean
-            'puntuacio': candidatura.puntuacio,
-            'notes': candidatura.notes,
+            'carta_presentacio': bool(candidatura.carta_presentacio), # Convert to boolean           
             'estudiant': {
                 'id': candidatura.estudiant.id,
                 'nom_complet': candidatura.estudiant.usuari.get_full_name(),

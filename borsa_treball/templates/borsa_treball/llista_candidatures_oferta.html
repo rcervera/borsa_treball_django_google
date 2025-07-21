@@ -515,11 +515,7 @@ function renderCandidatures(candidatures, estatsChoices) {
                                         title="Veure carta de presentació">
                                     <i class="bi bi-envelope-open"></i>
                                 </button>` : ''}
-                                <button class="btn btn-sm btn-outline-secondary" 
-                                        onclick="editarNotes(${candidatura.id}, \`${candidatura.notes || ''}\`, '${candidatura.puntuacio || ''}')"
-                                        title="Editar notes i puntuació">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
+                                
                                 <button class="btn btn-sm btn-outline-success" 
                                         onclick="contactarCandidatura(${candidatura.id})"
                                         title="Contactar candidat">
