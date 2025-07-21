@@ -1159,8 +1159,8 @@ def api_candidatures_oferta(request, oferta_id):
         'num_pages': paginator.num_pages,
         'has_next': candidatures_page.has_next(),
         'has_previous': candidatures_page.has_previous(),
-        'start_index': candidatures_page.start_index,
-        'end_index': candidatures_page.end_index,
+        'start_index': candidatures_page.start_index(),
+        'end_index': candidatures_page.end_index(),
         'total_count': paginator.count,
     }
 
