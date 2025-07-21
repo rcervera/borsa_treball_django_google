@@ -667,6 +667,7 @@ async function handleEstatChange() {
             updateOfferToggleButton(); // Re-avaluar l'estat del botó de l'oferta
             // Opcional: recarregar les candidatures per si el canvi d'estat afecta els filtres
             // loadCandidatures(); 
+            console.log(data)
         } else {
             this.value = estatActual;
             mostrarNotificacio(data.error || 'Error en canviar l\'estat', 'error');
@@ -741,6 +742,7 @@ document.getElementById('notesForm').addEventListener('submit', async function(e
         const data = await response.json();
 
         if (data.success) {
+            
             mostrarNotificacio(data.message, 'success');
             const modal = bootstrap.Modal.getInstance(document.getElementById('notesModal'));
             modal.hide();
