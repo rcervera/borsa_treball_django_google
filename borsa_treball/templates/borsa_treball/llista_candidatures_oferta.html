@@ -36,20 +36,16 @@
                             </div>
                         </div>
                         
-                        <!-- Badges d'informació -->
-                        <div class="d-flex flex-wrap align-items-center">
-                            {% if dies_restants > 0 %}
-                            <span class="badge bg-{% if dies_restants <= 7 %}danger{% elif dies_restants <= 14 %}warning{% else %}success{% endif %} me-2 mb-2">
-                                <i class="bi bi-clock me-1"></i>
-                                {{ dies_restants }} dies restants
-                            </span>
-                            {% else %}
-                            <span class="badge bg-danger me-2 mb-2">
-                                <i class="bi bi-x-circle me-1"></i>
-                                Caducada
-                            </span>
-                            {% endif %}
-                        </div>
+                        <h6 class="text-dark mb-0">
+                                        {% now "Y-m-d" as today %}
+                                        {% if oferta.data_limit|date:"Y-m-d" >= today %}
+                                            {{ oferta.data_limit|timeuntil }}
+                                        {% else %}
+                                            Caducada
+                                        {% endif %}
+                        </h6>
+                        <small class="text-muted">Temps restant</small>
+
                     </div>
                     
                     <div class="col-md-4">
