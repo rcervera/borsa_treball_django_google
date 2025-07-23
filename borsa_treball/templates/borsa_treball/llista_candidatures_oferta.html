@@ -14,83 +14,78 @@
                     <div class="col-md-8">
                         <div class="d-flex align-items-center mb-3">
                             <div>
-                                <h5 class="card-title mb-2 text-dark">                                      
-                                        <a href="{% url 'editar_oferta' oferta.id %}" class="text-decoration-none text-primary">
-                                            {{ oferta.titol }}
-                                        </a>
+                                <h5 class="card-title mb-2 text-dark">
+                                    <a href="{% url 'editar_oferta' oferta.id %}" class="text-decoration-none text-primary">
+                                        {{ oferta.titol }}
+                                    </a>
                                 </h5>
                                 <div class="d-flex align-items-center text-muted mb-2">
-                                        <i class="bi bi-calendar-event me-2"></i>
-                                        <small>{{ oferta.data_publicacio|date:"d/m/Y" }}</small>
-                                        <span class="mx-2">•</span>
-                                        <i class="bi bi-clock me-2"></i>
-                                        <small>Límit: {{ oferta.data_limit|date:"d/m/Y" }}</small>
+                                    <i class="bi bi-calendar-event me-2"></i>
+                                    <small>{{ oferta.data_publicacio|date:"d/m/Y" }}</small>
+                                    <span class="mx-2">•</span>
+                                    <i class="bi bi-clock me-2"></i>
+                                    <small>Límit: {{ oferta.data_limit|date:"d/m/Y" }}</small>
                                 </div>
-                                
                                 <small class="text-muted">{{ oferta.descripcio }}</small>
-
                                 <div class="d-flex align-items-center text-muted">
                                     <i class="bi bi-geo-alt me-2"></i>
-                                    <span>{{ oferta.lloc_treball }}</span>                                   
+                                    <span>{{ oferta.lloc_treball }}</span>
                                 </div>
                             </div>
                         </div>
-                        
-                         <div class="row text-center mb-3">
-                                <div class="col-4">
-                                    <h6 class="text-dark mt-2 mb-0">
-                                                    {% now "Y-m-d" as today %}
-                                                    {% if oferta.data_limit|date:"Y-m-d" >= today %}
-                                                        {{ oferta.data_limit|timeuntil }}
-                                                    {% else %}
-                                                        Caducada
-                                                    {% endif %}
-                                    </h6>
-                                    <small class="text-muted">Temps restant</small>
-                                </div>
-                        </div
-
+                        <!-- Temps restant section -->
+                        <div class="row text-center mb-3">
+                            <div class="col-4">
+                                <h6 class="text-dark mt-2 mb-0">
+                                    {% now "Y-m-d" as today %}
+                                    {% if oferta.data_limit|date:"Y-m-d" >= today %}
+                                        {{ oferta.data_limit|timeuntil }}
+                                    {% else %}
+                                        Caducada
+                                    {% endif %}
+                                </h6>
+                                <small class="text-muted">Temps restant</small>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div class="col-md-4">
-                        <!-- Estadístiques ràpides (actualitzades per JS) -->
-                        <div class="row text-center">
-                            <div class="col-2 mb-2">
-                                <div class="p-2 bg-light rounded">
-                                    <h4 class="text-primary mb-0" id="stat-total">{{ stats.total }}</h4>
-                                    <small class="text-muted">Total candidatures</small>
-                                </div>
-                            </div>
-                            <div class="col-2 mb-2">
-                                <div class="p-2 bg-light rounded">
-                                    <h4 class="text-success mb-0" id="stat-contratades">{{ stats.contratades }}</h4>
-                                    <small class="text-muted">Contractades</small>
-                                </div>
-                            </div>
-                            <div class="col-2">
-                                <div class="p-2 bg-light rounded">
-                                    <h4 class="text-secondary mb-0" id="stat-preseleccionades">{{ stats.preseleccionades }}</h4>
-                                    <small class="text-muted">Preseleccionades</small>
-                                </div>
-                            </div>
-                            <div class="col-2">
-                                <div class="p-2 bg-light rounded">
-                                    <h4 class="text-secondary mb-0" id="stat-entrevistes">{{ stats.entrevistes }}</h4>
-                                    <small class="text-muted">Entrevistes</small>
-                                </div>
-                            </div>
-                             <div class="col-2">
-                                <div class="p-2 bg-light rounded">
-                                    <h4 class="text-secondary mb-0" id="stat-en_proces">{{ stats.en_proces }}</h4>
-                                    <small class="text-muted">En procés</small>
-                                </div>
-                            </div>
-                            <div class="col-2">
-                                <div class="p-2 bg-light rounded">
-                                    <h4 class="text-danger mb-0" id="stat-rebutjades">{{ stats.rebutjades }}</h4>
-                                    <small class="text-muted">Rebutjades</small>
-                                </div>
-                            </div>
+                    <!-- Removed the col-md-4 that previously contained stats -->
+                </div>
+                <!-- New row for statistics, outside the previous row, but still inside card-body -->
+                <div class="row text-center mt-3"> <!-- Added mt-3 for spacing from the above content -->
+                    <div class="col-md-2 col-4 mb-2"> <!-- Use col-md-2 for desktop, col-4 for mobile to allow wrapping if needed -->
+                        <div class="p-2 bg-light rounded">
+                            <h4 class="text-primary mb-0" id="stat-total">{{ stats.total }}</h4>
+                            <small class="text-muted">Total candidatures</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-4 mb-2">
+                        <div class="p-2 bg-light rounded">
+                            <h4 class="text-success mb-0" id="stat-contratades">{{ stats.contratades }}</h4>
+                            <small class="text-muted">Contractades</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-4 mb-2">
+                        <div class="p-2 bg-light rounded">
+                            <h4 class="text-secondary mb-0" id="stat-preseleccionades">{{ stats.preseleccionades }}</h4>
+                            <small class="text-muted">Preseleccionades</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-4 mb-2">
+                        <div class="p-2 bg-light rounded">
+                            <h4 class="text-secondary mb-0" id="stat-entrevistes">{{ stats.entrevistes }}</h4>
+                            <small class="text-muted">Entrevistes</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-4 mb-2">
+                        <div class="p-2 bg-light rounded">
+                            <h4 class="text-secondary mb-0" id="stat-en_proces">{{ stats.en_proces }}</h4>
+                            <small class="text-muted">En procés</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-4 mb-2">
+                        <div class="p-2 bg-light rounded">
+                            <h4 class="text-danger mb-0" id="stat-rebutjades">{{ stats.rebutjades }}</h4>
+                            <small class="text-muted">Rebutjades</small>
                         </div>
                     </div>
                 </div>
