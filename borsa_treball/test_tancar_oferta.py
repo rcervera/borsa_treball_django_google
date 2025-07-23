@@ -125,6 +125,7 @@ class ToggleOfertaStatusTest(TestCase):
             oferta=self.oferta_activa, 
             estudiant=self.estudiant1, 
             estat='CO', 
+            activa=True,
             cv_adjunt=create_cv_file("cv_co.pdf"), 
             carta_presentacio='Carta de presentació CO que ha de ser prou llarga per a que pugui passar la validació inicial.'
         )
@@ -132,6 +133,7 @@ class ToggleOfertaStatusTest(TestCase):
             oferta=self.oferta_activa, 
             estudiant=self.estudiant2, 
             estat='RJ', 
+            activa=True,
             cv_adjunt=create_cv_file("cv_rj.pdf"), 
             carta_presentacio='Carta de presentació RJ que ha de ser prou llarga per a que pugui passar la validació inicial.'
         )
@@ -139,6 +141,7 @@ class ToggleOfertaStatusTest(TestCase):
             oferta=self.oferta_activa, 
             estudiant=self.estudiant3, 
             estat='EP',
+            activa=True,
             cv_adjunt=create_cv_file("cv_ep.pdf"), 
             carta_presentacio='Carta de presentació EP que ha de ser prou llarga per a que pugui passar la validació inicial.'
         )
@@ -146,6 +149,7 @@ class ToggleOfertaStatusTest(TestCase):
             oferta=self.oferta_activa, 
             estudiant=self.estudiant4, 
             estat='PR',
+            activa=True,
             cv_adjunt=create_cv_file("cv_pr.pdf"), 
             carta_presentacio='Carta de presentació PR que ha de ser prou llarga per a que pugui passar la validació inicial.'
         )
@@ -165,8 +169,8 @@ class ToggleOfertaStatusTest(TestCase):
             numero_vacants = 2,
         )
         self.oferta_all_final.cicles.add(self.cicle) # Assignar cicles amb .add()
-        Candidatura.objects.create(id=5, oferta=self.oferta_all_final, estudiant=self.estudiant1, estat='CO', cv_adjunt=create_cv_file("cv_final1.pdf"), carta_presentacio='Carta final 1.')
-        Candidatura.objects.create(id=6, oferta=self.oferta_all_final, estudiant=self.estudiant2, estat='RJ', cv_adjunt=create_cv_file("cv_final2.pdf"), carta_presentacio='Carta final 2.')
+        Candidatura.objects.create(id=5, oferta=self.oferta_all_final, estudiant=self.estudiant1, estat='CO', activa=True, cv_adjunt=create_cv_file("cv_final1.pdf"), carta_presentacio='Carta final 1.')
+        Candidatura.objects.create(id=6, oferta=self.oferta_all_final, estudiant=self.estudiant2, estat='RJ', activa=True, cv_adjunt=create_cv_file("cv_final2.pdf"), carta_presentacio='Carta final 2.')
 
         # Oferta with no candidatures
         self.oferta_no_candidatures = Oferta.objects.create(
