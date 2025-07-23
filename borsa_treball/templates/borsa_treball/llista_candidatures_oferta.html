@@ -267,6 +267,15 @@ let currentSearch = "{{ cerca }}";
 let currentEstatFiltre = "{{ estat_filtre }}";
 let currentOrdenar = "{{ ordenar }}";
 
+let currentStats = { // Variable per emmagatzemar les estadístiques del servidor
+    total: {{ stats.total }},
+    rebutjades: {{ stats.rebutjades }},
+    en_proces: {{ stats.en_proces }},
+    preseleccionades: {{ stats.preseleccionades }},
+    entrevistes: {{ stats.entrevistes }},
+    contratades: {{ stats.contratades }},
+};
+
 // --- Elements del DOM per a la gestió de l'oferta ---
 const valoracioTextarea = document.getElementById('valoracioEmpresa');
 const valoracioError = document.getElementById('valoracioError');
@@ -343,22 +352,17 @@ function formatTimeSince(seconds) {
 // --- Lògica de la gestió de l'oferta ---
 
 // Funció per comprovar si totes les candidatures estan en un estat final
+// Funció per comprovar si totes les candidatures estan en un estat final
 function areAllCandidaturesFinal() {
-    const estatSelects = document.querySelectorAll('.estat-select');
-    if (estatSelects.length === 0) {
-        return true; // Si no hi ha candidatures, es considera "final" per tancar l'oferta
+    // Si no hi ha candidatures en total, es considera que totes estan en estat final
+    if (currentStats.total === 0) {
+        return true;
     }
-    let allFinal = true;
-    for (let i = 0; i < estatSelects.length; i++) {
-        const select = estatSelects[i];
-        const currentStatus = select.value;
-        if (currentStatus !== 'CO' && currentStatus !== 'RE') { // 'CO' = Contractada, 'RE' = Rebutjada
-            allFinal = false;
-            break;
-        }
-    }
-    return allFinal;
+    // Comprova si la suma de rebutjades i contractades és igual al total de candidatures
+    return currentStats.total === (currentStats.rebutjades + currentStats.contratades);
 }
+
+
 
 // Funció per actualitzar l'estat i el text del botó de l'oferta
 function updateOfferToggleButton() {
@@ -421,6 +425,7 @@ async function loadCandidatures() {
             updateOfferToggleButton();
 
             // Actualitzar estadístiques
+            currentStats = data.stats; 
             updateStats(data.stats);
 
             // Renderitzar la llista de candidatures
@@ -678,10 +683,14 @@ async function handleEstatChange() {
         if (data.success) {
             this.dataset.estatActual = nouEstat;
             mostrarNotificacio(data.message, 'success');
+            // Actualitzar estadístiques globals
+            currentStats = data.stats; 
+            
             updateOfferToggleButton(); // Re-avaluar l'estat del botó de l'oferta
             // Opcional: recarregar les candidatures per si el canvi d'estat afecta els filtres
             // loadCandidatures(); 
             // Actualitzar estadístiques
+            
             updateStats(data.stats);
             console.log(data)
         } else {
