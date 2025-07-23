@@ -869,7 +869,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 mostrarNotificacio(data.message, 'success');
                 // Si l'oferta es re-obre, netejar la textarea
                 if (ofertaEstat === 'AC') {
-                    valoracioTextarea.value = '';
+                    // valoracioTextarea.value = '';
                 }
                 // Actualitzar la valoració de l'oferta si s'ha tancat
                 ofertaValoracio = data.valoracio || ''; // Assegurar que s'actualitza amb el valor retornat
@@ -877,7 +877,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 mostrarNotificacio(data.error || 'Error en canviar l\'estat de l\'oferta', 'error');
             }
         } catch (error) {
-            console.error('Error:', error);
+            // console.error('Error:', error);
             mostrarNotificacio('Error de connexió', 'error');
         } finally {
             toggleOfferStatusBtn.innerHTML = originalText;
