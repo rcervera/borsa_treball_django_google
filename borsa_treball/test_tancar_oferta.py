@@ -354,7 +354,7 @@ class ToggleOfertaStatusTest(TestCase):
         """
         Comprova el cas on l'usuari no té una empresa associada.
         """
-        user_no_empresa = Usuari.objects.create_user(username='noempresa', password='password123', tipus='EMP')
+        user_no_empresa = Usuari.objects.create_user(email='noempresa@test.com', password='password123', tipus='EST')
         # No assignem empresa a aquest usuari per simular el cas
         self.client.force_login(user_no_empresa)
         url = reverse('toggle_estat_oferta', args=[self.oferta_activa.id])  
