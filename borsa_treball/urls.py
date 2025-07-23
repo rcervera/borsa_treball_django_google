@@ -19,6 +19,8 @@ urlpatterns = [
     path('api/empresa/oferta/nova', views_empresa.crear_oferta_api, name='afegir_oferta_api'),
     path('api/empresa/oferta/<int:oferta_id>/', views_empresa.api_actualitzar_oferta, name='api_actualitzar_oferta'),
     path('empresa/oferta/<int:oferta_id>/toggle-visibilitat/', views_empresa.toggle_visibilitat_oferta, name='toggle_visibilitat_oferta'),
+    path('empresa/oferta/<int:oferta_id>/toggle-estat/', views_empresa.toggle_tancament_oferta, name='toggle_estat_oferta'),
+
     path('empresa/oferta/<int:oferta_id>/esborrar/', views_empresa.esborrar_oferta, name='esborrar_oferta'),
     # path('empresa/oferta/<int:oferta_id>/', views_empresa.detall_oferta, name='detall_oferta'),
     path('empresa/oferta/<int:oferta_id>/editar/', views_empresa.editar_oferta, name='editar_oferta'),

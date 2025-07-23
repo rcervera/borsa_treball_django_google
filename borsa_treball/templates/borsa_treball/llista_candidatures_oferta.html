@@ -675,7 +675,8 @@ async function handleEstatChange() {
     this.disabled = true;
     
     try {
-        const response = await fetch(`/candidatures/${candidaturaId}/canviar-estat/`, {
+       
+        const response = await fetch(`/empresa/oferta/${candidaturaId}/toggle-estat/`, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': getCookie('csrftoken'),
