@@ -36,7 +36,7 @@
                             </div>
                         </div>
                         
-                        <h6 class="text-dark mb-0">
+                        <h6 class="text-dark mt-2 mb-0">
                                         {% now "Y-m-d" as today %}
                                         {% if oferta.data_limit|date:"Y-m-d" >= today %}
                                             {{ oferta.data_limit|timeuntil }}
