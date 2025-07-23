@@ -675,8 +675,8 @@ async function handleEstatChange() {
     this.disabled = true;
     
     try {
-       
-        const response = await fetch(`/empresa/oferta/${candidaturaId}/toggle-estat/`, {
+        
+        const response = await fetch(`/candidatures/${candidaturaId}/canviar-estat/`, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': getCookie('csrftoken'),
@@ -851,7 +851,7 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleOfferStatusBtn.disabled = true;
 
         try {
-            const response = await fetch(`/ofertes/${ofertaId}/toggle-estat/`, {
+            const response = await fetch(`/empresa/oferta/${ofertaId}/toggle-estat/`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': getCookie('csrftoken'),
