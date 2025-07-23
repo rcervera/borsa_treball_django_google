@@ -559,15 +559,8 @@ def toggle_tancament_oferta(request, oferta_id):
         new_estat = data.get('estat')
         valoracio = data.get('valoracio', '').strip() # Get valoracio, default to empty string and strip whitespace
 
-        if new_estat == 'TC': # If the new state is 'Tancada'
-            if not valoracio:
-                return JsonResponse({
-                    'success': False,
-                    'error': 'La valoració és obligatòria per tancar l\'oferta.'
-                }, status=400) # Bad Request
-            
-            # Calculate current stats for validation
-            stats = oferta.candidatures.filter(activa=True).aggregate(
+        # Calculate current stats for validation
+        stats = oferta.candidatures.filter(activa=True).aggregate(
                 total=Count('id'),
                 rebutjades=Count('id', filter=Q(estat='RJ')),
                 contratades=Count('id', filter=Q(estat='CO')),
@@ -575,7 +568,16 @@ def toggle_tancament_oferta(request, oferta_id):
                 en_proces=Count('id', filter=Q(estat='EP')),
                 preseleccionades=Count('id', filter=Q(estat='PR')),
                 entrevistes=Count('id', filter=Q(estat='EN')),
-            )
+        )
+
+        if new_estat == 'TC': # If the new state is 'Tancada'
+            if not valoracio:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'La valoració és obligatòria per tancar l\'oferta.'
+                }, status=400) # Bad Request
+            
+            
 
             # Check if all active candidatures are either 'Contractada' or 'Rebutjada'
             if stats['total'] != (stats['rebutjades'] + stats['contratades']):
@@ -605,7 +607,8 @@ def toggle_tancament_oferta(request, oferta_id):
             'message': f'L\'oferta "{oferta.titol}" ara és {status_text}.',
             'estat': oferta.estat,
             'oferta_id': oferta.id,
-            'valoracio': oferta.valoracio_empresa # Return the updated valoracio
+            'valoracio': oferta.valoracio_empresa,  # Return the updated valoracio
+            'stats': stats
         })
             
     except json.JSONDecodeError:

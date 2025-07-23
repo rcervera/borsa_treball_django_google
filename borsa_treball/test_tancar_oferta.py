@@ -297,6 +297,7 @@ class ToggleOfertaStatusTest(TestCase):
         response = self.client.post(url, json.dumps(payload), content_type='application/json')
         self.assertEqual(response.status_code, 400) # Bad Request
         data = response.json()
+        print(data.stats)
         self.assertFalse(data['success'])
         self.assertIn('totes les candidatures han d\'estar en estat "Contractada" o "Rebutjada"', data['error'])
         self.oferta_activa.refresh_from_db()
