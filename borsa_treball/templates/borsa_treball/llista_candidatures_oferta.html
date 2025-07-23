@@ -36,15 +36,19 @@
                             </div>
                         </div>
                         
-                        <h6 class="text-dark mt-2 mb-0">
-                                        {% now "Y-m-d" as today %}
-                                        {% if oferta.data_limit|date:"Y-m-d" >= today %}
-                                            {{ oferta.data_limit|timeuntil }}
-                                        {% else %}
-                                            Caducada
-                                        {% endif %}
-                        </h6>
-                        <small class="text-muted">Temps restant</small>
+                         <div class="row text-center mb-3">
+                                <div class="col-4">
+                                    <h6 class="text-dark mt-2 mb-0">
+                                                    {% now "Y-m-d" as today %}
+                                                    {% if oferta.data_limit|date:"Y-m-d" >= today %}
+                                                        {{ oferta.data_limit|timeuntil }}
+                                                    {% else %}
+                                                        Caducada
+                                                    {% endif %}
+                                    </h6>
+                                    <small class="text-muted">Temps restant</small>
+                                </div>
+                        </div
 
                     </div>
                     
