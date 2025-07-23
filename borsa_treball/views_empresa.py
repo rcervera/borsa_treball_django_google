@@ -566,11 +566,11 @@ def toggle_tancament_oferta(request, oferta_id):
                     'error': 'La valoració és obligatòria per tancar l\'oferta.'
                 }, status=400) # Bad Request
             oferta.estat = 'TC'
-            oferta.valoracio = valoracio # Save the valoracio
+            oferta.valoracio_empresa = valoracio # Save the valoracio
             status_text = "tancada"
         elif new_estat == 'AC': # If the new state is 'Activa' (re-opening)
             oferta.estat = 'AC'
-            oferta.valoracio = '' # Clear valoracio when re-opening
+            # oferta.valoracio_empresa = '' # Clear valoracio when re-opening
             status_text = "activa"
         else:
             return JsonResponse({
@@ -585,7 +585,7 @@ def toggle_tancament_oferta(request, oferta_id):
             'message': f'L\'oferta "{oferta.titol}" ara és {status_text}.',
             'estat': oferta.estat,
             'oferta_id': oferta.id,
-            'valoracio': oferta.valoracio # Return the updated valoracio
+            'valoracio': oferta.valoracio_empresa # Return the updated valoracio
         })
             
     except json.JSONDecodeError:
