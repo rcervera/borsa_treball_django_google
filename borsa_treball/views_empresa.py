@@ -565,6 +565,26 @@ def toggle_tancament_oferta(request, oferta_id):
                     'success': False,
                     'error': 'La valoració és obligatòria per tancar l\'oferta.'
                 }, status=400) # Bad Request
+            
+            # Calculate current stats for validation
+            stats = oferta.candidatures.filter(activa=True).aggregate(
+                total=Count('id'),
+                rebutjades=Count('id', filter=Q(estat='RJ')),
+                contratades=Count('id', filter=Q(estat='CO')),
+                # Include other stats if needed for the frontend, but only total, RJ, CO for this validation
+                en_proces=Count('id', filter=Q(estat='EP')),
+                preseleccionades=Count('id', filter=Q(estat='PR')),
+                entrevistes=Count('id', filter=Q(estat='EN')),
+            )
+
+            # Check if all active candidatures are either 'Contractada' or 'Rebutjada'
+            if stats['total'] != (stats['rebutjades'] + stats['contratades']):
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Per tancar l\'oferta, totes les candidatures han d\'estar en estat "Contractada" o "Rebutjada".'
+                }, status=400)
+            
+            # If all checks pass, update the oferta
             oferta.estat = 'TC'
             oferta.valoracio_empresa = valoracio # Save the valoracio
             status_text = "tancada"
