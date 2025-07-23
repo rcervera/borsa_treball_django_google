@@ -195,7 +195,7 @@ class ToggleOfertaStatusTest(TestCase):
         i totes les candidatures estan en estat final.
         """
         self.client.force_login(self.user_empresa) # Login with the created user
-        url = reverse('toggle_oferta_estat', args=[self.oferta_all_final.id])
+        url = reverse('toggle_estat_oferta', args=[self.oferta_all_final.id])
         payload = {
             'estat': 'TC',
             'valoracio': 'Molt bona valoració del procés.'
@@ -224,7 +224,7 @@ class ToggleOfertaStatusTest(TestCase):
         i la valoració és vàlida.
         """
         self.client.force_login(self.user_empresa)
-        url = reverse('toggle_oferta_estat', args=[self.oferta_no_candidatures.id])
+        url = reverse('toggle_estat_oferta', args=[self.oferta_no_candidatures.id])
         payload = {
             'estat': 'TC',
             'valoracio': 'Oferta tancada sense candidatures.'
@@ -247,7 +247,7 @@ class ToggleOfertaStatusTest(TestCase):
         Comprova que l'oferta es reobre correctament.
         """
         self.client.force_login(self.user_empresa)
-        url = reverse('toggle_oferta_estat', args=[self.oferta_tancada.id])
+        url = reverse('toggle_estat_oferta', args=[self.oferta_tancada.id])
         payload = {
             'estat': 'AC',
             'valoracio': '' # Valoració no rellevant en re-obertura, però s'envia
@@ -270,7 +270,7 @@ class ToggleOfertaStatusTest(TestCase):
         Comprova que no es pot tancar l'oferta si la valoració és buida.
         """
         self.client.force_login(self.user_empresa)
-        url = reverse('toggle_oferta_estat', args=[self.oferta_activa.id])
+        url = reverse('toggle_estat_oferta', args=[self.oferta_activa.id])
         payload = {
             'estat': 'TC',
             'valoracio': ''
@@ -289,7 +289,7 @@ class ToggleOfertaStatusTest(TestCase):
         que no estan en estat final (CO o RJ).
         """
         self.client.force_login(self.user_empresa)
-        url = reverse('toggle_oferta_estat', args=[self.oferta_activa.id])
+        url = reverse('toggle_estat_oferta', args=[self.oferta_activa.id])
         payload = {
             'estat': 'TC',
             'valoracio': 'Valoració de prova.'
@@ -307,7 +307,7 @@ class ToggleOfertaStatusTest(TestCase):
         Comprova el cas on l'oferta no existeix o no pertany a l'empresa de l'usuari.
         """
         self.client.force_login(self.user_empresa)
-        url = reverse('toggle_oferta_estat', args=[999]) # Non-existent ID
+        url = reverse('toggle_estat_oferta', args=[999]) # Non-existent ID
         payload = {
             'estat': 'TC',
             'valoracio': 'Test'
@@ -323,7 +323,7 @@ class ToggleOfertaStatusTest(TestCase):
         Comprova el cas on es proporciona un estat no vàlid.
         """
         self.client.force_login(self.user_empresa)
-        url = reverse('toggle_oferta_estat', args=[self.oferta_activa.id])
+        url = reverse('toggle_estat_oferta', args=[self.oferta_activa.id])
         payload = {
             'estat': 'INVALID_STATE',
             'valoracio': 'Test'
@@ -341,7 +341,7 @@ class ToggleOfertaStatusTest(TestCase):
         Comprova el cas on el format JSON de la petició és invàlid.
         """
         self.client.force_login(self.user_empresa)
-        url = reverse('toggle_oferta_estat', args=[self.oferta_activa.id])
+        url = reverse('toggle_estat_oferta', args=[self.oferta_activa.id])
         response = self.client.post(url, "this is not json", content_type='application/json')
         self.assertEqual(response.status_code, 400)
         data = response.json()
@@ -357,7 +357,7 @@ class ToggleOfertaStatusTest(TestCase):
         user_no_empresa = Usuari.objects.create_user(username='noempresa', password='password123', tipus='EMP')
         # No assignem empresa a aquest usuari per simular el cas
         self.client.force_login(user_no_empresa)
-        url = reverse('toggle_oferta_estat', args=[self.oferta_activa.id])
+        url = reverse('toggle_estat_oferta', args=[self.oferta_activa.id])  
         payload = {
             'estat': 'TC',
             'valoracio': 'Test'
@@ -374,7 +374,7 @@ class ToggleOfertaStatusTest(TestCase):
         """
         Comprova que un usuari no autenticat no pot accedir a la vista.
         """
-        url = reverse('toggle_oferta_estat', args=[self.oferta_activa.id])
+        url = reverse('toggle_estat_oferta', args=[self.oferta_activa.id])
         payload = {
             'estat': 'TC',
             'valoracio': 'Test'
