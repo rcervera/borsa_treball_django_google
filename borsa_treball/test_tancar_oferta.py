@@ -70,8 +70,7 @@ class ToggleOfertaStatusTest(TestCase):
             empresa=self.empresa,
             cicles= [self.cicle1.id],
             tipus_contracte = "PR",
-            jornada = "CO",
-            lloc_treball = "Barcelona",
+            jornada = "CO",           
             numero_vacants = 2,
         )
         Oferta.objects.append(self.oferta_activa)
@@ -88,8 +87,7 @@ class ToggleOfertaStatusTest(TestCase):
             empresa=self.empresa,
             cicles= [self.cicle1.id],
             tipus_contracte = "PR",
-            jornada = "CO",
-            lloc_treball = "Barcelona",
+            jornada = "CO",           
             numero_vacants = 2,
         )
         Oferta.objects.append(self.oferta_tancada)
@@ -145,8 +143,7 @@ class ToggleOfertaStatusTest(TestCase):
             empresa=self.empresa,
             cicles= [self.cicle1.id],
             tipus_contracte = "PR",
-            jornada = "CO",
-            lloc_treball = "Barcelona",
+            jornada = "CO",           
             numero_vacants = 2,
         )
         Oferta.objects.append(self.oferta_all_final)
@@ -168,8 +165,7 @@ class ToggleOfertaStatusTest(TestCase):
             empresa=self.empresa,
              cicles= [self.cicle1.id],
             tipus_contracte = "PR",
-            jornada = "CO",
-            lloc_treball = "Barcelona",
+            jornada = "CO",           
             numero_vacants = 2,
         )
         Oferta.objects.append(self.oferta_no_candidatures)
