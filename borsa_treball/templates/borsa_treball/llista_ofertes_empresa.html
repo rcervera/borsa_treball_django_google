@@ -207,7 +207,7 @@
                                  <div class="col-4">
                                     <div class="border-end">
                                          <h6 class="text-dark mb-0">{{ oferta.candidatures_count }}</h6>
-                                        <small class="text-muted">Seguiment oferta</small>
+                                        <small class="text-muted">Candidatures</small>
                                     </div>
                                 </div>
                                
@@ -252,13 +252,11 @@
                                    
 
                                 </div>
-                                <div>
-                                    {% if oferta.candidatures_count > 0 %}
+                                <div>                                   
                                     <a href="{% url 'llista_candidatures_oferta' oferta.id %}" class="btn btn-outline-primary btn-sm me-2 rounded-pill">
                                         <i class="bi bi-people"></i>
-                                        <span class="d-none d-lg-inline ms-1">Candidatures</span>                                        
-                                    </a>
-                                    {% endif %}
+                                        <span class="d-none d-lg-inline ms-1">Seguiment oferta</span>                                        
+                                    </a>                                 
                                     
                                 </div>
                             </div>
@@ -352,7 +350,7 @@
                 }
             });
         }
-
+               
         
     });
 </script>
