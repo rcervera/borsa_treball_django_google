@@ -377,6 +377,8 @@ def llista_ofertes(request):
             ofertes = ofertes.filter(estat='OC')
         elif status_filter == 'revisio':
             ofertes = ofertes.filter(estat='RV')
+        elif status_filter == 'tancada':
+            ofertes = ofertes.filter(estat='TC')
         elif status_filter == 'totes':
             pass  # No s'aplica cap filtre
 
@@ -412,6 +414,7 @@ def llista_ofertes(request):
         'caducades': empresa.ofertes.filter(data_limit__lt=today).count(),
         'ocultes': empresa.ofertes.filter(estat='OC').count(),
         'revisio': empresa.ofertes.filter(estat='RV').count(),
+        'tancades': empresa.ofertes.filter(estat='TC').count(),
         'total_candidatures_actives': Candidatura.objects.filter(oferta__empresa=empresa, estat='AC').count(),
     }
     
@@ -442,6 +445,7 @@ def llista_ofertes(request):
         ('caducada', 'Caducades'),
         ('oculta', 'Ocultes'),
         ('revisio', 'En revisió'),
+        ('tancada', 'Tancades'),
     ]
     
     order_choices = [
