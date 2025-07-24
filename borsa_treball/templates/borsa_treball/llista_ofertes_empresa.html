@@ -6,6 +6,38 @@
 {% block page_title %}Les meves ofertes{% endblock %}
 
 {% block content %}
+<style>
+.tercer-btn {
+    background: linear-gradient(135deg, #dcdcdc, #a9a9a9); /* gris clar a gris mitjà */
+    border: none;
+    border-radius: 50px;
+    padding: 0.8rem 1.5rem;
+    font-weight: 600;
+    color: white;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    white-space: nowrap;
+    min-width: 180px;
+    height: 50px;
+}
+
+.tercer-btn:hover,
+.tercer-btn:focus {
+    transform: translateY(-3px);
+    background: linear-gradient(135deg, #c0c0c0, #808080); /* degradat més fosc en hover */
+    color: white;
+}
+
+.tercer-btn i {
+    margin-right: 0.5rem;
+}
+
+</style>
+
 <div class="row justify-content-center">
     <div class="col-lg-11 col-md-12">
         <!-- Header Section amb estadístiques -->
@@ -135,8 +167,8 @@
                         
                         <!-- Botons -->
                         <div class="col-md-1 mb-2">
-                            <button type="submit" class="btn btn-outline-primary w-100 rounded-pill" title="Aplicar filtres">
-                                <i class="bi bi-funnel"></i>
+                            <button type="submit" class="tercer-btn" title="Aplicar filtres">
+                                <i class="bi bi-funnel"></i> Aplicar filtres
                             </button>
                         </div>
                     </div>
