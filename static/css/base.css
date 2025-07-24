@@ -108,7 +108,7 @@ body {
 
 /* Botó operació secundaria */
 .secundari-btn {
-            background: linear-gradient(135deg, #d3e2fa, #8fabf8);
+            background: linear-gradient(135deg, #f6c13b, #d85e1d);
             border: none;
             border-radius: 50px;
             padding: 0.8rem 1.5rem;
@@ -127,7 +127,7 @@ body {
 
 .secundari-btn:hover {
             transform: translateY(-3px);
-            background: linear-gradient(135deg, #dfe5f4, #688af8);
+            background: linear-gradient(135deg, #d8c21d, #d98626);
             color: white;
 }
 
