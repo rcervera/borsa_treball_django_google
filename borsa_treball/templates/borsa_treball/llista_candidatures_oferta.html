@@ -47,16 +47,19 @@
                     </div>
                     <!-- Removed the col-md-4 that previously contained stats -->
                 </div>
-                <!-- New row for statistics, outside the previous row, but still inside card-body -->
+               
+                <!-- Estadístiques de candidatures -->
+
+
                 <div class="row text-center mt-3"> <!-- Added mt-3 for spacing from the above content -->
                     <div class="col-md-2 col-4 mb-2"> <!-- Use col-md-2 for desktop, col-4 for mobile to allow wrapping if needed -->
-                        <div class="p-2 bg-light rounded">
+                        <div class="p-2 border-end">
                             <h4 class="text-primary mb-0" id="stat-total">{{ stats.total }}</h4>
                             <small class="text-muted">Total candidatures</small>
                         </div>
                     </div>
                     <div class="col-md-2 col-4 mb-2">
-                        <div class="p-2 bg-light rounded">
+                        <div class="p-2 border-end">
                             <h4 class="text-success mb-0" id="stat-contratades">{{ stats.contratades }}</h4>
                             <small class="text-muted">Contractades</small>
                         </div>
