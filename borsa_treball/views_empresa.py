@@ -421,10 +421,10 @@ def llista_ofertes(request):
     items_per_page = request.GET.get('per_page', 6)
     try:
         items_per_page = int(items_per_page)
-        if items_per_page not in [6, 12, 24]:
-            items_per_page = 6
+        if items_per_page not in [4,6, 12, 24]:
+            items_per_page = 4
     except (ValueError, TypeError):
-        items_per_page = 6
+        items_per_page = 4
     
     paginator = Paginator(ofertes, items_per_page)
     page = request.GET.get('page', 1)
