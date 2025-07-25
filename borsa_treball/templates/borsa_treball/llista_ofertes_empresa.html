@@ -372,7 +372,7 @@
                         
                         {% if ofertes.has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ ofertes.next_page_number }}">
+                                <a class="tercer-btn" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ ofertes.next_page_number }}">
                                     Següent <i class="bi bi-chevron-right"></i>
                                 </a>
                             </li>
