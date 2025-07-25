@@ -211,7 +211,7 @@
                         <!-- Botons -->
                         <div class="col-md-1 mb-2">
                             <button type="submit" class="tercer-btn" title="Aplicar filtres">
-                                <i class="bi bi-funnel"></i> Filtrar
+                                <i class="bi bi-funnel"></i>
                             </button>
                         </div>
                     </div>
@@ -243,7 +243,7 @@
                     <div class="col-md-1 mb-2">
                         
                         <a href="?" class="tercer-btn" title="Netejar filtres">
-                        <i class="bi bi-arrow-clockwise"></i> Netejar
+                        <i class="bi bi-arrow-clockwise"></i>
                         </a>
                     </div>
 
@@ -373,7 +373,7 @@
                         {% if ofertes.has_next %}
                             <li class="page-item">
                                 <a class="tercer-btn" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ ofertes.next_page_number }}">
-                                    Següent <i class="bi bi-chevron-right"></i>
+                                    <i class="bi bi-chevron-right"></i>
                                 </a>
                             </li>
                         {% endif %}
