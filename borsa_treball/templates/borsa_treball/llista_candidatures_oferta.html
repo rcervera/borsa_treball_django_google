@@ -21,7 +21,7 @@
                                 </h5>
                                 <div class="d-flex align-items-center text-muted mb-2">
                                     <i class="bi bi-calendar-event me-2"></i>
-                                    <small>Publició: {{ oferta.data_publicacio|date:"d/m/Y" }}</small>
+                                    <small>Publicació: {{ oferta.data_publicacio|date:"d/m/Y" }}</small>
                                     <span class="mx-2">•</span>
                                      <i class="bi bi-calendar-event me-2"></i>
                                     <small>Límit: {{ oferta.data_limit|date:"d/m/Y" }}</small>
@@ -65,25 +65,25 @@
                         </div>
                     </div>
                     <div class="col-md-2 col-4 mb-2">
-                        <div class="p-2 bg-light rounded">
+                        <div class="p-2 border-end">
                             <h4 class="text-secondary mb-0" id="stat-preseleccionades">{{ stats.preseleccionades }}</h4>
                             <small class="text-muted">Preseleccionades</small>
                         </div>
                     </div>
                     <div class="col-md-2 col-4 mb-2">
-                        <div class="p-2 bg-light rounded">
+                        <div class="p-2 border-end">
                             <h4 class="text-secondary mb-0" id="stat-entrevistes">{{ stats.entrevistes }}</h4>
                             <small class="text-muted">Entrevistes</small>
                         </div>
                     </div>
                     <div class="col-md-2 col-4 mb-2">
-                        <div class="p-2 bg-light rounded">
+                        <div class="p-2 border-end">
                             <h4 class="text-secondary mb-0" id="stat-en_proces">{{ stats.en_proces }}</h4>
                             <small class="text-muted">En procés</small>
                         </div>
                     </div>
                     <div class="col-md-2 col-4 mb-2">
-                        <div class="p-2 bg-light rounded">
+                        <div class="p-2">
                             <h4 class="text-danger mb-0" id="stat-rebutjades">{{ stats.rebutjades }}</h4>
                             <small class="text-muted">Rebutjades</small>
                         </div>
