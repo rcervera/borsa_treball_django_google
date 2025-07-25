@@ -36,6 +36,13 @@
     margin-right: 0.5rem;
 }
 
+
+.tercer-btn.active {
+  background: linear-gradient(135deg, #bbbbbb, #999999);
+  color: white;
+  pointer-events: none;
+}
+
 <style>
   /* Estil general per tots els botons de paginació */
   .pagination .page-link {
@@ -364,8 +371,8 @@
                         
                         {% for num in ofertes.paginator.page_range %}
                             {% if ofertes.number == num %}
-                                <li class="page-item active">
-                                    <span class="tercer-btn">{{ num }}</span>
+                                <li class="page-item">
+                                    <span class="tercer-btn active">{{ num }}</span>
                                 </li>
                             {% elif num > ofertes.number|add:'-3' and num < ofertes.number|add:'3' %}
                                 <li class="page-item">
