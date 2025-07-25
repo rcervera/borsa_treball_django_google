@@ -269,89 +269,89 @@
             <div class="row" id="ofertesContainer">
                 {% for oferta in ofertes %}
                 <div class="col-lg-6 col-12 mb-4">
-    <div class="card shadow-sm border-0 h-100 oferta-card">
-        <div class="card-body p-4 d-flex flex-column">
-            <!-- Header de l'oferta -->
-            <div class="d-flex justify-content-between align-items-start mb-3">
-                <div class="flex-grow-1">
-                    <h5 class="card-title mb-2 text-dark">
-                        <a href="{% url 'editar_oferta' oferta.id %}" class="text-decoration-none text-primary">
-                            {{ oferta.titol }}
-                        </a>
-                    </h5>
-                    <div class="d-flex align-items-center text-muted mb-2">
-                        <i class="bi bi-calendar-event me-2"></i>
-                        <small>{{ oferta.data_publicacio|date:"d/m/Y" }}</small>
-                        <span class="mx-2">•</span>
-                        <i class="bi bi-clock me-2"></i>
-                        <small>Límit: {{ oferta.data_limit|date:"d/m/Y" }}</small>
+                    <div class="card shadow-sm border-0 h-100 oferta-card">
+                        <div class="card-body p-4 d-flex flex-column">
+                            <!-- Header de l'oferta -->
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="flex-grow-1">
+                                    <h5 class="card-title mb-2 text-dark">
+                                        <a href="{% url 'editar_oferta' oferta.id %}" class="text-decoration-none text-primary">
+                                            {{ oferta.titol }}
+                                        </a>
+                                    </h5>
+                                    <div class="d-flex align-items-center text-muted mb-2">
+                                        <i class="bi bi-calendar-event me-2"></i>
+                                        <small>{{ oferta.data_publicacio|date:"d/m/Y" }}</small>
+                                        <span class="mx-2">•</span>
+                                        <i class="bi bi-clock me-2"></i>
+                                        <small>Límit: {{ oferta.data_limit|date:"d/m/Y" }}</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Descripció -->
+                            <p class="card-text text-muted mb-3">
+                                {{ oferta.descripcio|truncatewords:20 }}
+                            </p>
+
+                            <!-- Estadístiques -->
+                            <div class="row text-center mb-3">
+                                <div class="col-4"></div>
+                                <div class="col-4">
+                                    <div class="border-end">
+                                        <h6 class="text-dark mb-0">{{ oferta.candidatures_count }}</h6>
+                                        <small class="text-muted">Candidatures</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <h6 class="text-dark mb-0">
+                                        {% now "Y-m-d" as today %}
+                                        {% if oferta.data_limit|date:"Y-m-d" >= today %}
+                                            {{ oferta.data_limit|timeuntil }}
+                                        {% else %}
+                                            Caducada
+                                        {% endif %}
+                                    </h6>
+                                    <small class="text-muted">Temps restant</small>
+                                </div>
+                            </div>
+
+                            <!-- Footer (Accions) -->
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-auto">
+                                <div>
+                                    {% if oferta.es_caducada %}
+                                        <span class="badge bg-danger-subtle text-danger">
+                                            <i class="bi bi-x-circle me-1"></i>Caducada
+                                        </span>
+                                    {% endif %}
+                                    {% if oferta.estat == 'RV' %}
+                                        <span class="badge bg-secondary-subtle text-danger">
+                                            <i class="bi bi-lightbulb-off me-1"></i>En revisió
+                                        </span>
+                                    {% elif oferta.estat == 'OC' %}
+                                        <span class="badge bg-secondary-subtle text-secondary">
+                                            <i class="bi bi-eye-slash me-1"></i>Oculta
+                                        </span>
+                                    {% elif oferta.estat == 'AC' %}
+                                        <span class="badge bg-success-subtle text-success">
+                                            <i class="bi bi-check-circle me-1"></i>Activa
+                                        </span>
+                                    {% elif oferta.estat == 'TC' %}
+                                        <span class="badge bg-warning-subtle text-warning">
+                                            <i class="bi bi-lock-fill me-1"></i>Tancada
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <a href="{% url 'llista_candidatures_oferta' oferta.id %}" class="secundari-btn">
+                                        <i class="bi bi-people"></i>
+                                        <span class="d-none d-lg-inline ms-1">Seguiment oferta</span>                                        
+                                    </a>                                 
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Descripció -->
-            <p class="card-text text-muted mb-3">
-                {{ oferta.descripcio|truncatewords:20 }}
-            </p>
-
-            <!-- Estadístiques -->
-            <div class="row text-center mb-3">
-                <div class="col-4"></div>
-                <div class="col-4">
-                    <div class="border-end">
-                        <h6 class="text-dark mb-0">{{ oferta.candidatures_count }}</h6>
-                        <small class="text-muted">Candidatures</small>
-                    </div>
-                </div>
-                <div class="col-4">
-                    <h6 class="text-dark mb-0">
-                        {% now "Y-m-d" as today %}
-                        {% if oferta.data_limit|date:"Y-m-d" >= today %}
-                            {{ oferta.data_limit|timeuntil }}
-                        {% else %}
-                            Caducada
-                        {% endif %}
-                    </h6>
-                    <small class="text-muted">Temps restant</small>
-                </div>
-            </div>
-
-            <!-- Footer (Accions) -->
-            <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-auto">
-                <div>
-                    {% if oferta.es_caducada %}
-                        <span class="badge bg-danger-subtle text-danger">
-                            <i class="bi bi-x-circle me-1"></i>Caducada
-                        </span>
-                    {% endif %}
-                    {% if oferta.estat == 'RV' %}
-                        <span class="badge bg-secondary-subtle text-danger">
-                            <i class="bi bi-lightbulb-off me-1"></i>En revisió
-                        </span>
-                    {% elif oferta.estat == 'OC' %}
-                        <span class="badge bg-secondary-subtle text-secondary">
-                            <i class="bi bi-eye-slash me-1"></i>Oculta
-                        </span>
-                    {% elif oferta.estat == 'AC' %}
-                        <span class="badge bg-success-subtle text-success">
-                            <i class="bi bi-check-circle me-1"></i>Activa
-                        </span>
-                    {% elif oferta.estat == 'TC' %}
-                        <span class="badge bg-warning-subtle text-warning">
-                            <i class="bi bi-lock-fill me-1"></i>Tancada
-                        </span>
-                    {% endif %}
-                </div>
-                <div>
-                    <a href="{% url 'llista_candidatures_oferta' oferta.id %}" class="secundari-btn">
-                        <i class="bi bi-people"></i>
-                        <span class="d-none d-lg-inline ms-1">Seguiment oferta</span>                                        
-                    </a>                                 
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
                 {% endfor %}
             </div>

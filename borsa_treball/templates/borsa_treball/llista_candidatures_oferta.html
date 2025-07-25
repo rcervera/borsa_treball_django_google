@@ -21,10 +21,20 @@
                                 </h5>
                                 <div class="d-flex align-items-center text-muted mb-2">
                                     <i class="bi bi-calendar-event me-2"></i>
-                                    <small>{{ oferta.data_publicacio|date:"d/m/Y" }}</small>
+                                    <small>Publició: {{ oferta.data_publicacio|date:"d/m/Y" }}</small>
+                                    <span class="mx-2">•</span>
+                                     <i class="bi bi-calendar-event me-2"></i>
+                                    <small>Límit: {{ oferta.data_limit|date:"d/m/Y" }}</small>
                                     <span class="mx-2">•</span>
                                     <i class="bi bi-clock me-2"></i>
-                                    <small>Límit: {{ oferta.data_limit|date:"d/m/Y" }}</small>
+                                    <small>Temps restant: 
+                                            {% now "Y-m-d" as today %}
+                                            {% if oferta.data_limit|date:"Y-m-d" >= today %}
+                                                {{ oferta.data_limit|timeuntil }}
+                                            {% else %}
+                                                Caducada
+                                            {% endif %}                                    
+                                    </small>
                                 </div>
                                 <small class="text-muted">{{ oferta.descripcio }}</small>
                                 <div class="d-flex align-items-center text-muted">
@@ -33,20 +43,7 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Temps restant section -->
-                        <div class="row text-center mb-3">
-                            <div class="col-4">
-                                <h6 class="text-dark mt-2 mb-0">
-                                    {% now "Y-m-d" as today %}
-                                    {% if oferta.data_limit|date:"Y-m-d" >= today %}
-                                        {{ oferta.data_limit|timeuntil }}
-                                    {% else %}
-                                        Caducada
-                                    {% endif %}
-                                </h6>
-                                <small class="text-muted">Temps restant</small>
-                            </div>
-                        </div>
+                       
                     </div>
                     <!-- Removed the col-md-4 that previously contained stats -->
                 </div>
