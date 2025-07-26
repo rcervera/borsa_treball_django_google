@@ -679,7 +679,7 @@ function renderPagination(pagination) {
         if (i === 1 || i === pagination.num_pages || (i >= pagination.current_page - 2 && i <= pagination.current_page + 2)) {
             const li = document.createElement('li');
             li.className = `tercer-btn ${i === pagination.current_page ? 'active' : ''}`;
-            li.innerHTML = `<a class="tercer-btn" href="#" data-page="${i}">${i}</a>`;
+            li.innerHTML = `<a href="#" data-page="${i}">${i}</a>`;
             ul.appendChild(li);
         } else if (i === pagination.current_page - 3 || i === pagination.current_page + 3) {
             // Afegir elipsis
