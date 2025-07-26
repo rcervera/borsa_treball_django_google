@@ -717,15 +717,18 @@ function renderPagination(pagination) {
 
     // Assignar esdeveniments als botons
     ul.querySelectorAll('.tercer-btn').forEach(link => {
-        link.addEventListener('click', function (e) {
-            e.preventDefault();
-            const page = this.dataset.page;
-            if (page) {
-                currentPage = parseInt(page);
-                loadCandidatures(); // Has d'assegurar que aquesta funció actualitza les dades
-            }
-        });
+    link.addEventListener('click', function (e) {
+        e.preventDefault();
+        const page = this.dataset.page;
+        console.log("Pàgina clicada:", page); // DEBUG
+
+        if (page) {
+            currentPage = parseInt(page);
+            loadCandidatures();
+        }
     });
+});
+
 }
 
 
