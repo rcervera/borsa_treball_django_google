@@ -375,6 +375,15 @@ function createToastContainer() {
     return container;
 }
 
+// Funció per mostrar la data en format D/M/Y
+function formatDateDMY(dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Els mesos van de 0 a 11
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+
 // Funció per calcular el "timesince" al frontend
 function formatTimeSince(seconds) {
     if (seconds < 60) return `${Math.floor(seconds)} segons enrere`;
@@ -520,7 +529,7 @@ function renderCandidatures(candidatures, estatsChoices) {
             <div class="card shadow-sm border-0 candidatura-card">
                 <div class="card-body p-4">
                     <div class="row align-items-center">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="d-flex align-items-center">
                                 <div class="me-3">
                                     <div class="avatar-circle bg-secondary text-white d-flex align-items-center justify-content-center">
@@ -556,8 +565,8 @@ function renderCandidatures(candidatures, estatsChoices) {
                         </div>
                         <div class="col-md-2">
                             <small class="text-muted">
-                                <i class="bi bi-calemdar me-1"></i>
-                                ${candidatura.data_candidatura}
+                                <i class="bi bi-calendar me-1"></i>
+                                ${formatDateDMY(candidatura.data_candidatura)}
                             </small>
                         </div>
                         <div class="col-md-2">
