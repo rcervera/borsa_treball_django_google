@@ -150,8 +150,7 @@
                         <select class="form-select" id="ordenar" name="ordenar">
                             <option value="-data_candidatura" {% if ordenar == '-data_candidatura' %}selected{% endif %}>Data (més recent)</option>
                             <option value="nom" {% if ordenar == 'nom' %}selected{% endif %}>Nom</option>
-                            <option value="estat" {% if ordenar == 'estat' %}selected{% endif %}>Estat</option>
-                            <option value="puntuacio" {% if ordenar == 'puntuacio' %}selected{% endif %}>Puntuació</option>
+                            <option value="estat" {% if ordenar == 'estat' %}selected{% endif %}>Estat</option>                            
                         </select>
                     </div>
 
@@ -628,9 +627,7 @@ function renderEmptyState(hasFilters) {
                     <i class="bi bi-x-lg me-2"></i>Netejar filtres
                 </button>` : `
                 <p class="text-muted">Encara no hi ha candidatures per aquesta oferta.</p>
-                <a href="{% url 'editar_oferta' oferta.id %}" class="btn btn-outline-primary">
-                    <i class="bi bi-arrow-left me-2"></i>Tornar a l'oferta
-                </a>`}
+                `}
             </div>
         </div>
     `;
