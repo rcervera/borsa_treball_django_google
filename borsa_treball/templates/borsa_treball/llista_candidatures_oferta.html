@@ -206,10 +206,13 @@
                     <textarea class="form-control" id="valoracioEmpresa" rows="4" placeholder="Escriu aquí la teva valoració sobre el procés de selecció i els candidats..."></textarea>
                     <div id="valoracioError" class="text-danger mt-1" style="display: none;">La valoració és obligatòria per tancar l'oferta.</div>
                 </div>
-                <button id="toggleOfferStatusBtn" class="principal-btn" disabled>
-                    <i class="bi bi-lock me-2"></i>
-                    Tancar Oferta
-                </button>
+                <div class="text-end">
+                    <button id="toggleOfferStatusBtn" class="principal-btn" disabled>
+                        <i class="bi bi-lock me-2"></i>
+                        Tancar Oferta
+                    </button>
+                </div>
+
                 <small class="text-muted mt-2 d-block text-center" id="offerStatusHint">
                     Per tancar l'oferta, totes les candidatures han d'estar en estat "Contractada" o "Rebutjada" i la valoració ha de ser omplerta.
                 </small>
