@@ -529,7 +529,7 @@ function renderCandidatures(candidatures, estatsChoices) {
             <div class="card shadow-sm border-0 candidatura-card">
                 <div class="card-body p-4">
                     <div class="row align-items-center">
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="d-flex align-items-center">
                                 <div class="me-3">
                                     <div class="avatar-circle bg-secondary text-white d-flex align-items-center justify-content-center">
@@ -566,15 +566,10 @@ function renderCandidatures(candidatures, estatsChoices) {
                         <div class="col-md-2">
                             <small class="text-muted">
                                 <i class="bi bi-calendar me-1"></i>
-                                ${formatDateDMY(candidatura.data_candidatura)}
+                                Data presentació: ${formatDateDMY(candidatura.data_candidatura)}
                             </small>
                         </div>
-                        <div class="col-md-2">
-                            <small class="text-muted">
-                                <i class="bi bi-clock me-1"></i>
-                                ${formatTimeSince(candidatura.data_candidatura_timesince)}
-                            </small>
-                        </div>
+                       
                         <div class="col-md-4">
                             <div class="d-flex flex-wrap gap-2 justify-content-end">
                                 ${candidatura.cv_adjunt ? `
