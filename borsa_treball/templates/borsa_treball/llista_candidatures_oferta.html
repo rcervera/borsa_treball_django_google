@@ -198,9 +198,9 @@
         <div class="card shadow-lg border-0 mt-4 mb-4">
             <div class="card-body p-4">
                 <h5 class="text-secondary mb-3">Tancament de l'Oferta</h5>
-                <div class="mb-3">
+                <div class="mb-3">                
                     <label for="valoracioEmpresa" class="form-label">
-                        <i class="bi bi-bookmark-check"></i>Valoració de l'Empresa *
+                        <i class="bi bi-chat me-2"></i>Valoració de l'Empresa *
                     </label>
                     <textarea class="form-control" id="valoracioEmpresa" rows="4" placeholder="Escriu aquí la teva valoració sobre el procés de selecció i els candidats..."></textarea>
                     <div id="valoracioError" class="text-danger mt-1" style="display: none;">La valoració és obligatòria per tancar l'oferta.</div>
@@ -623,9 +623,7 @@ function renderEmptyState(hasFilters) {
                 <h4 class="text-muted mt-3">No hi ha candidatures</h4>
                 ${hasFilters ? `
                 <p class="text-muted">No s'han trobat candidatures amb els filtres aplicats.</p>
-                <button onclick="clearFiltersAndLoad()" class="btn btn-outline-primary">
-                    <i class="bi bi-x-lg me-2"></i>Netejar filtres
-                </button>` : `
+                ` : `
                 <p class="text-muted">Encara no hi ha candidatures per aquesta oferta.</p>
                 `}
             </div>
@@ -670,8 +668,8 @@ function renderPagination(pagination) {
     // Botó "Anterior"
     if (pagination.has_previous) {
         const li = document.createElement('li');
-        li.className = 'page-item';
-        li.innerHTML = `<a class="page-link" href="#" data-page="${pagination.current_page - 1}"><i class="bi bi-chevron-left"></i></a>`;
+        li.className = 'tercer-btn';
+        li.innerHTML = `<a class="tercer-btn" href="#" data-page="${pagination.current_page - 1}"><i class="bi bi-chevron-left"></i></a>`;
         ul.appendChild(li);
     }
 
@@ -680,14 +678,14 @@ function renderPagination(pagination) {
         // Mostrar fins a 2 pàgines abans i 2 després de la pàgina actual, més la primera i l'última
         if (i === 1 || i === pagination.num_pages || (i >= pagination.current_page - 2 && i <= pagination.current_page + 2)) {
             const li = document.createElement('li');
-            li.className = `page-item ${i === pagination.current_page ? 'active' : ''}`;
-            li.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`;
+            li.className = `tercer-btn ${i === pagination.current_page ? 'active' : ''}`;
+            li.innerHTML = `<a class="tercer-btn" href="#" data-page="${i}">${i}</a>`;
             ul.appendChild(li);
         } else if (i === pagination.current_page - 3 || i === pagination.current_page + 3) {
             // Afegir elipsis
             const li = document.createElement('li');
-            li.className = 'page-item disabled';
-            li.innerHTML = `<span class="page-link">...</span>`;
+            li.className = 'tercer-btn disabled';
+            li.innerHTML = `<span class="tercer-btn">...</span>`;
             ul.appendChild(li);
         }
     }
@@ -695,13 +693,13 @@ function renderPagination(pagination) {
     // Botó "Següent"
     if (pagination.has_next) {
         const li = document.createElement('li');
-        li.className = 'page-item';
-        li.innerHTML = `<a class="page-link" href="#" data-page="${pagination.current_page + 1}"><i class="bi bi-chevron-right"></i></a>`;
+        li.className = 'tercer-btn';
+        li.innerHTML = `<a class="tercer-btn" href="#" data-page="${pagination.current_page + 1}"><i class="bi bi-chevron-right"></i></a>`;
         ul.appendChild(li);
     }
 
     // Afegir event listeners als botons de paginació
-    ul.querySelectorAll('.page-link').forEach(link => {
+    ul.querySelectorAll('.tercer-btn').forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
             currentPage = parseInt(this.dataset.page);
