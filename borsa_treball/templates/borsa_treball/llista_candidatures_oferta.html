@@ -515,6 +515,9 @@ function renderCandidatures(candidatures, estatsChoices) {
                             </div>
                         </div>
                         <div class="col-md-2">
+                            <label for="lloc_treball" class="form-label">
+                                <i class="bi bi-stoplights text-muted me-2"></i>Estat
+                            </label>
                             <div class="mb-2">
                                 <select class="form-select estat-select" 
                                         data-candidatura-id="${candidatura.id}"
@@ -526,6 +529,8 @@ function renderCandidatures(candidatures, estatsChoices) {
                                     `).join('')}
                                 </select>
                             </div>
+                        </div>
+                        <div class="col-md-2">
                             <small class="text-muted">
                                 <i class="bi bi-clock me-1"></i>
                                 ${formatTimeSince(candidatura.data_candidatura_timesince)}
