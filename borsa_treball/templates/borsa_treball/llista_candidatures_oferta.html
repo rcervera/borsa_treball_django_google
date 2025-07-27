@@ -249,53 +249,6 @@
     </div>
 </div>
 
-<!-- Modal per editar notes -->
-<div class="modal fade" id="notesModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form id="notesForm">
-                {% csrf_token %}
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="bi bi-pencil text-secondary me-2"></i>
-                        Editar Notes i Puntuació
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="puntuacio" class="form-label">Puntuació (0-100)</label>
-                        <input type="number" 
-                               class="form-control" 
-                               id="puntuacio" 
-                               name="puntuacio" 
-                               min="0" 
-                               max="100"
-                               placeholder="Opcional">
-                        <small class="text-muted">Deixa en blanc per no assignar puntuació</small>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="notes" class="form-label">Notes internes</label>
-                        <textarea class="form-control" 
-                                  id="notes" 
-                                  name="notes" 
-                                  rows="5"
-                                  placeholder="Escriu aquí les teves notes sobre aquest candidat..."></textarea>
-                        <small class="text-muted">Aquestes notes només són visibles per la teva empresa</small>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-check-circle me-2"></i>Guardar
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 
 <script>
 // --- Variables globals per mantenir l'estat ---
@@ -341,43 +294,6 @@ function getCookie(name) {
     return cookieValue;
 }
 
-// Funció per mostrar notificacions toast
-function mostrarNotificacio(missatge, tipus) {
-    const toastContainer = document.getElementById('toast-container') || createToastContainer();
-    
-    const toastId = 'toast-' + Date.now();
-    const toastHtml = `
-        <div id="${toastId}" class="toast align-items-center text-white bg-${tipus === 'success' ? 'success' : tipus === 'error' ? 'danger' : 'info'} border-0" role="alert">
-            <div class="d-flex">
-                <div class="toast-body">
-                    <i class="bi bi-${tipus === 'success' ? 'check-circle' : tipus === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
-                    ${missatge}
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>
-    `;
-    
-    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
-    
-    const toastElement = document.getElementById(toastId);
-    const toast = new bootstrap.Toast(toastElement, { delay: 5000 });
-    toast.show();
-    
-    toastElement.addEventListener('hidden.bs.toast', function() {
-        this.remove();
-    });
-}
-
-// Funció per crear el contenidor de toasts si no existeix
-function createToastContainer() {
-    const container = document.createElement('div');
-    container.id = 'toast-container';
-    container.className = 'toast-container position-fixed top-0 end-0 p-3';
-    container.style.zIndex = '1055';
-    document.body.appendChild(container);
-    return container;
-}
 
 // Funció per mostrar la data en format D/M/Y
 function formatDateDMY(dateString) {
@@ -499,14 +415,17 @@ async function loadCandidatures() {
             attachEstatSelectListeners();
 
         } else {
-            mostrarNotificacio(data.error || 'Error en carregar les candidatures', 'error');
+            if (typeof window.showErrorToast === 'function') {
+                showErrorToast(data.error || 'Error en carregar les candidatures');
+            }           
             if (candidaturesListContainer) {
                 candidaturesListContainer.innerHTML = `<div class="text-center py-5 text-danger"><i class="bi bi-exclamation-triangle" style="font-size: 4rem;"></i><h4 class="mt-3">Error</h4><p>${data.error || 'No s\'han pogut carregar les candidatures.'}</p></div>`;
             }
         }
-    } catch (error) {
-        console.error('Error:', error);
-        mostrarNotificacio('Error de connexió al servidor', 'error');
+    } catch (error) {        
+        if (typeof window.showErrorToast === 'function') {
+                showErrorToast('S\'ha produït un error de xarxa o del servidor.');
+        }
         if (candidaturesListContainer) {
             candidaturesListContainer.innerHTML = `<div class="text-center py-5 text-danger"><i class="bi bi-exclamation-triangle" style="font-size: 4rem;"></i><h4 class="mt-3">Error de connexió</h4><p>No s'ha pogut connectar amb el servidor.</p></div>`;
         }
@@ -759,7 +678,11 @@ async function handleEstatChange() {
 
         if (data.success) {
             this.dataset.estatActual = nouEstat;
-            mostrarNotificacio(data.message, 'success');
+           
+            if (typeof window.showSuccessToast === 'function') {
+                    showSuccessToast(data.message);
+            }
+
             // Actualitzar estadístiques globals
             currentStats = data.stats; 
 
@@ -772,18 +695,23 @@ async function handleEstatChange() {
             
         } else {
             this.value = estatActual;
-            mostrarNotificacio(data.error || 'Error en canviar l\'estat', 'error');
+            if (typeof window.showErrorToast === 'function') {
+                showErrorToast(data.error || 'Error en canviar l\'estat');
+            }           
         }
     } catch (error) {
-        console.error('Error:', error);
+       
         this.value = estatActual;
-        mostrarNotificacio('Error de connexió', 'error');
+        if (typeof window.showErrorToast === 'function') {
+            showErrorToast('Error de connexió');
+        }
+        
     } finally {
         this.disabled = false;
     }
 }
 
-// --- Funcions per modals (existents, amb petites adaptacions) ---
+// --- Funcions per modals 
 
 // Veure carta de presentació
 function veureCarta(candidaturaId) {
@@ -798,7 +726,9 @@ function veureCarta(candidaturaId) {
             const modal = new bootstrap.Modal(document.getElementById('cartaModal'));
             modal.show();
         } else {
-            mostrarNotificacio(data.error || 'Error en carregar la carta', 'error');
+             if (typeof window.showErrorToast === 'function') {
+                    showErrorToast(data.error || 'Error en carregar la carta');
+            }           
         }
     })
     .catch(error => {
@@ -811,63 +741,7 @@ function veureCarta(candidaturaId) {
 
 let candidaturaActual = null; // Variable global per a la candidatura que s'està editant
 
-// Editar notes
-function editarNotes(candidaturaId, notesActuals, puntuacioActual) {
-    candidaturaActual = candidaturaId;
-    
-    document.getElementById('notes').value = notesActuals || '';
-    document.getElementById('puntuacio').value = puntuacioActual || '';
-    
-    const modal = new bootstrap.Modal(document.getElementById('notesModal'));
-    modal.show();
-}
 
-// Guardar notes
-document.getElementById('notesForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    if (!candidaturaActual) return;
-    
-    const formData = new FormData(this);
-    
-    const submitBtn = this.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Guardant...';
-    submitBtn.disabled = true;
-    
-    try {
-        const response = await fetch(`/candidatures/${candidaturaActual}/notes/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
-            body: formData
-        });
-        const data = await response.json();
-
-        if (data.success) {
-            
-            mostrarNotificacio(data.message, 'success');
-            const modal = bootstrap.Modal.getInstance(document.getElementById('notesModal'));
-            modal.hide();
-            // Recarregar les candidatures per reflectir les notes/puntuació actualitzades
-            loadCandidatures(); 
-        } else {
-            mostrarNotificacio(data.error || 'Error en guardar les notes', 'error');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        mostrarNotificacio('Error de connexió', 'error');
-    } finally {
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    }
-});
-
-// Contactar candidatura (placeholder)
-function contactarCandidatura(candidaturaId) {
-    mostrarNotificacio('Funcionalitat de contacte en desenvolupament', 'info');
-}
 
 
 // --- Inicialització al carregar el DOM ---
@@ -926,8 +800,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const valoracio = valoracioTextarea.value.trim();
 
         // Validació client-side per la valoració quan es tanca
-        if (newOfferStatus === 'TC' && valoracio.length === 0) {
-            mostrarNotificacio('La valoració és obligatòria per tancar l\'oferta.', 'error');
+        if (newOfferStatus === 'TC' && valoracio.length === 0) {         
+            if (typeof window.showErrorToast === 'function') {
+                        showErrorToast('La valoració és obligatòria per tancar l\'oferta.');
+            }
             valoracioError.style.display = 'block';
             return;
         } else {
@@ -955,7 +831,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (data.success) {
                 ofertaEstat = newOfferStatus; // Actualitzar l'estat local de l'oferta
-                mostrarNotificacio(data.message, 'success');
+                
+                if (typeof window.showSuccessToast === 'function') {
+                        showSuccessToast(data.message );
+                }
+
                 // Si l'oferta es re-obre, netejar la textarea
                 if (ofertaEstat === 'AC') {
                     // valoracioTextarea.value = '';
@@ -963,11 +843,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Actualitzar la valoració de l'oferta si s'ha tancat
                 ofertaValoracio = data.valoracio || ''; // Assegurar que s'actualitza amb el valor retornat
             } else {
-                mostrarNotificacio(data.error || 'Error en canviar l\'estat de l\'oferta', 'error');
+                if (typeof window.showErrorToast === 'function') {
+                        showErrorToast(data.error || 'Error en canviar l\'estat de l\'oferta');
+                }                
             }
         } catch (error) {
             // console.error('Error:', error);
-            mostrarNotificacio('Error de connexió', 'error');
+            if (typeof window.showErrorToast === 'function') {
+                        showErrorToast('Error de connexió');
+            }
+           
         } finally {
             toggleOfferStatusBtn.innerHTML = originalText;
             updateOfferToggleButton(); // Re-avaluar l'estat del botó després de la crida API
