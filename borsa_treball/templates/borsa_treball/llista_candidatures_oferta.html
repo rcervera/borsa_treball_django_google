@@ -885,8 +885,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         filterInputs.forEach(input => {
             input.addEventListener('change', function() {
-                //filterForm.submit();
-                 e.preventDefault(); // Evitar la recàrrega de la pàgina
+                //filterForm.submit();               
                 currentSearch = document.getElementById('cerca').value;
                 currentEstatFiltre = document.getElementById('estat').value;
                 currentOrdenar = document.getElementById('ordenar').value;
