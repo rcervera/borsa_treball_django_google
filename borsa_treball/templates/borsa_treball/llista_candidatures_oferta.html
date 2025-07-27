@@ -623,9 +623,7 @@ function renderEmptyState(hasFilters) {
                 <h4 class="text-muted mt-3">No hi ha candidatures</h4>
                 ${hasFilters ? `
                 <p class="text-muted">No s'han trobat candidatures amb els filtres aplicats.</p>
-                <button onclick="clearFiltersAndLoad()" class="btn btn-outline-primary">
-                    <i class="bi bi-x-lg me-2"></i>Netejar filtres
-                </button>` : `
+                ` : `
                 <p class="text-muted">Encara no hi ha candidatures per aquesta oferta.</p>
                 `}
             </div>
@@ -881,10 +879,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 2. Configurar el formulari de filtres
 
-    // Auto-submit form quan canvien els filtres
-       
-        
-        
+         
 
     const filterForm = document.getElementById('filter-form');
     if (filterForm) {
