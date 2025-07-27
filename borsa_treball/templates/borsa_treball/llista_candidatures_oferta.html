@@ -880,8 +880,22 @@ document.addEventListener('DOMContentLoaded', function() {
     loadCandidatures();
 
     // 2. Configurar el formulari de filtres
+
+    // Auto-submit form quan canvien els filtres
+       
+        
+        
+
     const filterForm = document.getElementById('filter-form');
     if (filterForm) {
+        const filterInputs = filterForm.querySelectorAll('select[name="estat"], select[name="ordenar"]');
+
+        filterInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                filterForm.submit();
+            });
+        });
+        
         filterForm.addEventListener('submit', function(e) {
             e.preventDefault(); // Evitar la recàrrega de la pàgina
             currentSearch = document.getElementById('cerca').value;
