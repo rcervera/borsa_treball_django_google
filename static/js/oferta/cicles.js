@@ -61,6 +61,12 @@ const CiclesManager = (function () {
         }
     }
 
+    select.addEventListener('change', () => {
+            CiclesManager.afegirCicle();
+            // Reinicia el valor del select per tornar a mostrar el placeholder
+            select.value = '';
+    });
+
     function eliminarCicle(index) {
         const eliminat = ciclesSeleccionats.splice(index, 1)[0];
         const familia = eliminat.familia;
