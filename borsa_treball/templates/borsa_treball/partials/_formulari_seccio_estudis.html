@@ -11,7 +11,7 @@
 
             <div class="card border-dashed">
                 <div class="card-body">
-                    <div class="input-group">
+                    <div class="flex">
                         <select id="select-cicle" class="form-select">
                             <option value="">Selecciona un cicle</option>
                             {% for familia_data in cicles_agrupats_per_familia %}
@@ -26,12 +26,9 @@
                                     {% endfor %}
                                 </optgroup>
                             {% endfor %}
-                        </select>
-                        <button class="btn btn-primary" type="button" onclick="CiclesManager.afegirCicle()">
-                            <i class="bi bi-plus-lg"></i> Afegir estudi
-                        </button>
+                        </select>                        
                     </div>
-                    <small class="text-muted mt-2 d-block">Selecciona un cicle de la llista i prem el botó "+"" per afegir-lo.</small>
+                    <small class="text-muted mt-2 d-block">Selecciona un cicle de la llista i s'afegirà a la llista d'estudis requerits.</small>
                     <div id="error-cicles" class="error-validacio form-text text-danger"></div>
                 </div>
             </div>
