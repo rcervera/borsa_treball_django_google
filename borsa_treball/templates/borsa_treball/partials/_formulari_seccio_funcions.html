@@ -11,11 +11,13 @@
     <div class="card-body">
       <div class="input-group">
         <input type="text" id="nova-funcio" class="form-control" placeholder="Descripció de la funció (Ex: Desenvolupar aplicacions web amb React)">
-        <button class="btn btn-primary" type="button" onclick="FuncionsManager.afegirFuncio()">
-          <i class="bi bi-plus-lg"></i> Afegir funció
+        <button class="tercer-btn" type="button" onclick="FuncionsManager.afegirFuncio()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3z"/>
+          </svg>
         </button>
       </div>
-      <small class="text-muted mt-2 d-block">Prem Enter o fes clic a "+" per afegir una funció.</small>
+      <small class="text-muted mt-2 d-block">Escriu la funció i prem Enter o fes clic a "+" per afegir-la.</small>
       <div id="error-funcions" class="error-validacio form-text text-danger"></div>
     </div>
   </div>
