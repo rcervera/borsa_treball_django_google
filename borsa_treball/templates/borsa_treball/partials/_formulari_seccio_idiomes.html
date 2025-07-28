@@ -8,41 +8,41 @@
   </div>
 
   <div class="card border-dashed">
-    <div class="card-body">
-      <div class="row g-2 align-items-end">
-        <div class="col-md-5">
-          <label for="idioma_nom" class="form-label">Idioma</label>
-          <input type="text" id="idioma_nom" list="llista_idiomes" class="form-control" placeholder="Ex: Català">
-          <datalist id="llista_idiomes">
-            <option value="Català">
-            <option value="Castellà">
-            <option value="Anglès">
-            <option value="Francès">
-            <option value="Alemany">
-          </datalist>
-        </div>
-        <div class="col-md-5">
-          <label for="idioma_nivell" class="form-label">Nivell</label>
-          <input type="text" id="idioma_nivell" list="llista_nivells" class="form-control" placeholder="Ex: Alt, Parlat, Escrit">
-          <datalist id="llista_nivells">
-            <option value="Alt">
-            <option value="Mitjà">
-            <option value="Baix">
-            <option value="Parlat">
-            <option value="Escrit">
-            <option value="Nadiu">
-          </datalist>
-        </div>
-        <div class="col-md-2 text-end">
-          <button type="button" class="tercer-btn" onclick="IdiomesManager.afegirIdioma()">
-             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-             </svg>
-          </button>
-        </div>
+  <div class="card-body">
+    <div class="row g-2 align-items-end">
+      <div class="col">
+        <label for="idioma_nom" class="form-label">Idioma</label>
+        <input type="text" id="idioma_nom" list="llista_idiomes" class="form-control" placeholder="Ex: Català">
+        <datalist id="llista_idiomes">
+          <option value="Català">
+          <option value="Castellà">
+          <option value="Anglès">
+          <option value="Francès">
+          <option value="Alemany">
+        </datalist>
       </div>
-      <small class="text-muted d-block mt-2">Pots escriure un idioma i nivell nous o triar dels suggerits.</small>
-      <div id="error-idiomes" class="error-validacio form-text text-danger"></div>
+      <div class="col">
+        <label for="idioma_nivell" class="form-label">Nivell</label>
+        <input type="text" id="idioma_nivell" list="llista_nivells" class="form-control" placeholder="Ex: Alt, Parlat, Escrit">
+        <datalist id="llista_nivells">
+          <option value="Alt">
+          <option value="Mitjà">
+          <option value="Baix">
+          <option value="Parlat">
+          <option value="Escrit">
+          <option value="Nadiu">
+        </datalist>
+      </div>
+      <div class="col-auto text-end">
+        <label class="form-label d-block invisible">Botó</label> <!-- Placeholder per mantenir alineació -->
+        <button type="button" class="tercer-btn" onclick="IdiomesManager.afegirIdioma()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+          </svg>
+        </button>
+      </div>
     </div>
+    <small class="text-muted d-block mt-2">Pots escriure un idioma i nivell nous o triar dels suggerits.</small>
+    <div id="error-idiomes" class="error-validacio form-text text-danger"></div>
   </div>
 </div>
