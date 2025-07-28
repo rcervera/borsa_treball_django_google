@@ -38,6 +38,12 @@ const CiclesManager = (function () {
 
         renderitzarCiclesDisponibles();
         renderitzarCiclesSeleccionats();
+        select.addEventListener('change', () => {
+            CiclesManager.afegirCicle();
+            // Reinicia el valor del select per tornar a mostrar el placeholder
+            select.value = '';
+        });
+
     }
 
     function afegirCicle() {
@@ -58,14 +64,12 @@ const CiclesManager = (function () {
 
             renderitzarCiclesDisponibles();
             renderitzarCiclesSeleccionats();
+
+            
         }
     }
 
-    select.addEventListener('change', () => {
-            CiclesManager.afegirCicle();
-            // Reinicia el valor del select per tornar a mostrar el placeholder
-            select.value = '';
-    });
+    
 
     function eliminarCicle(index) {
         const eliminat = ciclesSeleccionats.splice(index, 1)[0];
