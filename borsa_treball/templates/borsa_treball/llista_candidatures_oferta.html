@@ -385,6 +385,7 @@ async function loadCandidatures() {
         const data = await response.json();
 
         if (data.success) {
+            console.log(data)
             // Actualitzar l'estat global de l'oferta i el botó
             ofertaEstat = data.oferta.estat;
             ofertaValoracio = data.oferta.valoracio || '';
