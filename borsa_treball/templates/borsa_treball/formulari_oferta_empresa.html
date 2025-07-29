@@ -243,6 +243,14 @@
                     FuncionsManager.afegirFuncio();
                 }
             });
+
+            // Afegir capacitat amb Enter           
+            document.getElementById('nova-capacitat-lliure').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    CapacitatsManager.afegirCapacitat();
+                }
+            });
             
             document.getElementById("jornada").addEventListener("change", function () {
                 const divHores = document.getElementById("div_hores");
