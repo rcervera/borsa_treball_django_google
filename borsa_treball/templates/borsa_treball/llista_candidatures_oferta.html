@@ -254,7 +254,7 @@
 // --- Variables globals per mantenir l'estat ---
 const ofertaId = {{ oferta.id }};
 let ofertaEstat = "{{ oferta.estat }}"; // 'AC' (Activa) o 'TC' (Tancada)
-let ofertaValoracio = "{{ oferta.valoracio|default:'' }}"; // Valoració actual de l'oferta
+let ofertaValoracio = "{{ oferta.valoracio_empresa|default:'' }}"; // Valoració actual de l'oferta
 
 let currentPage = 1;
 let currentSearch = "{{ cerca }}";
@@ -387,7 +387,7 @@ async function loadCandidatures() {
         if (data.success) {
             // Actualitzar l'estat global de l'oferta i el botó
             ofertaEstat = data.oferta.estat;
-            ofertaValoracio = data.oferta.valoracio || '';
+            ofertaValoracio = data.oferta.valoracio_empresa || '';
             updateOfferToggleButton();
 
             // Actualitzar estadístiques
