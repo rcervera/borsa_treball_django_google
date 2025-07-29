@@ -251,6 +251,23 @@
                     CapacitatsManager.afegirCapacitatLliure();
                 }
             });
+
+            // Afegir idioma amb Enter      
+
+             document.getElementById('idioma_nom').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    IdiomesManager.afegirIdioma();                   
+                }
+            });     
+            document.getElementById('idioma_nivell').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    IdiomesManager.afegirIdioma();
+                }
+            });
+
+           
             
             document.getElementById("jornada").addEventListener("change", function () {
                 const divHores = document.getElementById("div_hores");
