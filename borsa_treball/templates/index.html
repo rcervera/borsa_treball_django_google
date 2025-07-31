@@ -217,7 +217,7 @@
 
                                                 {% for num in registres_auditoria.paginator.page_range %}
                                                     {% if registres_auditoria.number == num %}
-                                                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                                        <li class="page-item active"><span class="tercer-btn active">{{ num }}</span></li>
                                                     {% elif num > registres_auditoria.number|add:'-3' and num < registres_auditoria.number|add:'3' %}
                                                         <li class="page-item"><a class="tercer-btn" href="?page={{ num }}">{{ num }}</a></li>
                                                     {% endif %}
