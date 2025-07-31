@@ -110,4 +110,4 @@ def informe_curs_view(request):
         'chart_data': chart_data,  # Afegim les dades del gràfic al context
     }
 
-    return render(request, 'informes/informe_curs.html', context)
+    return render(request, 'borsa_treball/informes/informe_curs.html', context)
