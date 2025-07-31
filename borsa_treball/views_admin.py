@@ -1,17 +1,19 @@
+# views.py (versió actualitzada)
+
 from django.shortcuts import render
 from django.utils import timezone
 from datetime import date
-from django.db.models import Count, Avg
+from django.db.models import Count
+from .models import Oferta, Estudiant, Empresa, Candidatura, EstatCandidatura
+import json # Importem json per si calgués, encara que el tag 'json_script' ho gestiona internament
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
-from .models import Oferta, Estudiant, Empresa, Candidatura, EstatCandidatura
 
 @login_required
 @staff_member_required
 def informe_curs_view(request):
     """
-    Genera un informe d'activitat de la borsa de treball per a un període determinat,
-    per defecte el curs acadèmic actual.
+    Genera un informe d'activitat i una comparativa històrica dels últims 4 cursos.
     """
     # 1. Determinar les dates per defecte (curs acadèmic actual)
     today = timezone.now().date()
@@ -29,66 +31,69 @@ def informe_curs_view(request):
     try:
         start_date = date.fromisoformat(start_date_str)
         end_date = date.fromisoformat(end_date_str)
-    except (ValueError, TypeError):
+    except ValueError:
         start_date = default_start_date
         end_date = default_end_date
         
-    # 3. Realitzar les consultes a la base de dades
+    # --- Càlculs per a l'informe principal (període actual) ---
+    # (Aquesta part es manté igual que abans)
     
-    # Ofertes creades en el període
     ofertes_period = Oferta.objects.filter(data_publicacio__range=[start_date, end_date])
     num_ofertes = ofertes_period.count()
-    
-    # Nous estudiants i empreses registrats
-    # Filtrem per la data de registre de l'usuari associat
     num_alumnes_nous = Estudiant.objects.filter(usuari__data_registre__date__range=[start_date, end_date]).count()
     num_empreses_noves = Empresa.objects.filter(usuari__data_registre__date__range=[start_date, end_date]).count()
-    
-    # Candidatures i contractacions
-    candidatures_period = Candidatura.objects.filter(data_candidatura__date__range=[start_date, end_date])
-    num_candidatures = candidatures_period.count()
-    
-    # Filtrem per data_canvi_estat per saber quan es va marcar com a contractat
+    num_candidatures = Candidatura.objects.filter(data_candidatura__date__range=[start_date, end_date]).count()
     num_contractats = Candidatura.objects.filter(
         estat=EstatCandidatura.CONTRATADA,
         data_canvi_estat__date__range=[start_date, end_date]
     ).count()
-
-    # Mitjana de candidatures per oferta
+    
     if num_ofertes > 0:
         mitjana_candidatures_per_oferta = round(num_candidatures / num_ofertes, 2)
     else:
         mitjana_candidatures_per_oferta = 0
 
-    # 4. Càlculs addicionals per enriquir l'informe
-    
-    # Diccionari per mapejar codis a noms llegibles
     tipus_contracte_display = dict(Oferta.TIPUS_CONTRACTE)
-    
-    # Ofertes per tipus de contracte
-    ofertes_per_tipus_contracte = list(ofertes_period
-        .values('tipus_contracte')
-        .annotate(count=Count('id'))
-        .order_by('-count')
-    )
-    # Afegim el nom llegible
+    ofertes_per_tipus_contracte = list(ofertes_period.values('tipus_contracte').annotate(count=Count('id')).order_by('-count'))
     for item in ofertes_per_tipus_contracte:
         item['nom_llegible'] = tipus_contracte_display.get(item['tipus_contracte'], 'Desconegut')
+    top_empreses = list(ofertes_period.values('empresa__nom_comercial').annotate(count=Count('id')).order_by('-count')[:5])
+    ofertes_per_familia = list(ofertes_period.filter(cicles__familia__nom__isnull=False).values('cicles__familia__nom').annotate(count=Count('id', distinct=True)).order_by('-count'))
 
-    # Top 5 empreses amb més ofertes
-    top_empreses = list(ofertes_period
-        .values('empresa__nom_comercial')
-        .annotate(count=Count('id'))
-        .order_by('-count')[:5]
-    )
+    # --- NOU: Càlcul de dades per a la gràfica històrica ---
     
-    # Ofertes per família professional (a través dels cicles)
-    ofertes_per_familia = list(ofertes_period
-        .filter(cicles__familia__nom__isnull=False)
-        .values('cicles__familia__nom')
-        .annotate(count=Count('id', distinct=True)) # 'distinct=True' per no comptar la mateixa oferta varies vegades si té cicles de la mateixa familia
-        .order_by('-count')
-    )
+    chart_data = {
+        'labels': [],
+        'num_ofertes': [],
+        'num_candidatures': [],
+        'num_contractats': [],
+    }
+
+    for i in range(4):  # Bucle per als últims 4 anys (0, 1, 2, 3)
+        # Calculem les dates del període històric
+        period_start = start_date.replace(year=start_date.year - i)
+        period_end = end_date.replace(year=end_date.year - i)
+        
+        # Generem una etiqueta per al gràfic
+        label = f"Curs {period_start.year % 100}/{period_end.year % 100}"
+        
+        # Realitzem les consultes per a aquest període
+        p_ofertes = Oferta.objects.filter(data_publicacio__range=[period_start, period_end]).count()
+        p_candidatures = Candidatura.objects.filter(data_candidatura__date__range=[period_start, period_end]).count()
+        p_contractats = Candidatura.objects.filter(
+            estat=EstatCandidatura.CONTRATADA,
+            data_canvi_estat__date__range=[period_start, period_end]
+        ).count()
+        
+        # Afegim les dades a les llistes
+        chart_data['labels'].append(label)
+        chart_data['num_ofertes'].append(p_ofertes)
+        chart_data['num_candidatures'].append(p_candidatures)
+        chart_data['num_contractats'].append(p_contractats)
+
+    # Invertim les llistes per tenir un ordre cronològic al gràfic (del més antic al més nou)
+    for key in chart_data:
+        chart_data[key].reverse()
 
     context = {
         'start_date': start_date,
@@ -102,6 +107,7 @@ def informe_curs_view(request):
         'ofertes_per_tipus_contracte': ofertes_per_tipus_contracte,
         'top_empreses': top_empreses,
         'ofertes_per_familia': ofertes_per_familia,
+        'chart_data': chart_data,  # Afegim les dades del gràfic al context
     }
 
-    return render(request, 'borsa_treball/informes/informe_curs.html', context)
+    return render(request, 'informes/informe_curs.html', context)
