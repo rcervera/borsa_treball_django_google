@@ -36,8 +36,7 @@ def informe_curs_view(request):
         end_date = default_end_date
         
     # --- Càlculs per a l'informe principal (període actual) ---
-    # (Aquesta part es manté igual que abans)
-    
+      
     ofertes_period = Oferta.objects.filter(data_publicacio__range=[start_date, end_date])
     num_ofertes = ofertes_period.count()
     num_alumnes_nous = Estudiant.objects.filter(usuari__data_registre__date__range=[start_date, end_date]).count()
