@@ -104,4 +104,4 @@ def informe_curs_view(request):
         'ofertes_per_familia': ofertes_per_familia,
     }
 
-    return render(request, 'informes/informe_curs.html', context)
+    return render(request, 'borsa_treball/informes/informe_curs.html', context)
