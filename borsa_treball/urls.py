@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 from . import views_empresa
 from . import views_estudiant
+from . import views_admin
+
 from django.views.generic import TemplateView
 
 urlpatterns = [
@@ -73,5 +75,7 @@ urlpatterns = [
     path('candidatures/<int:candidatura_id>/cv/', views_empresa.descarregar_cv_candidatura, name='descarregar_cv_candidatura'),
     path('candidatures/<int:candidatura_id>/canviar-estat/', views_empresa.canviar_estat_candidatura, name='canviar_estat_candidatura'),
     path('administrador/candidatures/<int:candidatura_id>/cv/', views.descarregar_cv_candidatura_admin, name='descarregar_cv_candidatura_admin'),
+
+    path('informes/curs/', views_admin.informe_curs_view, name='informe_curs'),
 ]
 
