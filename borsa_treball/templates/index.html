@@ -209,7 +209,7 @@
                                             <ul class="pagination pagination-sm mb-0">
                                                 {% if registres_auditoria.has_previous %}
                                                     <li class="page-item">
-                                                        <a class="page-link" href="?page={{ registres_auditoria.previous_page_number }}" aria-label="Previous">
+                                                        <a class="tercer-btn" href="?page={{ registres_auditoria.previous_page_number }}" aria-label="Previous">
                                                             <span aria-hidden="true">&laquo;</span>
                                                         </a>
                                                     </li>
@@ -219,13 +219,13 @@
                                                     {% if registres_auditoria.number == num %}
                                                         <li class="page-item active"><span class="page-link">{{ num }}</span></li>
                                                     {% elif num > registres_auditoria.number|add:'-3' and num < registres_auditoria.number|add:'3' %}
-                                                        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                                                        <li class="page-item"><a class="tercer-btn" href="?page={{ num }}">{{ num }}</a></li>
                                                     {% endif %}
                                                 {% endfor %}
 
                                                 {% if registres_auditoria.has_next %}
                                                     <li class="page-item">
-                                                        <a class="page-link" href="?page={{ registres_auditoria.next_page_number }}" aria-label="Next">
+                                                        <a class="tercer-btn" href="?page={{ registres_auditoria.next_page_number }}" aria-label="Next">
                                                             <span aria-hidden="true">&raquo;</span>
                                                         </a>
                                                     </li>
