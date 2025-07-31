@@ -6,28 +6,139 @@
     <p class="text-muted">Informe generat pel període del {{ start_date|date:"d/m/Y" }} al {{ end_date|date:"d/m/Y" }}</p>
 
     <div class="card my-4">
+        <div class="card-body">
+            <h5 class="card-title">Seleccionar Període</h5>
+            <form method="get" action="{% url 'informe_curs' %}">
+                <div class="row align-items-end">
+                    <div class="col-md-5">
+                        <label for="start_date" class="form-label">Data d'inici</label>
+                        <input type="date" id="start_date" name="start_date" class="form-control" value="{{ start_date|date:'Y-m-d' }}">
+                    </div>
+                    <div class="col-md-5">
+                        <label for="end_date" class="form-label">Data de fi</label>
+                        <input type="date" id="end_date" name="end_date" class="form-control" value="{{ end_date|date:'Y-m-d' }}">
+                    </div>
+                    <div class="col-md-2 d-grid">
+                        <button type="submit" class="btn btn-primary">Generar Informe</button>
+                    </div>
+                </div>
+            </form>
         </div>
+    </div>
 
     <h2>📊 Resum General</h2>
     <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h3 class="card-title">{{ num_ofertes }}</h3>
+                    <p class="card-text">Noves Ofertes Publicades</p>
+                </div>
+            </div>
         </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h3 class="card-title">{{ num_alumnes_nous }}</h3>
+                    <p class="card-text">Nous Estudiants Inscrits</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h3 class="card-title">{{ num_empreses_noves }}</h3>
+                    <p class="card-text">Noves Empreses Registrades</p>
+                </div>
+            </div>
+        </div>
+    </div>
     
-    <h2>🧑‍💼 Activitat de Candidatures</h2>
+    <h2 class="mt-4">🧑‍💼 Activitat de Candidatures</h2>
      <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h3 class="card-title">{{ num_candidatures }}</h3>
+                    <p class="card-text">Total de Candidatures</p>
+                </div>
+            </div>
         </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h3 class="card-title">{{ mitjana_candidatures_per_oferta }}</h3>
+                    <p class="card-text">Mitjana de Candidatures/Oferta</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center bg-success text-white h-100">
+                <div class="card-body">
+                    <h3 class="card-title">{{ num_contractats }}</h3>
+                    <p class="card-text">Estudiants Contractats</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <hr class="my-4">
     <h2>🗓️ Comparativa Històrica (Últims 4 Cursos)</h2>
     <div class="card mt-4">
         <div class="card-body">
-            <canvas id="historicalChart" style="min-height: 400px;"></canvas>
+            <canvas id="historicalChart" style="min-height: 400px; width: 100%;"></canvas>
         </div>
     </div>
     
     <hr class="my-4">
-    <h2>📈 Anàlisis Addicionals</h2>
+    <h2>📈 Anàlisis Addicionals del Període Actual</h2>
     <div class="row">
+        <div class="col-lg-4 mb-4">
+            <h5>Ofertes per Tipus de Contracte</h5>
+            {% if ofertes_per_tipus_contracte %}
+                <ul class="list-group">
+                    {% for item in ofertes_per_tipus_contracte %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ item.nom_llegible }}
+                            <span class="badge bg-primary rounded-pill">{{ item.count }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No hi ha dades disponibles.</p>
+            {% endif %}
         </div>
+        <div class="col-lg-4 mb-4">
+            <h5>Top 5 Empreses amb Més Ofertes</h5>
+            {% if top_empreses %}
+                 <ul class="list-group">
+                    {% for item in top_empreses %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ item.empresa__nom_comercial }}
+                            <span class="badge bg-primary rounded-pill">{{ item.count }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No hi ha dades disponibles.</p>
+            {% endif %}
+        </div>
+        <div class="col-lg-4 mb-4">
+            <h5>Ofertes per Família Professional</h5>
+            {% if ofertes_per_familia %}
+                 <ul class="list-group">
+                    {% for item in ofertes_per_familia %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ item.cicles__familia__nom }}
+                            <span class="badge bg-primary rounded-pill">{{ item.count }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No hi ha dades disponibles.</p>
+            {% endif %}
+        </div>
+    </div>
 
 </div> {{ chart_data|json_script:"chartData" }}
 
@@ -35,11 +146,9 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Obtenim les dades del context de Django
         const chartData = JSON.parse(document.getElementById('chartData').textContent);
         const ctx = document.getElementById('historicalChart').getContext('2d');
 
-        // Comprovem si tenim dades per evitar errors
         if (chartData && chartData.labels) {
             new Chart(ctx, {
                 type: 'bar',
