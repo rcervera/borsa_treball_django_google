@@ -1,54 +1,37 @@
 {% extends "base.html" %}
 
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-
-
 {% block content %}
 <div class="container mt-4">
     <h1>Informe d'Activitat del Curs Escolar</h1>
-    
     <p class="text-muted">Informe generat pel període del {{ start_date|date:"d/m/Y" }} al {{ end_date|date:"d/m/Y" }}</p>
+
     <div class="card my-4">
-        <div class="card-body">
-            <h5 class="card-title">Seleccionar Període</h5>
-            <form method="get" action="{% url 'informe_curs' %}">
-                <div class="row align-items-end">
-                    <div class="col-md-5">
-                        <label for="start_date">Data d'inici</label>
-                        <input type="date" id="start_date" name="start_date" class="form-control" value="{{ start_date|date:'Y-m-d' }}">
-                    </div>
-                    <div class="col-md-5">
-                        <label for="end_date">Data de fi</label>
-                        <input type="date" id="end_date" name="end_date" class="form-control" value="{{ end_date|date:'Y-m-d' }}">
-                    </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100">Generar Informe</button>
-                    </div>
-                </div>
-            </form>
         </div>
-    </div>
+
     <h2>📊 Resum General</h2>
-    <div class="row"></div>
+    <div class="row">
+        </div>
+    
     <h2>🧑‍💼 Activitat de Candidatures</h2>
-    <div class="row"></div>
+     <div class="row">
+        </div>
 
     <hr class="my-4">
     <h2>🗓️ Comparativa Històrica (Últims 4 Cursos)</h2>
     <div class="card mt-4">
         <div class="card-body">
-            <canvas id="historicalChart"></canvas>
+            <canvas id="historicalChart" style="min-height: 400px;"></canvas>
         </div>
     </div>
     
     <hr class="my-4">
     <h2>📈 Anàlisis Addicionals</h2>
-    <div class="row"></div>
-</div>
+    <div class="row">
+        </div>
 
-{{ chart_data|json_script:"chartData" }}
+</div> {{ chart_data|json_script:"chartData" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -56,57 +39,60 @@
         const chartData = JSON.parse(document.getElementById('chartData').textContent);
         const ctx = document.getElementById('historicalChart').getContext('2d');
 
-        new Chart(ctx, {
-            type: 'bar', // Tipus de gràfic
-            data: {
-                labels: chartData.labels, // Etiquetes de l'eix X (Ex: 'Curs 21/22')
-                datasets: [
-                    {
-                        label: 'Nº Ofertes',
-                        data: chartData.num_ofertes,
-                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
+        // Comprovem si tenim dades per evitar errors
+        if (chartData && chartData.labels) {
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [
+                        {
+                            label: 'Nº Ofertes',
+                            data: chartData.num_ofertes,
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Nº Candidatures',
+                            data: chartData.num_candidatures,
+                            backgroundColor: 'rgba(255, 206, 86, 0.6)',
+                            borderColor: 'rgba(255, 206, 86, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Nº Contractats',
+                            data: chartData.num_contractats,
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Quantitat'
+                            }
+                        }
                     },
-                    {
-                        label: 'Nº Candidatures',
-                        data: chartData.num_candidatures,
-                        backgroundColor: 'rgba(255, 206, 86, 0.6)',
-                        borderColor: 'rgba(255, 206, 86, 1)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Nº Contractats',
-                        data: chartData.num_contractats,
-                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
                         title: {
                             display: true,
-                            text: 'Quantitat'
+                            text: 'Comparativa d\'Ofertes, Candidatures i Contractacions'
                         }
                     }
-                },
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    title: {
-                        display: true,
-                        text: 'Comparativa d\'Ofertes, Candidatures i Contractacions'
-                    }
                 }
-            }
-        });
+            });
+        }
     });
 </script>
 {% endblock %}
