@@ -476,10 +476,7 @@ body {
             color: white;
             border-radius: 15px;
 }
-    
-.stat-card {
-            border-left: 4px solid var(--primary-color);
-}
+ 
 
 .icon-size-3rem {
     font-size: 3rem;
