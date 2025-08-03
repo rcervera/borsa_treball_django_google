@@ -115,7 +115,7 @@
                                 {% if candidatura %}
                                     {% if candidatura.estat == 'EP' %}
                                         <button class="delete-btn"
-                                            onclick="confirmarEliminacio({{ candidatura.id }}, '{{ candidatura.oferta.titol }}')">
+                                             onclick="confirmarEliminacio({{ candidatura.id }}, '{{ candidatura.oferta.titol }}', event)">
                                             <i class="bi bi-trash me-1"></i>Eliminar
                                         </button>
                                     {% endif %}
@@ -237,8 +237,8 @@
 const candidaturaId = {% if candidatura %}{{ candidatura.id }}{% else %}null{% endif %};
 let candidaturaAEliminar = null;
 
-function confirmarEliminacio(candidaturaId, e) {
-    e.preventDefault();
+function confirmarEliminacio titolOferta, event) {
+    event.preventDefault();
     candidaturaAEliminar = candidaturaId;
     // Netejar missatges anteriors del modal d'eliminació
     const deleteFeedbackDiv = document.getElementById('deleteFeedbackMessage');
