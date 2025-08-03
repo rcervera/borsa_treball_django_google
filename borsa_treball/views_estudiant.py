@@ -178,7 +178,7 @@ def llista_ofertes_estudiants_auth(request):
     )
     
     # Paginació
-    paginator = Paginator(ofertes, 12)  # 12 ofertes per pàgina
+    paginator = Paginator(ofertes, 10)  # 12 ofertes per pàgina
     page = request.GET.get('page')
     
     try:

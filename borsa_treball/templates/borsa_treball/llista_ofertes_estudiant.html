@@ -270,12 +270,12 @@
                     <ul class="pagination pagination-lg">
                         {% if ofertes.has_previous %}
                         <li class="page-item">
-                            <a class="page-link" href="?{% if cerca %}cerca={{ cerca }}&{% endif %}{% if empresa_seleccionada %}empresa={{ empresa_seleccionada }}&{% endif %}{% if cicle_seleccionat %}cicle={{ cicle_seleccionat }}&{% endif %}{% if tipus_contracte_seleccionat %}tipus_contracte={{ tipus_contracte_seleccionat }}&{% endif %}{% if jornada_seleccionada %}jornada={{ jornada_seleccionada }}&{% endif %}ordenar={{ ordenar }}&page=1">
+                            <a class="tercer-btn" href="?{% if cerca %}cerca={{ cerca }}&{% endif %}{% if empresa_seleccionada %}empresa={{ empresa_seleccionada }}&{% endif %}{% if cicle_seleccionat %}cicle={{ cicle_seleccionat }}&{% endif %}{% if tipus_contracte_seleccionat %}tipus_contracte={{ tipus_contracte_seleccionat }}&{% endif %}{% if jornada_seleccionada %}jornada={{ jornada_seleccionada }}&{% endif %}ordenar={{ ordenar }}&page=1">
                                 <i class="bi bi-chevron-double-left"></i>
                             </a>
                         </li>
                         <li class="page-item">
-                            <a class="page-link" href="?{% if cerca %}cerca={{ cerca }}&{% endif %}{% if empresa_seleccionada %}empresa={{ empresa_seleccionada }}&{% endif %}{% if cicle_seleccionat %}cicle={{ cicle_seleccionat }}&{% endif %}{% if tipus_contracte_seleccionat %}tipus_contracte={{ tipus_contracte_seleccionat }}&{% endif %}{% if jornada_seleccionada %}jornada={{ jornada_seleccionada }}&{% endif %}ordenar={{ ordenar }}&page={{ ofertes.previous_page_number }}">
+                            <a class="tercer-btn" href="?{% if cerca %}cerca={{ cerca }}&{% endif %}{% if empresa_seleccionada %}empresa={{ empresa_seleccionada }}&{% endif %}{% if cicle_seleccionat %}cicle={{ cicle_seleccionat }}&{% endif %}{% if tipus_contracte_seleccionat %}tipus_contracte={{ tipus_contracte_seleccionat }}&{% endif %}{% if jornada_seleccionada %}jornada={{ jornada_seleccionada }}&{% endif %}ordenar={{ ordenar }}&page={{ ofertes.previous_page_number }}">
                                 <i class="bi bi-chevron-left"></i>
                             </a>
                         </li>
@@ -284,23 +284,23 @@
                         {% for num in ofertes.paginator.page_range %}
                         {% if ofertes.number == num %}
                         <li class="page-item active">
-                            <span class="page-link">{{ num }}</span>
+                            <span class="tercer-btn">{{ num }}</span>
                         </li>
                         {% elif num > ofertes.number|add:'-3' and num < ofertes.number|add:'3' %}
                         <li class="page-item">
-                            <a class="page-link" href="?{% if cerca %}cerca={{ cerca }}&{% endif %}{% if empresa_seleccionada %}empresa={{ empresa_seleccionada }}&{% endif %}{% if cicle_seleccionat %}cicle={{ cicle_seleccionat }}&{% endif %}{% if tipus_contracte_seleccionat %}tipus_contracte={{ tipus_contracte_seleccionat }}&{% endif %}{% if jornada_seleccionada %}jornada={{ jornada_seleccionada }}&{% endif %}ordenar={{ ordenar }}&page={{ num }}">{{ num }}</a>
+                            <a class="tercer-btn" href="?{% if cerca %}cerca={{ cerca }}&{% endif %}{% if empresa_seleccionada %}empresa={{ empresa_seleccionada }}&{% endif %}{% if cicle_seleccionat %}cicle={{ cicle_seleccionat }}&{% endif %}{% if tipus_contracte_seleccionat %}tipus_contracte={{ tipus_contracte_seleccionat }}&{% endif %}{% if jornada_seleccionada %}jornada={{ jornada_seleccionada }}&{% endif %}ordenar={{ ordenar }}&page={{ num }}">{{ num }}</a>
                         </li>
                         {% endif %}
                         {% endfor %}
                         
                         {% if ofertes.has_next %}
                         <li class="page-item">
-                            <a class="page-link" href="?{% if cerca %}cerca={{ cerca }}&{% endif %}{% if empresa_seleccionada %}empresa={{ empresa_seleccionada }}&{% endif %}{% if cicle_seleccionat %}cicle={{ cicle_seleccionat }}&{% endif %}{% if tipus_contracte_seleccionat %}tipus_contracte={{ tipus_contracte_seleccionat }}&{% endif %}{% if jornada_seleccionada %}jornada={{ jornada_seleccionada }}&{% endif %}ordenar={{ ordenar }}&page={{ ofertes.next_page_number }}">
+                            <a class="tercer-btn" href="?{% if cerca %}cerca={{ cerca }}&{% endif %}{% if empresa_seleccionada %}empresa={{ empresa_seleccionada }}&{% endif %}{% if cicle_seleccionat %}cicle={{ cicle_seleccionat }}&{% endif %}{% if tipus_contracte_seleccionat %}tipus_contracte={{ tipus_contracte_seleccionat }}&{% endif %}{% if jornada_seleccionada %}jornada={{ jornada_seleccionada }}&{% endif %}ordenar={{ ordenar }}&page={{ ofertes.next_page_number }}">
                                 <i class="bi bi-chevron-right"></i>
                             </a>
                         </li>
                         <li class="page-item">
-                            <a class="page-link" href="?{% if cerca %}cerca={{ cerca }}&{% endif %}{% if empresa_seleccionada %}empresa={{ empresa_seleccionada }}&{% endif %}{% if cicle_seleccionat %}cicle={{ cicle_seleccionat }}&{% endif %}{% if tipus_contracte_seleccionat %}tipus_contracte={{ tipus_contracte_seleccionat }}&{% endif %}{% if jornada_seleccionada %}jornada={{ jornada_seleccionada }}&{% endif %}ordenar={{ ordenar }}&page={{ ofertes.paginator.num_pages }}">
+                            <a class="tercer-btn" href="?{% if cerca %}cerca={{ cerca }}&{% endif %}{% if empresa_seleccionada %}empresa={{ empresa_seleccionada }}&{% endif %}{% if cicle_seleccionat %}cicle={{ cicle_seleccionat }}&{% endif %}{% if tipus_contracte_seleccionat %}tipus_contracte={{ tipus_contracte_seleccionat }}&{% endif %}{% if jornada_seleccionada %}jornada={{ jornada_seleccionada }}&{% endif %}ordenar={{ ordenar }}&page={{ ofertes.paginator.num_pages }}">
                                 <i class="bi bi-chevron-double-right"></i>
                             </a>
                         </li>
