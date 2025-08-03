@@ -176,8 +176,8 @@ body {
 
 .delete-btn {
   background: linear-gradient(135deg, #f7b7b7, #f41b1b);
-   border: none;
-            border-radius: 50px;
+  border: none;
+  border-radius: 50px;
             padding: 0.8rem 1.5rem;
             font-weight: 600;
             color: white;
@@ -197,7 +197,7 @@ body {
 .delete-btn:hover,
 .delete-btn:focus {
     transform: translateY(-3px);
-    background: linear-gradient(135deg, #c0c0c0, #808080); /* degradat més fosc en hover */
+    background: linear-gradient(135deg, #f37c7c, #ce3737); /* degradat més fosc en hover */
     color: white;
 }
 
