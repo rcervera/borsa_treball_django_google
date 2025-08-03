@@ -237,8 +237,8 @@
 const candidaturaId = {% if candidatura %}{{ candidatura.id }}{% else %}null{% endif %};
 let candidaturaAEliminar = null;
 
-function confirmarEliminacio titolOferta, event) {
-    event.preventDefault();
+function confirmarEliminacio(candidaturaId, titolOferta, e) {
+    e.preventDefault();
     candidaturaAEliminar = candidaturaId;
     // Netejar missatges anteriors del modal d'eliminació
     const deleteFeedbackDiv = document.getElementById('deleteFeedbackMessage');
