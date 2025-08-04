@@ -106,29 +106,29 @@ body {
 
 
 
-/* Botó operació secundaria */
+/* Botó operació secundària */
 .secundari-btn {
-            background: linear-gradient(135deg, #f6c13b, #d85e1d);
-            border: none;
-            border-radius: 50px;
-            padding: 0.8rem 1.5rem;
-            font-weight: 600;
-            color: white;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            white-space: nowrap;
-            min-width: 180px;
-            height: 50px;
+    background: linear-gradient(135deg, #b3d4fc, #75bdf0);
+    border: none;
+    border-radius: 50px;
+    padding: 0.8rem 1.5rem;
+    font-weight: 600;
+    color: white;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    white-space: nowrap;
+    min-width: 180px;
+    height: 50px;
 }
 
 .secundari-btn:hover {
-            transform: translateY(-3px);
-            background: linear-gradient(135deg, #d8c21d, #d98626);
-            color: white;
+    transform: translateY(-3px);
+    background: linear-gradient(135deg, #a1c8f4, #5faee3);
+    color: white;
 }
 
 .secundari-btn i {
