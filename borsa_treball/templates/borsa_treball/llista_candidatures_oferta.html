@@ -347,7 +347,7 @@ function updateOfferToggleButton() {
             valoracioTextarea.value = ofertaValoracio;
         }
     } else { // 'AC' = Activa
-        valoracioTextarea.value = ofertaValoracio;
+        // valoracioTextarea.value = ofertaValoracio;
         toggleOfferStatusBtn.textContent = 'Tancar Oferta';
         toggleOfferStatusBtn.classList.remove('btn-warning');
         toggleOfferStatusBtn.classList.add('btn-primary');
@@ -374,7 +374,7 @@ function updateOfferToggleButton() {
 
 // Funció principal per carregar les candidatures
 async function loadCandidatures() {
-    const url = `/api/ofertes/${ofertaId}/candidatures/?page=${currentPage}&cerca=${currentSearch}&estat=${currentEstatFiltre}&ordenar=${currentOrdenar}`;
+    const url = `/btreball/api/ofertes/${ofertaId}/candidatures/?page=${currentPage}&cerca=${currentSearch}&estat=${currentEstatFiltre}&ordenar=${currentOrdenar}`;
 
     const candidaturesListContainer = document.getElementById('candidatures-list-container');
     if (candidaturesListContainer) {
@@ -668,7 +668,7 @@ async function handleEstatChange() {
     
     try {
         
-        const response = await fetch(`/candidatures/${candidaturaId}/canviar-estat/`, {
+        const response = await fetch(`/btreball/candidatures/${candidaturaId}/canviar-estat/`, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': getCookie('csrftoken'),
@@ -717,7 +717,7 @@ async function handleEstatChange() {
 
 // Veure carta de presentació
 function veureCarta(candidaturaId) {
-    fetch(`/candidatures/${candidaturaId}/carta/`)
+    fetch(`/btreball/candidatures/${candidaturaId}/carta/`)
     .then(response => response.json())
     .then(data => {
         if (data.success) {
@@ -818,7 +818,7 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleOfferStatusBtn.disabled = true;
 
         try {
-            const response = await fetch(`/empresa/oferta/${ofertaId}/toggle-estat/`, {
+            const response = await fetch(`/btreball/empresa/oferta/${ofertaId}/toggle-estat/`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': getCookie('csrftoken'),
