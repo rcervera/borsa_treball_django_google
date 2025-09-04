@@ -287,7 +287,11 @@
             const formData = new FormData(form);
 
             const ofertaId = form.dataset.ofertaId || null;
-            const url = ofertaId ? `/api/empresa/oferta/${ofertaId}/` : "/api/empresa/oferta/nova";
+            //const url = ofertaId ? `/api/empresa/oferta/${ofertaId}/` : "/api/empresa/oferta/nova";
+            const url = ofertaId ? 
+                    `{% url 'api_actualitzar_oferta' oferta_id=0 %}`.replace('0', ofertaId) : 
+                    "{% url 'afegir_oferta_api' %}";
+
             const method = ofertaId ? "PUT" : "POST";
 
             // Construir objecte de dades per a l'API
