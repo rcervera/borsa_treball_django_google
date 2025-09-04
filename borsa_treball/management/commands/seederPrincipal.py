@@ -534,6 +534,7 @@ class Command(BaseCommand):
             }
         ]
         
+        
         for noticia in noticies:
             Noticia.objects.create(
                 titol=noticia['titol'],

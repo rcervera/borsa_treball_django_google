@@ -155,10 +155,10 @@ BOOTSTRAP5 = {
     'include_jquery': True,
     'theme_url': None,
     'javascript_url': {
-        "url": "/static/django_bootstrap5/bootstrap.bundle.min.js",
+        "url": "/btreball/static/django_bootstrap5/bootstrap.bundle.min.js",
     },
     'css_url': {
-         "url": "/static/django_bootstrap5/bootstrap.min.css",
+         "url": "/btreball/static/django_bootstrap5/bootstrap.min.css",
     },
     'horizontal_label_class': 'col-md-3',
     'horizontal_field_class': 'col-md-9',
