@@ -374,7 +374,9 @@ function updateOfferToggleButton() {
 
 // Funció principal per carregar les candidatures
 async function loadCandidatures() {
-    const url = `/btreball/api/ofertes/${ofertaId}/candidatures/?page=${currentPage}&cerca=${currentSearch}&estat=${currentEstatFiltre}&ordenar=${currentOrdenar}`;
+    // const url = `/btreball/api/ofertes/${ofertaId}/candidatures/?page=${currentPage}&cerca=${currentSearch}&estat=${currentEstatFiltre}&ordenar=${currentOrdenar}`;
+    
+    const url = `{% url 'api_candidatures_oferta' oferta_id=0 %}`.replace('0', ofertaId) + `?page=${currentPage}&cerca=${currentSearch}&estat=${currentEstatFiltre}&ordenar=${currentOrdenar}`;
 
     const candidaturesListContainer = document.getElementById('candidatures-list-container');
     if (candidaturesListContainer) {
