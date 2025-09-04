@@ -30,11 +30,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-FORCE_SCRIPT_NAME = "/btreball"
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-ALLOWED_HOSTS = ['192.168.128.144','localhost','127.0.0.1','www.vidalibarraquer.net', 'vidalibarraquer.net']
-CSRF_TRUSTED_ORIGINS = ["https://www.vidalibarraquer.net", "https://vidalibarraquer.net"]
-APPEND_SLASH = True
+ALLOWED_HOSTS = ['192.168.128.144','localhost','127.0.0.1']
 
 
 # Application definition
@@ -135,7 +131,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = '/btreball/static/'
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     BASE_DIR / "static",
@@ -145,12 +141,12 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
 # Configuració per arxius públics (fotos de notícies)
-MEDIA_URL = '/btreball/media/'
+MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 # Configuració per arxius privats (currículums)
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, 'private/')
-PRIVATE_MEDIA_URL = '/btreball/protected/'
+PRIVATE_MEDIA_URL = '/protected/'
 
   
 
@@ -159,10 +155,10 @@ BOOTSTRAP5 = {
     'include_jquery': True,
     'theme_url': None,
     'javascript_url': {
-        "url": "/btreball/static/django_bootstrap5/bootstrap.bundle.min.js",
+        "url": "/static/django_bootstrap5/bootstrap.bundle.min.js",
     },
     'css_url': {
-         "url": "/btreball/static/django_bootstrap5/bootstrap.min.css",
+         "url": "/static/django_bootstrap5/bootstrap.min.css",
     },
     'horizontal_label_class': 'col-md-3',
     'horizontal_field_class': 'col-md-9',
