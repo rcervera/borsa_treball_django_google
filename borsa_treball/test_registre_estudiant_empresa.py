@@ -1,5 +1,5 @@
 from django.test import TestCase, Client, override_settings
-from django.urls import reverse
+from django.urls import clear_url_caches, reverse
 from .models import FamiliaProfessional, Usuari, Estudiant, EstudiEstudiant, Cicle, Empresa, Sector, RegistreAuditoria
 from django.utils.timezone import now
 import json
@@ -9,10 +9,18 @@ class RegistreEstudiantTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # Aquest mètode s'executa UNA SOLA VEGADA per a tota la classe, abans de res.
-        # És el lloc ideal per generar la URL sota l'efecte del decorador.
+        # Aquest mètode s'executa UNA SOLA VEGADA per a tota la classe.
         super().setUpClass()
+        
+        # LA SOLUCIÓ DEFINITIVA: Buidem la memòria cau de les URLs.
+        # Això força a Django a "oblidar" les rutes que havia carregat inicialment
+        # amb el prefix /btreball.
+        clear_url_caches()
+        
+        # Ara, en cridar a reverse(), es veu obligat a rellegir la configuració
+        # de les URLs, que en aquest punt ja NO té FORCE_SCRIPT_NAME.
         cls.url = reverse('registre_estudiant_api')
+
 
     def setUp(self):
         self.client = Client()
