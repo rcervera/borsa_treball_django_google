@@ -421,9 +421,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const formData = new FormData(form);
 
-        const url = candidaturaId
-            ? `/api/candidatures/${candidaturaId}/editar/`  
-            : `/api/ofertes/{{ oferta.id }}/candidatura/`;  // només quan afegeixes
+        //const url = candidaturaId
+        //    ? `/api/candidatures/${candidaturaId}/editar/`  
+        //    : `/api/ofertes/{{ oferta.id }}/candidatura/`;  // només quan afegeixes
+
+        const url = candidaturaId 
+            ? `{% url 'editar_candidatura_estudiant' candidatura_id=0 %}`.replace('0', candidaturaId)
+            : `{% url 'afegir_candidatura_api' oferta_id=0 %}`.replace('0', {{ oferta.id }});
 
         try {
             const response = await fetch(url, {
