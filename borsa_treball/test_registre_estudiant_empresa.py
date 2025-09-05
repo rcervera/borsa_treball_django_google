@@ -51,7 +51,7 @@ class RegistreEstudiantTestCase(TestCase):
         # Mostrar dades enviades
         print(f"--- Dades enviades: {json.dumps(dades, indent=2)} ---")
 
-        response = self.client.post('api/registre-estudiant/', data=json.dumps(dades), content_type='application/json')
+        response = self.client.post('/api/registre-estudiant/', data=json.dumps(dades), content_type='application/json')
         
         # Mostrar status code i response
         print(f"--- Status code: {response.status_code} ---")
