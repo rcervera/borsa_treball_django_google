@@ -7,15 +7,20 @@ import json
 @override_settings(FORCE_SCRIPT_NAME=None) # O també FORCE_SCRIPT_NAME=''
 class RegistreEstudiantTestCase(TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        # Aquest mètode s'executa UNA SOLA VEGADA per a tota la classe, abans de res.
+        # És el lloc ideal per generar la URL sota l'efecte del decorador.
+        super().setUpClass()
+        cls.url = reverse('registre_estudiant_api')
+
     def setUp(self):
         self.client = Client()
         
         # Utilitzem 'override_settings' com a gestor de context per
         # assegurar que 'reverse' s'executa amb la configuració modificada,
         # evitant haver de repetir-ho a cada test.
-        with override_settings(FORCE_SCRIPT_NAME=None):
-            self.url = reverse('registre_estudiant_api')
-        
+                
         # Crear una família professional
         self.familia = FamiliaProfessional.objects.create(
             nom='Informàtica i comunicacions'
