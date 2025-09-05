@@ -670,7 +670,7 @@ async function handleEstatChange() {
     
     try {
        
-        const response = await fetch(`/btreball/candidatures/${candidaturaId}/canviar-estat/`, {
+        const response = await fetch(`{% url 'canviar_estat_candidatura' candidatura_id=0 %}`.replace('0', candidaturaId), {
             method: 'POST',
             headers: {
                 'X-CSRFToken': getCookie('csrftoken'),
@@ -820,7 +820,7 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleOfferStatusBtn.disabled = true;
 
         try {
-            const response = await fetch(`/btreball/empresa/oferta/${ofertaId}/toggle-estat/`, {
+           const response = await fetch(`{% url 'toggle_estat_oferta' oferta_id=0 %}`.replace('0', ofertaId), {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': getCookie('csrftoken'),
