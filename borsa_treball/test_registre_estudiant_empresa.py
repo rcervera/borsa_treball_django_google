@@ -1,9 +1,10 @@
-from django.test import TestCase, Client
+from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 from .models import FamiliaProfessional, Usuari, Estudiant, EstudiEstudiant, Cicle, Empresa, Sector, RegistreAuditoria
 from django.utils.timezone import now
 import json
 
+@override_settings(FORCE_SCRIPT_NAME=None) # O també FORCE_SCRIPT_NAME=''
 class RegistreEstudiantTestCase(TestCase):
 
     def setUp(self):
