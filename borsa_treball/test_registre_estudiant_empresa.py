@@ -39,7 +39,25 @@ class RegistreEstudiantTestCase(TestCase):
             "terms": True
         }
 
+        # Mostrar URL
+        print(f"\n--- URL cridada: {self.url} ---")
+        
+        # Mostrar dades enviades
+        print(f"--- Dades enviades: {json.dumps(dades, indent=2)} ---")
+
         response = self.client.post(self.url, data=json.dumps(dades), content_type='application/json')
+        
+        # Mostrar status code i response
+        print(f"--- Status code: {response.status_code} ---")
+        print(f"--- Response content: {response.content.decode('utf-8')} ---")
+        
+        # Si la response és JSON, mostrar-la formatejada
+        try:
+            response_json = response.json()
+            print(f"--- Response JSON formatejada: {json.dumps(response_json, indent=2)} ---")
+        except:
+            print("--- No es pot parsejar com JSON ---")
+
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json()['success'], True)
         self.assertTrue(Usuari.objects.filter(email="test@student.com").exists())
