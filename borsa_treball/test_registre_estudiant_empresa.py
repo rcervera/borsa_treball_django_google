@@ -9,7 +9,12 @@ class RegistreEstudiantTestCase(TestCase):
 
     def setUp(self):
         self.client = Client()
-        self.url = reverse('registre_estudiant_api')
+        
+        # Utilitzem 'override_settings' com a gestor de context per
+        # assegurar que 'reverse' s'executa amb la configuració modificada,
+        # evitant haver de repetir-ho a cada test.
+        with override_settings(FORCE_SCRIPT_NAME=None):
+            self.url = reverse('registre_estudiant_api')
         
         # Crear una família professional
         self.familia = FamiliaProfessional.objects.create(
