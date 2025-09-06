@@ -6,21 +6,8 @@ import json
 
 @override_settings(FORCE_SCRIPT_NAME=None) # O també FORCE_SCRIPT_NAME=''
 class RegistreEstudiantTestCase(TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        # Aquest mètode s'executa UNA SOLA VEGADA per a tota la classe.
-        super().setUpClass()
-        
-        # LA SOLUCIÓ DEFINITIVA: Buidem la memòria cau de les URLs.
-        # Això força a Django a "oblidar" les rutes que havia carregat inicialment
-        # amb el prefix /btreball.
-        clear_url_caches()
-        
-        # Ara, en cridar a reverse(), es veu obligat a rellegir la configuració
-        # de les URLs, que en aquest punt ja NO té FORCE_SCRIPT_NAME.
-        cls.url = reverse('registre_estudiant_api')
-
+    url = '/api/registre-estudiant/'  # URL fixa amb FORCE_SCRIPT_NAME None
+    #url = reverse('registre_estudiant_api')  # Aquesta línia es mou a setUp per assegurar que s'executa amb la configuració correcta           
 
     def setUp(self):
         self.client = Client()
@@ -28,7 +15,7 @@ class RegistreEstudiantTestCase(TestCase):
         # Utilitzem 'override_settings' com a gestor de context per
         # assegurar que 'reverse' s'executa amb la configuració modificada,
         # evitant haver de repetir-ho a cada test.
-                
+           
         # Crear una família professional
         self.familia = FamiliaProfessional.objects.create(
             nom='Informàtica i comunicacions'

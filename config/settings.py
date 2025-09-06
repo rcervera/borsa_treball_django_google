@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import sys
 
 # Carrega variables d'entorn
 load_dotenv()
@@ -30,7 +31,16 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-FORCE_SCRIPT_NAME = "/btreball"
+# FORCE_SCRIPT_NAME = "/btreball"
+
+
+
+
+if "test" in sys.argv:
+    FORCE_SCRIPT_NAME = None
+else:
+    FORCE_SCRIPT_NAME = "/btreball"
+
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 ALLOWED_HOSTS = ['192.168.128.144','localhost','127.0.0.1','www.vidalibarraquer.net', 'vidalibarraquer.net']
 CSRF_TRUSTED_ORIGINS = ["https://www.vidalibarraquer.net", "https://vidalibarraquer.net"]
