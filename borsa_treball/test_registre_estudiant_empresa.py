@@ -4,14 +4,16 @@ from .models import FamiliaProfessional, Usuari, Estudiant, EstudiEstudiant, Cic
 from django.utils.timezone import now
 import json
 
-@override_settings(FORCE_SCRIPT_NAME=None) # O també FORCE_SCRIPT_NAME=''
+
 class RegistreEstudiantTestCase(TestCase):
-    url = '/api/registre-estudiant/'  # URL fixa amb FORCE_SCRIPT_NAME None
-    #url = reverse('registre_estudiant_api')  # Aquesta línia es mou a setUp per assegurar que s'executa amb la configuració correcta           
+  
+    #  # Aquesta línia es mou a setUp per assegurar que s'executa amb la configuració correcta           
 
     def setUp(self):
         self.client = Client()
-        
+
+        self.url = reverse('registre_estudiant_api')
+
         # Utilitzem 'override_settings' com a gestor de context per
         # assegurar que 'reverse' s'executa amb la configuració modificada,
         # evitant haver de repetir-ho a cada test.
