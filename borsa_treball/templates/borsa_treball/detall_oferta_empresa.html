@@ -170,13 +170,15 @@
                                 value="{{ oferta.get_jornada_display|default:'' }}" readonly="readonly">
                         </div>
 
-                        <div class="col-md-3 mb-3" id="div_hores" {% if oferta.jornada != "PA" %}style="display: none;"{% endif %}>
-                            <label for="hores" class="form-label">
-                                <i class="bi bi-clock text-muted me-2"></i>Nombre d'hores
-                            </label>
-                            <input type="number" class="form-control" id="hores" name="hores" 
-                                value="{{ oferta.hores_setmanals|default_if_none:'' }}" readonly="readonly">
-                        </div>
+                        {% if oferta.jornada == "PA" %}
+                            <div class="col-md-3 mb-3" id="div_hores">
+                                <label for="hores" class="form-label">
+                                    <i class="bi bi-clock text-muted me-2"></i>Nombre d'hores
+                                </label>
+                                <input type="number" class="form-control" id="hores" name="hores" min="1" 
+                                    placeholder="Ex: 20" value="{{ oferta.hores_setmanals|default_if_none:'' }}" readonly="readonly">
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div class="row">
