@@ -715,7 +715,7 @@ def editar_oferta(request, oferta_id):
             'dies_restants': dies_restants,       
             'today': today,
         }
-        return render(request, 'borsa_treball/detall_oferta_tauler.html', context)
+        return render(request, 'borsa_treball/detall_oferta_empresa.html', context)
 
     familias = FamiliaProfessional.objects.order_by('nom').prefetch_related(
         Prefetch(

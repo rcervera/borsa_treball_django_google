@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if mode == "editar" %}Editar Oferta - Borsa de Treball{% else %}Nova Oferta - Borsa de Treball{% endif %}{% endblock %}
+
+{% block page_title %}Les meves ofertes{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10 col-md-11">
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-5">
+
+              
+                <div class="d-flex justify-content-end mb-3">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-gear me-2"></i>Accions
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            {% if oferta.candidatures_count > 0 %}
+                            <li><a class="dropdown-item" href="{% url 'llista_candidatures_oferta' oferta.id %}">
+                                <i class="bi bi-people me-2"></i>Veure candidatures ({{ oferta.candidatures_count }})
+                            </a></li>
+                            {% else %}
+                            <li><span class="dropdown-item-text text-muted">
+                                <i class="bi bi-people me-2"></i>Cap candidatura
+                            </span></li>
+                            {% endif %}
+                            {% if oferta.estat == 'RV' or oferta.estat == 'OC' %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="toggleVisibilitat('{{ oferta.id }}',this)">
+                                {% if oferta.estat == 'RV' %}
+                                <i class="bi bi-eye-slash me-2"></i>Ocultar l'oferta
+                                {% else %}
+                                <i class="bi bi-eye me-2"></i>Fer visible l'oferta
+                                {% endif %}
+                            </a></li>
+                            <li><a class="dropdown-item text-danger" href="#" onclick="confirmarEliminacio('{{ oferta.id }}')">
+                                <i class="bi bi-trash me-2"></i>Eliminar oferta
+                            </a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="text-center mb-4">
+                    <h2 class="h4 text-dark mb-2">Editar Oferta de Treball</h2>
+                    <p class="text-muted">Pots modificar les dades de l'oferta de treball</p>
+                    <div class="mb-2">
+                        {% if oferta.es_caducada %}
+                        <span class="badge bg-danger-subtle text-danger">
+                            <i class="bi bi-x-circle me-1"></i>Caducada
+                        </span>
+                        {% endif %}
+                        <span id="estat-oferta">
+                          <span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle me-1"></i>Activa</span>
+                           
+                        </span>
+                    </div>
+                </div>
+                <div class="alert alert-light alert-info-small">
+                    <div class="d-flex">
+                        <div class="alert-icon me-2">
+                            <i class="bi bi-question-circle"></i>
+                        </div>
+                        <div class="alert-content">
+                           <p class="mb-2">No es pot eliminar ni canviar l'estat de l'oferta quan està activa.</p>
+                        </div>
+                    </div>
+                </div>
+                
+
+
+                <div id="api-missatges"></div>
+
+
+               
+
+               
+             
+
+               
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
