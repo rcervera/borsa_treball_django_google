@@ -706,6 +706,17 @@ def editar_oferta(request, oferta_id):
         empresa=empresa
     )
 
+    if(oferta.estat == 'AC'): 
+        today = timezone.now().date()
+        dies_restants = (oferta.data_limit - today).days if oferta.data_limit > today else 0      
+    
+        context = {
+            'oferta': oferta,
+            'dies_restants': dies_restants,       
+            'today': today,
+        }
+        return render(request, 'borsa_treball/detall_oferta_tauler.html', context)
+
     familias = FamiliaProfessional.objects.order_by('nom').prefetch_related(
         Prefetch(
             'cicle_set',  
