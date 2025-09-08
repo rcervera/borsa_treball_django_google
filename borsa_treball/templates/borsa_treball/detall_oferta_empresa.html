@@ -90,8 +90,8 @@
                             <label for="data_limit" class="form-label">
                                 <i class="bi bi-calendar-event text-muted me-2"></i>Data límit *
                             </label>
-                            <input type="date" class="form-control" id="data_limit" name="data_limit" 
-                                value="{{ oferta.data_limit|default:'' }}" readonly="readonly">
+                            <input type="text" class="form-control" id="data_limit" name="data_limit" 
+                                value="{{ oferta.data_limit|date:'d/m/Y' }}" readonly="readonly">
                         </div>
                     </div>
 
@@ -167,7 +167,7 @@
                                 <i class="bi bi-clock text-muted me-2"></i>Jornada *
                             </label>
                             <input type="text" class="form-control" id="jornada" name="jornada"
-                                value="{{ oferta.jornada|default:'' }}" readonly="readonly">
+                                value="{{ oferta.get_jornada_display|default:'' }}" readonly="readonly">
                         </div>
 
                         <div class="col-md-3 mb-3" id="div_hores" {% if oferta.jornada != "PA" %}style="display: none;"{% endif %}>
