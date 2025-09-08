@@ -11,7 +11,6 @@
         <div class="card shadow-lg border-0">
             <div class="card-body p-5">
 
-              
                 <div class="d-flex justify-content-end mb-3">
                     <div class="dropdown">
                         <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -43,9 +42,9 @@
                         </ul>
                     </div>
                 </div>
+
                 <div class="text-center mb-4">
                     <h2 class="h4 text-dark mb-2">Detall Oferta de Treball</h2>
-                 
                     <div class="mb-2">
                         {% if oferta.es_caducada %}
                         <span class="badge bg-danger-subtle text-danger">
@@ -53,27 +52,25 @@
                         </span>
                         {% endif %}
                         <span id="estat-oferta">
-                          <span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle me-1"></i>Activa</span>
-                           
+                            <span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle me-1"></i>Activa</span>
                         </span>
                     </div>
                 </div>
+
                 <div class="alert alert-light alert-info-small">
                     <div class="d-flex">
                         <div class="alert-icon me-2">
                             <i class="bi bi-question-circle"></i>
                         </div>
                         <div class="alert-content">
-                           <p class="mb-2">No es pot eliminar ni canviar l'estat de l'oferta quan està activa.</p>
+                           <p class="mb-2">No es pot editar, eliminar ni canviar l'estat de l'oferta quan és activa.</p>
                         </div>
                     </div>
                 </div>
-                
-
 
                 <div id="api-missatges"></div>
 
-
+                <!-- Informació bàsica -->
                 <div class="mb-5">
                     <h5 class="text-primary mb-4">
                         <i class="bi bi-info-circle me-2"></i>Informació Bàsica
@@ -87,7 +84,6 @@
                             <input type="text" class="form-control" id="titol" name="titol" 
                                 placeholder="Ex: Desenvolupador/a Web Junior"
                                 value="{{ oferta.titol|default:'' }}" readonly="readonly">
-                           
                         </div>
 
                         <div class="col-md-4 mb-3">
@@ -95,8 +91,7 @@
                                 <i class="bi bi-calendar-event text-muted me-2"></i>Data límit *
                             </label>
                             <input type="date" class="form-control" id="data_limit" name="data_limit" 
-                                >
-                           
+                                value="{{ oferta.data_limit|default:'' }}" readonly="readonly">
                         </div>
                     </div>
 
@@ -106,7 +101,6 @@
                         </label>
                         <textarea class="form-control" id="descripcio" name="descripcio" rows="4"
                                 placeholder="Descriu les responsabilitats i objectius del lloc de treball..." readonly="readonly">{{ oferta.descripcio|default:'' }}</textarea>
-                      
                     </div>
 
                     <div class="row">
@@ -117,7 +111,6 @@
                             <input type="text" class="form-control" id="lloc_treball" name="lloc_treball" 
                                 placeholder="Exemple: Tarragona"
                                 value="{{ oferta.lloc_treball|default:'' }}" readonly="readonly">
-                           
                         </div>
 
                         <div class="col-md-4 mb-3">
@@ -125,14 +118,12 @@
                                 <i class="bi bi-people-fill text-muted me-2"></i>Vacants *
                             </label>
                             <input type="number" class="form-control" id="numero_vacants" name="numero_vacants"
-                                min="1" max="100" value="{{ oferta.numero_vacants|default:'' }}" readonly="readonly" >
-                           
+                                min="1" max="100" value="{{ oferta.numero_vacants|default:'' }}" readonly="readonly">
                         </div>
                     </div>
                 </div>
 
-                            
-
+                <!-- Condicions Laborals -->
                 <div class="mb-5">
                     <h5 class="text-primary mb-4">
                         <i class="bi bi-briefcase me-2"></i>Condicions Laborals
@@ -143,51 +134,48 @@
                             <label for="tipus_contracte" class="form-label">
                                 <i class="bi bi-file-earmark-text text-muted me-2"></i>Tipus de contracte *
                             </label>
-                            <input type="text"  class="form-select" id="tipus_contracte" name="tipus_contracte" value="{{ oferta.tipus_contracte }}" required>
-                                
+                            <input type="text" class="form-control" id="tipus_contracte" name="tipus_contracte" 
+                                value="{{ oferta.tipus_contracte }}" readonly="readonly">
                         </div>
 
                         <div class="col-md-4 mb-3">
                             <label for="destinatari" class="form-label">
                                 <i class="bi bi-send text-muted me-2"></i>A qui va dirigida l'oferta
                             </label>
-                            <select class="form-select" id="destinatari" name="destinatari" required>
-                                <option value="">Selecciona destinatari</option>
-                               
-                            </select>
-                            <div id="error-destinatari" class="error-validacio form-text text-danger"></div>
+                            <input type="text" class="form-control" id="destinatari" name="destinatari"
+                                value="{{ oferta.destinatari|default:'' }}" readonly="readonly">
                         </div>
 
                         <div class="col-md-4 mb-3">
                             <label for="experiencia" class="form-label">
                                 <i class="bi bi-calendar4-range text-muted me-2"></i>Experiència requerida
                             </label>
-                           
-                            <div id="error-experiencia" class="error-validacio form-text text-danger"></div>
+                            <input type="text" class="form-control" id="experiencia" name="experiencia"
+                                value="{{ oferta.experiencia|default:'' }}" readonly="readonly">
                         </div>
 
                         <div class="col-md-6 mb-3">
                             <label for="horari" class="form-label">
                                 <i class="bi bi-alarm text-muted me-2"></i>Horari
                             </label>
-                            <input type="text" class="form-control" id="horari" name="horari" placeholder="Ex: 9:00 - 17:00" value="{{ oferta.horari|default:'' }}">
-                            <div id="error-horari" class="error-validacio form-text text-danger"></div>
+                            <input type="text" class="form-control" id="horari" name="horari" 
+                                value="{{ oferta.horari|default:'' }}" readonly="readonly">
                         </div>
 
                         <div class="col-md-3 mb-3">
                             <label for="jornada" class="form-label">
                                 <i class="bi bi-clock text-muted me-2"></i>Jornada *
                             </label>
-                           
-                            <div id="error-jornada" class="error-validacio form-text text-danger"></div>
+                            <input type="text" class="form-control" id="jornada" name="jornada"
+                                value="{{ oferta.jornada|default:'' }}" readonly="readonly">
                         </div>
 
                         <div class="col-md-3 mb-3" id="div_hores" {% if oferta.jornada != "PA" %}style="display: none;"{% endif %}>
                             <label for="hores" class="form-label">
                                 <i class="bi bi-clock text-muted me-2"></i>Nombre d'hores
                             </label>
-                            <input type="number" class="form-control" id="hores" name="hores" min="1" placeholder="Ex: 20" value="{{ oferta.hores_setmanals|default_if_none:'' }}">
-                            <div id="error-hores" class="error-validacio form-text text-danger"></div>
+                            <input type="number" class="form-control" id="hores" name="hores" 
+                                value="{{ oferta.hores_setmanals|default_if_none:'' }}" readonly="readonly">
                         </div>
                     </div>
 
@@ -196,112 +184,103 @@
                             <label for="salari" class="form-label">
                                 <i class="bi bi-currency-euro text-muted me-2"></i>Salari
                             </label>
-                            <input type="text" class="form-control" id="salari" name="salari" placeholder="Ex: 18.000-22.000€" value="{{ oferta.salari|default:'' }}">
-                            <div id="error-salari" class="error-validacio form-text text-danger"></div>
+                            <input type="text" class="form-control" id="salari" name="salari" 
+                                value="{{ oferta.salari|default:'' }}" readonly="readonly">
                         </div>
                     </div>
-            </div>
+                </div>
 
-             <div class="mb-5">
+                <!-- Estudis -->
+                <div class="mb-5">
                     <h5 class="text-primary mb-4">
                         <i class="bi bi-mortarboard me-2"></i>Estudis
                     </h5>
-
                     <div class="row">
                         <div class="col-md-12 mb-3">
                             <div id="cicles-container" class="mb-3">
                                 {% for cicle in oferta.cicles.all %}
                                     <div class="funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start">
-                
                                         <div class="flex-grow-1">
-                                            <strong class="text-primary"></strong> {{ cicle.nom }} — <em>{{ cicle.get_grau_display }} ()</em>
-                                          
+                                            <strong class="text-primary"></strong> {{ cicle.nom }} — <em>{{ cicle.get_grau_display }}</em>
                                         </div>
+                                    </div>
                                 {% endfor %}
-                
-                            </div>                            
-                        </div>
-                    </div>
-                </div>
-               
-                            
-            <div class="mb-5">
-                <h5 class="text-primary mb-4">
-                    <i class="bi bi-stars me-2"></i> Capacitats clau
-                </h5>
-
-                <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <div id="capacitatsLliures-container" class="mb-3">
-                            {% for capacitat in oferta.capacitats.all %}
-                                    <div class="funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <strong class="text-primary"></strong> {{ capacitat.nom }}   
-                                        </div>                                       
-                                     </div>
-                            {% endfor %}
-                        </div>                 
-                       
-                    </div>
-                </div>                
-            </div>
-
-            <div class="mb-5">
-                <h5 class="text-primary mb-4">
-                     <i class="bi bi-list-task me-2"></i>Funcions del Càrrec
-                </h5>
-
-                <div id="idiomes-container" class="mb-3">
-                     {% for funcio in oferta.funcions.all %}
-                                    <div class="funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <strong class="text-primary"> {{ funcio.ordre }} </strong> {{ funcio.descripcio }} 
-                                           
-                                        </div>                                       
-                                     </div>
-                            {% endfor %}
-                </div>
-            </div>
-
-            <div class="mb-5">
-                <h5 class="text-primary mb-4">
-                    <i class="bi bi-translate me-2"></i>Idiomes Requerits
-                </h5>
-
-                <div id="idiomes-container" class="mb-3">
-                     {% for idioma in oferta.idiomes.all %}
-                                    <div class="funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <strong class="text-primary"></strong> {{ idioma.idioma }} - {{ idioma.nivell }}
-                                        </div>                                       
-                                     </div>
-                            {% endfor %}
-                </div>
-            </div>
-
-            <div class="mt-5 mb-5">
-            <h5 class="text-primary mb-4">
-                <i class="bi bi-info-square me-2"></i>Altres
-            </h5>
-
-            <div class="row">
-                <div class="mb-3">
-                <label for="requisits" class="form-label">
-                    <i class="bi bi-info-square text-muted me-2"></i>Altres requisits
-                </label>
-                <textarea class="form-control" id="requisits" name="requisits" rows="4" placeholder="Escriu altres requisits necessaris per al lloc de treball..." readonly="readonly">{{ oferta.requisits|default:'' }}</textarea>
-               
-                </div>
-            </div>
-            </div>
-                            
-                                
                             </div>
                         </div>
                     </div>
                 </div>
 
-               
+                <!-- Capacitats -->
+                <div class="mb-5">
+                    <h5 class="text-primary mb-4">
+                        <i class="bi bi-stars me-2"></i> Capacitats clau
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <div id="capacitatsLliures-container" class="mb-3">
+                                {% for capacitat in oferta.capacitats.all %}
+                                    <div class="funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <strong class="text-primary"></strong> {{ capacitat.nom }}   
+                                        </div>                                       
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Funcions -->
+                <div class="mb-5">
+                    <h5 class="text-primary mb-4">
+                         <i class="bi bi-list-task me-2"></i>Funcions del Càrrec
+                    </h5>
+                    <div id="idiomes-container" class="mb-3">
+                        {% for funcio in oferta.funcions.all %}
+                            <div class="funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <strong class="text-primary"> {{ funcio.ordre }} </strong> {{ funcio.descripcio }} 
+                                </div>                                       
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Idiomes -->
+                <div class="mb-5">
+                    <h5 class="text-primary mb-4">
+                        <i class="bi bi-translate me-2"></i>Idiomes Requerits
+                    </h5>
+                    <div id="idiomes-container" class="mb-3">
+                        {% for idioma in oferta.idiomes.all %}
+                            <div class="funcio-item p-3 mb-2 rounded d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <strong class="text-primary"></strong> {{ idioma.idioma }} - {{ idioma.nivell }}
+                                </div>                                       
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Altres -->
+                <div class="mt-5 mb-5">
+                    <h5 class="text-primary mb-4">
+                        <i class="bi bi-info-square me-2"></i>Altres
+                    </h5>
+                    <div class="row">
+                        <div class="mb-3">
+                            <label for="requisits" class="form-label">
+                                <i class="bi bi-info-square text-muted me-2"></i>Altres requisits
+                            </label>
+                            <textarea class="form-control" id="requisits" name="requisits" rows="4" 
+                                readonly="readonly">{{ oferta.requisits|default:'' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+            </div> <!-- card-body -->
+        </div> <!-- card -->
+    </div> <!-- col -->
+</div> <!-- row -->
 
 {% endblock %}
-
