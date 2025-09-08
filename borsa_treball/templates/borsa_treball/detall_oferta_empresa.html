@@ -44,8 +44,8 @@
                     </div>
                 </div>
                 <div class="text-center mb-4">
-                    <h2 class="h4 text-dark mb-2">Editar Oferta de Treball</h2>
-                    <p class="text-muted">Pots modificar les dades de l'oferta de treball</p>
+                    <h2 class="h4 text-dark mb-2">Detall Oferta de Treball</h2>
+                 
                     <div class="mb-2">
                         {% if oferta.es_caducada %}
                         <span class="badge bg-danger-subtle text-danger">
@@ -86,8 +86,8 @@
                             </label>
                             <input type="text" class="form-control" id="titol" name="titol" 
                                 placeholder="Ex: Desenvolupador/a Web Junior"
-                                value="{{ oferta.titol|default:'' }}" required>
-                            <div id="error-titol" class="error-validacio form-text text-danger"></div>
+                                value="{{ oferta.titol|default:'' }}" readonly="readonly">
+                           
                         </div>
 
                         <div class="col-md-4 mb-3">
@@ -96,7 +96,7 @@
                             </label>
                             <input type="date" class="form-control" id="data_limit" name="data_limit" 
                                 >
-                            <div id="error-data_limit" class="error-validacio form-text text-danger"></div>
+                           
                         </div>
                     </div>
 
@@ -105,8 +105,8 @@
                             <i class="bi bi-file-text text-muted me-2"></i>Descripció de l'oferta *
                         </label>
                         <textarea class="form-control" id="descripcio" name="descripcio" rows="4"
-                                placeholder="Descriu les responsabilitats i objectius del lloc de treball..." required>{{ oferta.descripcio|default:'' }}</textarea>
-                        <div id="error-descripcio" class="error-validacio form-text text-danger"></div>
+                                placeholder="Descriu les responsabilitats i objectius del lloc de treball..." readonly="readonly">{{ oferta.descripcio|default:'' }}</textarea>
+                      
                     </div>
 
                     <div class="row">
@@ -116,8 +116,8 @@
                             </label>
                             <input type="text" class="form-control" id="lloc_treball" name="lloc_treball" 
                                 placeholder="Exemple: Tarragona"
-                                value="{{ oferta.lloc_treball|default:'' }}" required>
-                            <div id="error-lloc_treball" class="error-validacio form-text text-danger"></div>
+                                value="{{ oferta.lloc_treball|default:'' }}" readonly="readonly">
+                           
                         </div>
 
                         <div class="col-md-4 mb-3">
@@ -125,8 +125,8 @@
                                 <i class="bi bi-people-fill text-muted me-2"></i>Vacants *
                             </label>
                             <input type="number" class="form-control" id="numero_vacants" name="numero_vacants"
-                                min="1" max="100" value="{{ oferta.numero_vacants|default:'' }}" required>
-                            <div id="error-numero_vacants" class="error-validacio form-text text-danger"></div>
+                                min="1" max="100" value="{{ oferta.numero_vacants|default:'' }}" readonly="readonly" >
+                           
                         </div>
                     </div>
                 </div>
