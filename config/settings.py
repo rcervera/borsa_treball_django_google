@@ -192,7 +192,7 @@ AUTHENTICATION_BACKENDS = (
 
 # URL de redirecció després del login
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/btreball'
 LOGOUT_REDIRECT_URL = '/btreball'
 
 SOCIAL_AUTH_USER_MODEL = 'borsa_treball.Usuari'
