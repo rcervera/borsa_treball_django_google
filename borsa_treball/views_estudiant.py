@@ -264,6 +264,23 @@ def detall_oferta_estudiant(request, oferta_id):
     
     return render(request, 'borsa_treball/detall_oferta_estudiant.html', context)
 
+
+# Vista per llistar ofertes externes (no gestionades per empreses registrades)
+from .models import OfertaExterna
+
+def tauler_ofertes_externes(request):
+    ofertes_list = OfertaExterna.objects.filter(activa=True).order_by('-data_publicacio')
+    paginator = Paginator(ofertes_list, 10)  # 10 ofertes per pàgina
+
+    page_number = request.GET.get('page')
+    ofertes = paginator.get_page(page_number)
+
+    return render(request, 'borsa_treball/tauler_ofertes_externes.html', {
+        'ofertes': ofertes
+    })
+
+
+
 #
 #   PERFIL ESTUDIANT
 #

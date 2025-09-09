@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ofertes Externes - Borsa de Treball</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body { background-color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        h2 { color: #1e293b !important; font-weight: 700; text-align: center; margin-bottom: 2.5rem !important; }
+        .table-container { background: #ffffff; border-radius: 0.5rem; overflow: hidden; border: 1px solid #f1f5f9; }
+        .table-ofertes thead th { background: #f8fafc; color: #1e293b; font-weight: 600; padding: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .table-ofertes tbody tr { border-bottom: 1px solid #e2e8f0; transition: background-color 0.2s ease; }
+        .table-ofertes tbody tr:hover { background-color: #f8fafc; }
+        .table-ofertes tbody td { padding: 1rem; vertical-align: middle; }
+        .table-ofertes a { color: #1d4ed8; font-weight: 600; text-decoration: none; transition: color 0.3s ease; }
+        .table-ofertes a:hover { color: #1e40af; }
+        .pagination { justify-content: center; margin-top: 2rem; }
+        .pagination .page-link { color: #1d4ed8; border: 1px solid #e2e8f0; border-radius: 0.25rem; margin: 0 0.1rem; font-weight: 500; padding: 0.5rem 0.75rem; transition: all 0.2s ease; }
+        .pagination .page-link:hover { background-color: #f8fafc; border-color: #3b82f6; color: #1d4ed8; }
+        .pagination .page-item.active .page-link { background-color: #3b82f6; border-color: #3b82f6; color: white; }
+        .alert-info { background-color: #f0f9ff; border: 1px solid #e0f2fe; border-radius: 0.5rem; color: #0369a1; padding: 1.5rem; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="mb-4">Ofertes Externes Actives</h2>
+
+    {% if ofertes %}
+    <div class="table-responsive table-container">
+        <table class="table align-middle table-ofertes">
+            <thead>
+                <tr>
+                    <th>Títol</th>
+                    <th>Entitat</th>
+                    <th>Data límit</th>
+                    <th>Enllaç</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for oferta in ofertes %}
+                <tr>
+                    <td>
+                        <strong>{{ oferta.titol }}</strong>
+                        <br>
+                        <small class="text-muted d-block mt-1">{{ oferta.descripcio|truncatewords:20 }}</small>
+                    </td>
+                    <td>{{ oferta.entitat|default:"-" }}</td>
+                    <td>
+                        {% if oferta.data_limit %}
+                            {{ oferta.data_limit|date:"d/m/Y" }}
+                        {% else %}
+                            <span class="text-muted">Sense límit</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if oferta.link %}
+                            <a href="{{ oferta.link }}" target="_blank">
+                                <i class="bi bi-box-arrow-up-right me-1"></i>Veure oferta
+                            </a>
+                        {% else %}
+                            <span class="text-muted">No disponible</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if ofertes.has_other_pages %}
+    <nav aria-label="Paginació" class="mt-4">
+        <ul class="pagination">
+            {% if ofertes.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page=1">&laquo;&laquo;</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ ofertes.previous_page_number }}">&laquo;</a></li>
+            {% endif %}
+
+            {% for num in ofertes.paginator.page_range %}
+                {% if ofertes.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > ofertes.number|add:'-3' and num < ofertes.number|add:'3' %}
+                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if ofertes.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ ofertes.next_page_number }}">&raquo;</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ ofertes.paginator.num_pages }}">&raquo;&raquo;</a></li>
+            {% endif %}
+        </ul>
+        <div class="text-center">
+            <small class="pagination-info">Mostrant {{ ofertes.start_index }} - {{ ofertes.end_index }} de {{ ofertes.paginator.count }} ofertes</small>
+        </div>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="alert alert-info text-center">
+        <i class="bi bi-search fs-4 me-2"></i> No hi ha ofertes externes actives en aquest moment.
+    </div>
+    {% endif %}
+</div>
+</body>
+</html>
