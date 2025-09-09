@@ -309,6 +309,19 @@ class RegistreAuditoriaAdmin(admin.ModelAdmin):
     date_hierarchy = 'data'
     readonly_fields = ('data',)
 
+
+
+from .models import OfertaExterna
+
+@admin.register(OfertaExterna)
+class OfertaExternaAdmin(admin.ModelAdmin):
+    list_display = ('titol', 'entitat', 'data_limit', 'activa', 'data_publicacio')
+    list_filter = ('activa', 'data_limit', 'entitat')
+    search_fields = ('titol', 'descripcio', 'entitat')
+    ordering = ('-data_publicacio',)
+    date_hierarchy = 'data_publicacio'
+
+
 admin.site.register(Usuari, UsuariAdmin)
 admin.site.register(Sector)
 admin.site.register(FamiliaProfessional)

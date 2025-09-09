@@ -525,3 +525,21 @@ class Missatge(models.Model):
 
     def __str__(self):
         return f"De {self.remitent.username} a {self.destinatari.username}: {self.assumpte}"
+
+
+class OfertaExterna(models.Model):
+    titol = models.CharField(max_length=255, verbose_name="Títol")
+    descripcio = models.TextField(blank=True, null=True, verbose_name="Descripció")
+    entitat = models.CharField(max_length=255, blank=True, null=True, verbose_name="Entitat/Empresa/Organisme")
+    link = models.URLField(blank=True, null=True, verbose_name="Enllaç a l'oferta")
+    data_limit = models.DateField(blank=True, null=True, verbose_name="Data límit")
+    activa = models.BooleanField(default=True, verbose_name="Oferta activa")
+    data_publicacio = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Oferta Externa"
+        verbose_name_plural = "Ofertes Externes"
+        ordering = ['-data_publicacio']
+
+    def __str__(self):
+        return self.titol
