@@ -49,6 +49,7 @@ urlpatterns = [
 
     path('tauler_ofertes', views_estudiant.llista_ofertes_tauler, name='tauler_ofertes'),
     path('detall_oferta_tauler/<int:oferta_id>', views_estudiant.detall_oferta_tauler, name='detall_oferta_tauler'),
+     path("ofertes-externes/", views_estudiant.tauler_ofertes_externes, name="tauler_ofertes_externes"),
     
     # rutes incorrectes de moment...
     
