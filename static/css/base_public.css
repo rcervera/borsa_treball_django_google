@@ -283,6 +283,184 @@ body {
     font-size: 0.9rem;
 }
 
+
+/* Títol principal */
+        h2 {
+            color: #1e293b !important;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2.5rem !important;
+        }
+
+        /* Formulari de filtratge */
+        .filter-section {
+            background: #f8fafc;
+            border: none;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .filter-section label {
+            color: #1e293b !important;
+            font-weight: 600;
+        }
+
+        .form-select {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+        }
+
+        .form-select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+        }
+
+        /* Botó de filtre */
+        .btn-filter {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border: none;
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-filter:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+        }
+
+        /* Taula moderna */
+        .table-container {
+            background: #ffffff;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            border: 1px solid #f1f5f9;
+        }
+
+        .table-ofertes {
+            margin-bottom: 0 !important;
+        }
+
+        /* Header de taula simplificat */
+        .table-ofertes thead th {
+            background: #f8fafc;
+            color: #1e293b;
+            font-weight: 600;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .table-ofertes tbody tr {
+            border-bottom: 1px solid #e2e8f0;
+            transition: background-color 0.2s ease;
+        }
+
+        .table-ofertes tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .table-ofertes tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+        /* Enllaços de la taula */
+        .table-ofertes a {
+            color: #1d4ed8;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .table-ofertes a:hover {
+            color: #1e40af;
+        }
+
+        /* Badges i etiquetes */
+        .estudis-badge {
+            background: #f0f9ff;
+            color: #0369a1;
+            border-radius: 0.25rem;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+            font-size: 0.9rem;
+        }
+
+        .dias-restantes {
+            font-size: 0.85em;
+            font-weight: 600;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.25rem;
+            display: inline-block;
+            margin-top: 0.3rem;
+        }
+
+        .dias-restantes.text-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .dias-restantes.text-warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .dias-restantes.text-success {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        /* Paginació simplificada */
+        .pagination {
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .pagination .page-link {
+            color: #1d4ed8;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.25rem;
+            margin: 0 0.1rem;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .pagination .page-link:hover {
+            background-color: #f8fafc;
+            border-color: #3b82f6;
+            color: #1d4ed8;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+
+        .pagination-info {
+            color: #64748b;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* Alert */
+        .alert-info {
+            background-color: #f0f9ff;
+            border: 1px solid #e0f2fe;
+            border-radius: 0.5rem;
+            color: #0369a1;
+            padding: 1.5rem;
+        }
+
+        
+
 /* Responsive */
 @media (max-width: 768px) {
     .main-container { padding: 2rem 0; }
