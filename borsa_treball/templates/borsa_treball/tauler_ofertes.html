@@ -37,10 +37,10 @@
                 <tr>
                     <th>Títol de l'Oferta</th>
                     <th>Estudis Requerits</th>                  
-                    <th>Lloc de Treball</th>
-                    <th>Tipus Contracte</th>
-                    <th>Jornada</th>
-                    <th>Data Límit</th>
+                    <th class="d-none d-md-table-cell">Lloc de Treball</th>
+                    <th class="d-none d-md-table-cell">Tipus Contracte</th>
+                    <th class="d-none d-md-table-cell">Jornada</th>
+                    <th class="d-none d-md-table-cell">Data Límit</th>
                 </tr>
             </thead>
             <tbody>
@@ -64,10 +64,10 @@
                             <span class="text-muted small">No especificat</span>
                         {% endfor %}
                     </td>
-                    <td>{{ oferta.lloc_treball }}</td>
-                    <td>{{ oferta.get_tipus_contracte_display }}</td>
-                    <td>{{ oferta.get_jornada_display }}</td>
-                    <td class="data-limit-cell">
+                    <td class="d-none d-md-table-cell">{{ oferta.lloc_treball }}</td>
+                    <td class="d-none d-md-table-cell">{{ oferta.get_tipus_contracte_display }}</td>
+                    <td class="d-none d-md-table-cell">{{ oferta.get_jornada_display }}</td>
+                    <td class="d-none d-md-table-cell data-limit-cell">
                         <span class="text-muted d-block">{{ oferta.data_limit|date:"d/m/Y" }}</span>
                         {% if oferta.days_remaining is not None %}
                             {% if oferta.days_remaining == -1 %}
