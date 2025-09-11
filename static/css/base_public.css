@@ -561,7 +561,7 @@ body {
         .info-item {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             padding: 0.5rem 0;
             border-bottom: 1px solid #f1f5f9;
         }
@@ -585,6 +585,18 @@ body {
         .info-value {
             font-weight: 600;
             font-size: 0.9rem;
+            /* Alineem el text a la dreta, especialment útil si ocupa més d'una línia */
+            text-align: right; 
+            
+            /* Permet que paraules molt llargues es trenquin per evitar el desbordament */
+            overflow-wrap: break-word;
+            word-wrap: break-word; /* Compatibilitat amb navegadors antics */
+
+            /* Afegeix un espai mínim a l'esquerra per evitar que toqui l'etiqueta */
+            margin-left: 1rem; 
+            
+            /* Aquesta propietat és clau en un contenidor flex per permetre que l'element s'encongeixi i el text es parteixi */
+            min-width: 0;
         }
 
         /* Botons moderns */
