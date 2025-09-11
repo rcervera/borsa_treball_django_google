@@ -459,7 +459,219 @@ body {
             padding: 1.5rem;
         }
 
-        
+
+
+        /* Títol principal */
+        h2 {
+            color: #1e293b !important;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2rem !important;
+        }
+
+        /* Targetes modernes compactes */
+        .modern-card {
+            background: #ffffff;
+            border: 1px solid #f1f5f9;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .modern-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .modern-card .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Targeta principal compacta */
+        .hero-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-card .card-body {
+            padding: 2rem;
+        }
+
+        /* Estadístiques compactes */
+        .stats-row {
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 0.5rem;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        /* Badges moderns */
+        .modern-badge {
+            background: #f0f9ff;
+            color: #0369a1;
+            border-radius: 0.25rem;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .modern-badge.success {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .modern-badge.warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        /* Seccions compactes */
+        .section-title {
+            color: #1d4ed8;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 0.5rem;
+        }
+
+        /* Info ràpida compacta */
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #64748b;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-label i {
+            margin-right: 0.5rem;
+            width: 16px;
+        }
+
+        .info-value {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Botons moderns */
+        .modern-btn {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border: none;
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .modern-btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            color: white;
+        }
+
+        .modern-btn-outline {
+            background: transparent;
+            border: 2px solid #e2e8f0;
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .modern-btn-outline:hover {
+            background: #f8fafc;
+            border-color: #3b82f6;
+            color: #1d4ed8;
+            transform: translateY(-2px);
+        }
+
+        /* Layout compacte */
+        .compact-section {
+            margin-bottom: 1rem;
+        }
+
+        .compact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .compact-item {
+            background: #f8fafc;
+            border: 1px solid #f1f5f9;
+            border-radius: 0.25rem;
+            padding: 0.75rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .compact-item i {
+            margin-right: 0.5rem;
+            color: #3b82f6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-card .card-body {
+                padding: 1.5rem;
+            }
+            
+            .modern-card .card-body {
+                padding: 1rem;
+            }
+            
+            .stats-row {
+                padding: 0.75rem;
+            }
+            
+            .stat-number {
+                font-size: 1.25rem;
+            }
+        }
+         
 
 /* Responsive */
 @media (max-width: 768px) {
