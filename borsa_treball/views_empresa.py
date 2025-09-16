@@ -328,7 +328,7 @@ def crear_oferta_api(request):
                 usuari=request.user
             )
 
-            # send_html_email(oferta,empresa)
+            enviar_email(oferta)
 
     except ValidationError as e:
         return JsonResponse({
@@ -346,22 +346,32 @@ def crear_oferta_api(request):
 
 
 
-# Define the function to send the email
-def send_html_email(oferta,empresa):
-    # Context data for the template
-    context = {'oferta': oferta, 'empresa': empresa}
+# views.py
+from django.core.mail import send_mail
+from django.http import HttpResponse
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from .models import Oferta
+
+def enviar_email(oferta):
+   
+
+    subject = f"Nova oferta: {oferta.titol}"
+    message = "Aquest és un missatge enviat des de Django!"
+    recipient_list = ["rcerver4@xtec.cat"]
+
+    html_content = render_to_string("borsa_treball/emails/nova_oferta.html", {"oferta": oferta})
+
+    # send_mail(subject, message, None, recipient_list)
+
+    # Crear el missatge amb versió HTML
+    msg = EmailMultiAlternatives(subject, "Oferta disponible", None, recipient_list)
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
     
-    # Render the template as a string
-    html_content = 'nova oferta' #render_to_string('borsa_treball/emails/nova_oferta.html', context)
-    
-    # Create an email message object
-    subject = "Nova oferta afegida"
-    from_email = settings.EMAIL_HOST_USER
-    # message = EmailMultiAlternatives(subject, '', from_email, 'rcerver4@xtec.cat')
-    # message.attach_alternative(html_content, "text/html")
-    
-    # Send the email
-    # message.send()
+    return HttpResponse(html_content)
+
+
 
 
 
