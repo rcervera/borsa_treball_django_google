@@ -546,5 +546,5 @@ def enviar_oferta_email(request):
    # msg.attach_alternative(html_content, "text/html")
    # msg.send()
 
-    return HttpResponse(html_content)
+    return HttpResponse("enviat")
 
