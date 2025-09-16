@@ -25,6 +25,10 @@ from django.utils.dateparse import parse_date
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_POST, require_GET
 
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.conf import settings
+
 # Imports locals
 from .models import (
     Candidatura,
@@ -324,6 +328,8 @@ def crear_oferta_api(request):
                 usuari=request.user
             )
 
+            send_html_email(oferta,empresa)
+
     except ValidationError as e:
         return JsonResponse({
             'success': False,
@@ -337,6 +343,25 @@ def crear_oferta_api(request):
         }, status=500)
 
     return JsonResponse({'success': True, 'message': 'Oferta creada correctament'})
+
+
+
+# Define the function to send the email
+def send_html_email(oferta,empresa):
+    # Context data for the template
+    context = {'oferta': oferta, 'empresa': empresa}
+    
+    # Render the template as a string
+    html_content = render_to_string('borsa_treball/emails/nova_oferta.html', context)
+    
+    # Create an email message object
+    subject = "Nova oferta afegida"
+    from_email = settings.EMAIL_HOST_USER
+    message = EmailMultiAlternatives(subject, '', from_email, 'rcerver4@xtec.cat')
+    message.attach_alternative(html_content, "text/html")
+    
+    # Send the email
+    message.send()
 
 
 
