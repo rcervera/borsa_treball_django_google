@@ -545,7 +545,7 @@ def enviar_oferta_email(request):
     to = ["rcerver4@xtec.cat"]
 
     # Renderitzar el template HTML
-    html_content = render_to_string("borsa_treball/email/nova_oferta.html", {"oferta": oferta})
+    html_content = render_to_string("borsa_treball/emails/nova_oferta.html", {"oferta": oferta})
 
     # Crear el missatge amb versió HTML
     msg = EmailMultiAlternatives(subject, "Oferta disponible", from_email, to)
