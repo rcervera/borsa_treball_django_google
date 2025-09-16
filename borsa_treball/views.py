@@ -537,7 +537,7 @@ from django.template.loader import render_to_string
 from .models import Oferta
 
 def enviar_email(request):
-    
+
     # Recuperar la darrera oferta desada
     oferta = Oferta.objects.last()
     if not oferta:
@@ -547,7 +547,9 @@ def enviar_email(request):
     message = "Aquest és un missatge enviat des de Django!"
     recipient_list = ["rcerver4@xtec.cat"]
 
+    html_content = render_to_string("borsa_treball/email/oferta_detall.html", {"oferta": oferta})
+
     send_mail(subject, message, None, recipient_list)
     
-    return HttpResponse("Email enviat correctament!")
+    return HttpResponse(html_content)
 
