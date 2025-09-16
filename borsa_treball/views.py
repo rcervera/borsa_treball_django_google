@@ -539,7 +539,7 @@ def enviar_oferta_email(request):
     
 
     # Renderitzar el template HTML
-    html_content = render_to_string("borsa_treball/emails/nova_oferta.html")
+    # html_content = render_to_string("/borsa_treball/emails/nova_oferta.html")
 
     # Crear el missatge amb versió HTML
    # msg = EmailMultiAlternatives(subject, "Oferta disponible", from_email, to)
