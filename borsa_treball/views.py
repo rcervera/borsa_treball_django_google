@@ -549,7 +549,12 @@ def enviar_email(request):
 
     html_content = render_to_string("borsa_treball/emails/nova_oferta.html", {"oferta": oferta})
 
-    send_mail(subject, message, None, recipient_list)
+    # send_mail(subject, message, None, recipient_list)
+
+    # Crear el missatge amb versió HTML
+    msg = EmailMultiAlternatives(subject, "Oferta disponible", None, recipient_list)
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
     
     return HttpResponse(html_content)
 
