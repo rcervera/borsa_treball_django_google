@@ -536,16 +536,10 @@ from .models import Oferta
 
 def enviar_oferta_email(request):
     # Recuperar la darrera oferta desada
-    oferta = Oferta.objects.last()
-    if not oferta:
-        return HttpResponse("No hi ha cap oferta desada.")
-
-    subject = f"Nova oferta: {oferta.titol}"
-    from_email = "borsatreballvidal@gmail.com"
-    to = ["rcerver4@xtec.cat"]
+    
 
     # Renderitzar el template HTML
-    html_content = render_to_string("borsa_treball/emails/nova_oferta.html", {"oferta": oferta})
+    html_content = render_to_string("borsa_treball/emails/nova_oferta.html")
 
     # Crear el missatge amb versió HTML
    # msg = EmailMultiAlternatives(subject, "Oferta disponible", from_email, to)
