@@ -328,7 +328,7 @@ def crear_oferta_api(request):
                 usuari=request.user
             )
 
-            # send_html_email(oferta,empresa)
+            send_html_email(oferta,empresa)
 
     except ValidationError as e:
         return JsonResponse({
@@ -352,7 +352,7 @@ def send_html_email(oferta,empresa):
     context = {'oferta': oferta, 'empresa': empresa}
     
     # Render the template as a string
-    html_content = render_to_string('borsa_treball/emails/nova_oferta.html', context)
+    html_content = 'nova oferta' #render_to_string('borsa_treball/emails/nova_oferta.html', context)
     
     # Create an email message object
     subject = "Nova oferta afegida"
