@@ -29,6 +29,10 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.conf import settings
 
+
+
+from .models import Oferta
+
 # Imports locals
 from .models import (
     Candidatura,
@@ -328,7 +332,8 @@ def crear_oferta_api(request):
                 usuari=request.user
             )
 
-            enviar_email(oferta)
+            # Email només s’enviarà quan la transacció hagi acabat correctament
+            transaction.on_commit(lambda: enviar_email(oferta))
 
     except ValidationError as e:
         return JsonResponse({
@@ -346,12 +351,7 @@ def crear_oferta_api(request):
 
 
 
-# views.py
-from django.core.mail import send_mail
-from django.http import HttpResponse
-from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
-from .models import Oferta
+
 
 def enviar_email(oferta):
    
