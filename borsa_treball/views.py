@@ -548,9 +548,9 @@ def enviar_oferta_email(request):
     html_content = render_to_string("borsa_treball/emails/nova_oferta.html", {"oferta": oferta})
 
     # Crear el missatge amb versió HTML
-    msg = EmailMultiAlternatives(subject, "Oferta disponible", from_email, to)
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
+   # msg = EmailMultiAlternatives(subject, "Oferta disponible", from_email, to)
+   # msg.attach_alternative(html_content, "text/html")
+   # msg.send()
 
-    return HttpResponse("Email enviat amb l'última oferta!")
+    return HttpResponse(html_content)
 
