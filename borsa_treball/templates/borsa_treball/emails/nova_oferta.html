@@ -18,35 +18,7 @@
   <div class="container">
     <!-- Encabezado -->
     <div class="header">
-      <div class="empresa">{{ oferta.empresa.nom }}</div>
-      <div class="titol">{{ oferta.titol }}</div>
-    </div>
-
-    <!-- Informació bàsica -->
-    <div class="info"><span class="label">Lloc de treball:</span> {{ oferta.lloc_treball }}</div>
-    <div class="info"><span class="label">Vacants:</span> {{ oferta.numero_vacants }}</div>
-    <div class="info"><span class="label">Data límit:</span> {{ oferta.data_limit|date:"d/m/Y" }}</div>
-    <div class="info"><span class="label">Contracte:</span> {{ oferta.get_tipus_contracte_display }}</div>
-    <div class="info"><span class="label">Jornada:</span> {{ oferta.get_jornada_display }}</div>
-    {% if oferta.hores_setmanals %}
-    <div class="info"><span class="label">Hores setmanals:</span> {{ oferta.hores_setmanals }}</div>
-    {% endif %}
-    {% if oferta.horari %}
-    <div class="info"><span class="label">Horari:</span> {{ oferta.horari }}</div>
-    {% endif %}
-    <div class="info"><span class="label">Destinatari:</span> {{ oferta.get_public_destinatari_display }}</div>
-    {% if oferta.experiencia %}
-    <div class="info"><span class="label">Experiència:</span> {{ oferta.get_experiencia_display }}</div>
-    {% endif %}
-    {% if oferta.salari %}
-    <div class="info"><span class="label">Salari:</span> {{ oferta.salari }}</div>
-    {% endif %}
-
-    <!-- Descripció -->
-    <div class="section">
-      <div class="label">Descripció</div>
-      <div>{{ oferta.descripcio|linebreaks }}</div>
-    </div>
+    Nova oferta de feina publicada  
   </div>
 </body>
 </html>
