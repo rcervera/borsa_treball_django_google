@@ -357,11 +357,11 @@ def send_html_email(oferta,empresa):
     # Create an email message object
     subject = "Nova oferta afegida"
     from_email = settings.EMAIL_HOST_USER
-    message = EmailMultiAlternatives(subject, '', from_email, 'rcerver4@xtec.cat')
-    message.attach_alternative(html_content, "text/html")
+    # message = EmailMultiAlternatives(subject, '', from_email, 'rcerver4@xtec.cat')
+    # message.attach_alternative(html_content, "text/html")
     
     # Send the email
-    message.send()
+    # message.send()
 
 
 
