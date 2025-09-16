@@ -547,7 +547,7 @@ def enviar_email(request):
     message = "Aquest és un missatge enviat des de Django!"
     recipient_list = ["rcerver4@xtec.cat"]
 
-    html_content = render_to_string("borsa_treball/email/oferta_detall.html", {"oferta": oferta})
+    html_content = render_to_string("borsa_treball/emails/nova_oferta.html", {"oferta": oferta})
 
     send_mail(subject, message, None, recipient_list)
     
