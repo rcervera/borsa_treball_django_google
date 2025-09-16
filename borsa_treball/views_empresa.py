@@ -328,7 +328,7 @@ def crear_oferta_api(request):
                 usuari=request.user
             )
 
-            send_html_email(oferta,empresa)
+            # send_html_email(oferta,empresa)
 
     except ValidationError as e:
         return JsonResponse({
