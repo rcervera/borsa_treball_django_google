@@ -529,22 +529,16 @@ def api_canviar_contrasenya(request):
 
 
     
-from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
+# views.py
+from django.core.mail import send_mail
 from django.http import HttpResponse
-from .models import Oferta
 
-def enviar_oferta_email(request):
-    # Recuperar la darrera oferta desada
+def enviar_email(request):
+    subject = "Prova d'enviament"
+    message = "Aquest és un missatge enviat des de Django!"
+    recipient_list = ["destinatari@example.com"]
+
+    send_mail(subject, message, None, recipient_list)
     
-
-    # Renderitzar el template HTML
-    # html_content = render_to_string("/borsa_treball/emails/nova_oferta.html")
-
-    # Crear el missatge amb versió HTML
-   # msg = EmailMultiAlternatives(subject, "Oferta disponible", from_email, to)
-   # msg.attach_alternative(html_content, "text/html")
-   # msg.send()
-
-    return HttpResponse("enviat")
+    return HttpResponse("Email enviat correctament!")
 
