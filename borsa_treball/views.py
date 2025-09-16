@@ -532,9 +532,18 @@ def api_canviar_contrasenya(request):
 # views.py
 from django.core.mail import send_mail
 from django.http import HttpResponse
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from .models import Oferta
 
 def enviar_email(request):
-    subject = "Prova d'enviament"
+    
+    # Recuperar la darrera oferta desada
+    oferta = Oferta.objects.last()
+    if not oferta:
+        return HttpResponse("No hi ha cap oferta desada.")
+
+    subject = f"Nova oferta: {oferta.titol}"
     message = "Aquest és un missatge enviat des de Django!"
     recipient_list = ["rcerver4@xtec.cat"]
 
