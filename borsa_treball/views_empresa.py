@@ -358,7 +358,7 @@ def enviar_email(oferta):
 
     subject = f"Nova oferta: {oferta.titol}"
     message = "Aquest és un missatge enviat des de Django!"
-    recipient_list = ["rcerver4@xtec.cat"]
+    recipient_list = [settings.EMAIL_RESPONSABLE_BORSA]
 
     html_content = render_to_string("borsa_treball/emails/nova_oferta.html", {"oferta": oferta})
 
