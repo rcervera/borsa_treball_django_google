@@ -78,5 +78,6 @@ urlpatterns = [
     path('administrador/candidatures/<int:candidatura_id>/cv/', views.descarregar_cv_candidatura_admin, name='descarregar_cv_candidatura_admin'),
 
     path('informes/curs/', views_admin.informe_curs_view, name='informe_curs'),
+    path("enviar-email/", views.enviar_email, name="enviar_email"),
 ]
 

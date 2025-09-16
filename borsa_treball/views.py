@@ -529,3 +529,15 @@ def api_canviar_contrasenya(request):
 
 
     
+# views.py
+from django.core.mail import send_mail
+from django.http import HttpResponse
+
+def enviar_email(request):
+    subject = "Prova d'enviament"
+    message = "Aquest és un missatge enviat des de Django!"
+    recipient_list = ["rcerver4@xtec.cat"]
+
+    send_mail(subject, message, None, recipient_list)
+    
+    return HttpResponse("Email enviat correctament!")
