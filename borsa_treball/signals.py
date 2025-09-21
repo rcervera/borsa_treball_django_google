@@ -22,6 +22,8 @@ def enviar_email_si_activa(sender, instance, created, **kwargs):
     """
     if not created:
         try:
+            old_instance = sender.objects.get(pk=instance.pk)
+            if not old_instance.activa and instance.activa:
                     
                     subject = "Prova d'email: Candidatura activada"
                     message = f"La candidatura {instance.pk} de l'estudiant {instance.estudiant.usuari.get_full_name()}  s'ha activat."             
@@ -31,4 +33,5 @@ def enviar_email_si_activa(sender, instance, created, **kwargs):
                     
         except Exception as e:
                 error_msg = f"Error enviant email de prova per candidatura {instance.pk}: {e}"
+                logger.error(error_msg)
                 
