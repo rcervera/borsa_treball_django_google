@@ -30,7 +30,7 @@ def enviar_email_si_activa(sender, instance, created, **kwargs):
 
                 # renderitzar la plantilla HTML
                 html_content = render_to_string(
-                    "emails/candidatura_activada.html",
+                    "borsa_treball/emails/candidatura_activada.html",
                     {
                         "empresa": empresa,
                         "candidatura": instance,
