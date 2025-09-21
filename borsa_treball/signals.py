@@ -25,7 +25,7 @@ def enviar_email_si_activa(sender, instance, created, **kwargs):
             old_instance = sender.objects.get(pk=instance.pk)
             if not old_instance.activa and instance.activa:
                 subject = "Prova d'email: Candidatura activada"
-                message = f"La candidatura {instance.pk} de l'estudiant {instance.estudiant.usuari.get_full_name()} s'ha activat."
+                message = f"La candidatura {instance.pk} de l'estudiant  s'ha activat."
                 from_email = settings.DEFAULT_FROM_EMAIL
                 to = ['rcerver4@xtec.cat']
 
