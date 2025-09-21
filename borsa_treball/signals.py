@@ -22,9 +22,9 @@ def enviar_email_si_activa(sender, instance, created, **kwargs):
     """
     if not created:
         try:
-                
+                    
                     subject = "Prova d'email: Candidatura activada"
-                    message = f"La candidatura de l'estudiant  s'ha activat."             
+                    message = f"La candidatura {instance.pk} de l'estudiant  s'ha activat."             
                     to = ['rcerver4@xtec.cat']
 
                     send_mail(subject, message,None, to)
