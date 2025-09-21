@@ -24,7 +24,5 @@ def enviar_email_si_activa(sender, instance, created, **kwargs):
                     accio="Activació Candidatura",
                     model_afectat="Candidatura",
                     descripcio=f"Candidatura {instance.pk} activada per l'estudiant {instance.estudiant.usuari.get_full_name()} a l'oferta {instance.oferta}.",
-                    usuari=None,  # Opcional: si vols, posa l'usuari actual si tens request
-                    data=timezone.now(),
-                    revisat=False
+                    usuari=None,  # Opcional: si vols, posa l'usuari actual si tens request                   
                 )
