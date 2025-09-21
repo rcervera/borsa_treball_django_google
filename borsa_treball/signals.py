@@ -20,15 +20,15 @@ def enviar_email_si_activa(sender, instance, created, **kwargs):
     """
     Signal de prova: envia un email senzill a rcerver4@xtec.cat quan activa passa a True
     """
-   
-    try:
-            
-                subject = "Prova d'email: Candidatura activada"
-                message = f"La candidatura de l'estudiant  s'ha activat."             
-                to = ['rcerver4@xtec.cat']
-
-                send_mail(subject, message,None, to)
+    if not created:
+        try:
                 
-    except Exception as e:
-            error_msg = f"Error enviant email de prova per candidatura {instance.pk}: {e}"
-            
+                    subject = "Prova d'email: Candidatura activada"
+                    message = f"La candidatura de l'estudiant  s'ha activat."             
+                    to = ['rcerver4@xtec.cat']
+
+                    send_mail(subject, message,None, to)
+                    
+        except Exception as e:
+                error_msg = f"Error enviant email de prova per candidatura {instance.pk}: {e}"
+                
