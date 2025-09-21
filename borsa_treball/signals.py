@@ -1,60 +1,67 @@
-from django.db.models.signals import pre_save
+# borsa_treball/signals.py
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-from django.utils.timezone import now
+from django.urls import reverse
+from django.conf import settings
 from .models import Candidatura
 
+@receiver(post_save, sender=Candidatura)
+def enviar_email_si_activa(sender, instance, created, **kwargs):
+    """
+    Envia un email a l'usuari de l'empresa quan una candidatura passa de activa=False a activa=True
+    """
+    if not created:  # només si ja existia
+        # recuperar l'estat anterior
+        old_instance = sender.objects.get(pk=instance.pk)
+        if not old_instance.activa and instance.activa:
+            empresa = instance.oferta.empresa
+            usuari_empresa = empresa.usuari
 
-@receiver(pre_save, sender=Candidatura)
-def enviar_email_si_activa(sender, instance, **kwargs):
-    if not instance.pk:
-        return  # Nova candidatura, no comparem
+            if usuari_empresa and usuari_empresa.email:
+                subject = f"Nova candidatura activada per a {empresa.nom_comercial}"
+                from_email = settings.DEFAULT_FROM_EMAIL
+                #to = [usuari_empresa.email]
+                to = 'rcerver4@xtec.cat'
 
-    anterior = Candidatura.objects.get(pk=instance.pk)
+                # Generar URL absoluta del login
+                url_login = f"{reverse('login')}"
 
-    # Només si activa passa de False → True
-    if not anterior.activa and instance.activa:
-        empresa = instance.oferta.empresa
+                # renderitzar la plantilla HTML
+                html_content = render_to_string(
+                    "emails/candidatura_activada.html",
+                    {
+                        "empresa": empresa,
+                        "candidatura": instance,
+                        "estudiant": instance.estudiant,
+                        "url_login": url_login,
+                        "any": instance.data_canvi_estat.year,
+                    },
+                )
 
-        if empresa and empresa.usuari and empresa.usuari.email:
-            subject = "Nova candidatura activada"
+                # fallback de text pla
+                text_content = f"""
+                    Benvolguts/des {empresa.nom_comercial},
 
-            # Renderitzar la plantilla HTML amb context
-            html_content = render_to_string(
-                "borsa_treball/emails/candidatura_activada.html",
-                {
-                    "empresa_nom": empresa.nom_comercial,
-                    "estudiant_nom": instance.estudiant.get_full_name(),
-                    "oferta_nom": instance.oferta.titol,
-                    "carta_presentacio": instance.carta_presentacio,
-                    "any": now().year,
-                },
-            )
+                    S'ha activat una nova candidatura per a l'oferta {instance.oferta}.
 
-            # Versió de text pla (fallback)
-            text_content = (
-                f"Benvolguts/des {empresa.nom_comercial},\n\n"
-                f"La candidatura de {instance.estudiant} per a l'oferta {instance.oferta} ha estat activada.\n\n"
-                f"Carta de presentació:\n{instance.carta_presentacio}\n\n"
-                "Trobareu adjunt el CV de l’estudiant.\n\n"
-                "Atentament,\nBorsa de treball"
-            )
+                    Carta de presentació:
+                    {instance.carta_presentacio}
 
-            email = EmailMultiAlternatives(
-                subject=subject,
-                body=text_content,  # text pla               
-                to=['rcerver4@xtec.cat']
-                # to=[empresa.usuari.email],  # email de l'usuari associat a l'empresa
-            )
-            email.attach_alternative(html_content, "text/html")
+                    Podeu visualitzar totes les candidatures a les vostres ofertes iniciant sessió a la web:
+                    {url_login}
 
-            # Adjuntar CV si existeix
-            if instance.cv_adjunt:
-                email.attach_file(instance.cv_adjunt.path)
+                    Missatge automàtic enviat des de l'app de la Borsa de Treball de l'Institut Vidal i Barraquer.
+                    """
 
-            # Adjuntar altres documents si existeixen
-            if instance.altres_adjunts:
-                email.attach_file(instance.altres_adjunts.path)
+                msg = EmailMultiAlternatives(subject, text_content, from_email, to)
+                msg.attach_alternative(html_content, "text/html")
 
-            email.send(fail_silently=False)
+                # adjuntar CV si existeix
+                if instance.cv_adjunt:
+                    msg.attach_file(instance.cv_adjunt.path)
+
+                
+
+                msg.send()

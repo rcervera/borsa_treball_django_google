@@ -3,51 +3,35 @@
 <head>
   <meta charset="utf-8">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f8f9fa;
-      padding: 20px;
-      color: #333;
+    body { 
+        font-family: Arial, sans-serif; 
+        background-color: #f9f9f9; 
+        padding: 20px; 
     }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background: #ffffff;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      padding: 20px;
+    .container { 
+        background: #fff; 
+        padding: 20px; 
+        border-radius: 6px; 
+        box-shadow: 0 2px 5px rgba(0,0,0,.1); 
     }
-    h2 {
-      color: #0069d9;
-      margin-bottom: 15px;
+    h2 { color: #333; }
+    p { color: #555; }
+    .footer { margin-top: 20px; font-size: 12px; color: #888; }
+    .carta { 
+        border-left: 4px solid #0069d9; 
+        background: #f1f7ff; 
+        padding: 12px; 
+        margin: 15px 0; 
+        white-space: pre-line; 
     }
-    .carta {
-      border-left: 4px solid #0069d9;
-      background: #f1f7ff;
-      padding: 12px;
-      margin: 15px 0;
-      white-space: pre-line;
-    }
-    .footer {
-      font-size: 12px;
-      color: #888;
-      margin-top: 20px;
-      text-align: center;
-    }
-    .app-info {
-      margin-top: 25px;
-      padding: 12px;
-      background: #eef9f1;
-      border: 1px solid #cce5cc;
-      border-radius: 4px;
-      font-size: 14px;
-    }
-    .app-info a {
-      color: #0069d9;
-      text-decoration: none;
-    }
-    .app-info a:hover {
-      text-decoration: underline;
+    .boton { 
+        display:inline-block; 
+        padding:10px 20px; 
+        background:#0069d9; 
+        color:#fff; 
+        text-decoration:none; 
+        border-radius:4px; 
+        margin-top: 10px;
     }
   </style>
 </head>
@@ -55,32 +39,20 @@
   <div class="container">
     <h2>Nova candidatura activada</h2>
 
-    <p>Benvolguts/des {{ empresa_nom }},</p>
+    <p>Benvolguts/benvolgudes de <strong>{{ empresa.nom_comercial }}</strong>,</p>
 
-    <p>
-      La candidatura de <strong>{{ estudiant_nom }}</strong> per a l'oferta
-      <strong>{{ oferta_nom }}</strong> ha estat activada.
-    </p>
+    <p>L’estudiant <strong>{{ estudiant.get_full_name }}</strong> ha activat una candidatura per a l'oferta <strong>{{ candidatura.oferta. }}</strong>.</p>
 
-    {% if carta_presentacio %}
-      <p><strong>Carta de presentació:</strong></p>
-      <div class="carta">{{ carta_presentacio }}</div>
+    {% if candidatura.carta_presentacio %}
+      <h3>Carta de presentació:</h3>
+      <div class="carta">{{ candidatura.carta_presentacio|linebreaks }}</div>
     {% endif %}
 
-    <p>Trobareu adjunt el CV de l’estudiant.</p>
-
-    <div class="app-info">
-      Aquest missatge ha estat enviat des de l'aplicació de la
-      <strong>Borsa de treball de l'Institut Vidal i Barraquer</strong>.<br>
-      Podeu visualitzar totes les candidatures a les vostres ofertes
-      iniciant sessió a la web de l’aplicació:
-      <a href="https://www.vidalibarraquer.net/btreball" target="_blank">
-        www.vidalibarraquer.net/btreball
-      </a>
-    </div>
+    <p>Podeu visualitzar totes les candidatures a les vostres ofertes fent clic al botó següent:</p>
+    <a href="{{ url_login }}" class="boton">Accedir a la Borsa de Treball</a>
 
     <div class="footer">
-      Borsa de treball &copy; {{ any }}
+      Missatge automàtic enviat des de l'aplicació de la Borsa de Treball de l'Institut Vidal i Barraquer &copy; {{ any }}.
     </div>
   </div>
 </body>
