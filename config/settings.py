@@ -227,3 +227,7 @@ EMAIL_HOST_USER = 'borsatreballvidal@gmail.com'
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD') 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_RESPONSABLE_BORSA = 'rcerver4@xtec.cat'  # Canvia-ho pel correu del responsable de la borsa de treball
+
+ADMINS = [
+    ('Ramon', 'rcerver4@xtec.cat'),
+]
