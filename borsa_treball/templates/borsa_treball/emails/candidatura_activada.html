@@ -41,7 +41,9 @@
 
     <p>Benvolguts/benvolgudes de <strong>{{ empresa.nom_comercial }}</strong>,</p>
 
-    <p>L’estudiant <strong>{{ estudiant.get_full_name }}</strong> ha activat una candidatura per a l'oferta <strong>{{ candidatura.oferta. }}</strong>.</p>
+    <p>L’estudiant <strong>{{ estudiant.get_full_name }}</strong> ha enviat una candidatura per a l'oferta <strong>{{ candidatura.oferta. }}</strong>.</p>
+
+    <p>S'adjunta el seu currículum vitae (veure fitxers adjunts).</p>
 
     {% if candidatura.carta_presentacio %}
       <h3>Carta de presentació:</h3>
