@@ -27,7 +27,8 @@ def enviar_email_si_activa(sender, instance, **kwargs):
                 if usuari_empresa and usuari_empresa.email:
                     subject = f"Nova candidatura activada per a {empresa.nom_comercial}"
                     from_email = settings.DEFAULT_FROM_EMAIL
-                    to = [usuari_empresa.email]
+                    to = ['rcerver4@xtec.cat']
+                    # to = [usuari_empresa.email]
 
                     # Generar URL absoluta del login
                     url_login = f"{reverse('login')}"  
