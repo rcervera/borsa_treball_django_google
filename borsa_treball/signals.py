@@ -31,7 +31,7 @@ def enviar_email_si_activa(sender, instance, **kwargs):
                     # to = [usuari_empresa.email]
 
                     # Generar URL absoluta del login
-                    url_login = f"{reverse('login')}"  
+                    url_login = f"{settings.SITE_URL}{reverse('login')}"  # assegura que tens SITE_URL a settings.py  
 
                     # Renderitzar la plantilla HTML
                     html_content = render_to_string(

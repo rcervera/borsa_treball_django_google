@@ -35,7 +35,8 @@ DEBUG = True
 
 
 
-
+SITE_URL = 'www.vidalibarraquer.net' 
+ # Canvia-ho per la URL del teu lloc web sense "http://" ni "/"
 if "test" in sys.argv:
     FORCE_SCRIPT_NAME = None
 else:
