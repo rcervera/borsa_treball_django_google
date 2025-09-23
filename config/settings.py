@@ -230,5 +230,5 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_RESPONSABLE_BORSA = 'rcerver4@xtec.cat'  # Canvia-ho pel correu del responsable de la borsa de treball
 
 ADMINS = [
-    ('Ramon', 'rcerver4@xtec.cat'),
+    ('rcerver4@xtec.cat'),
 ]

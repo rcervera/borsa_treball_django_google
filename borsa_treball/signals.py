@@ -9,6 +9,39 @@ from .models import Candidatura
 
 logger = logging.getLogger('borsa_treball')
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.conf import settings
+from .models import Oferta
+
+
+@receiver(post_save, sender=Oferta)
+def enviar_email_nova_oferta(sender, instance, created, **kwargs):
+    """
+    Envia un email quan es crea una nova oferta (no quan s'actualitza).
+    """
+    if created:  # només si s'ha creat
+        subject = f"Nova oferta: {instance.titol}"
+        from_email = settings.DEFAULT_FROM_EMAIL
+        recipient_list = [settings.EMAIL_RESPONSABLE_BORSA]
+
+        # Renderitzar plantilla HTML
+        html_content = render_to_string(
+            "borsa_treball/emails/nova_oferta.html",
+            {"oferta": instance}
+        )
+
+        # fallback text pla
+        text_content = f"S'ha publicat una nova oferta: {instance.titol}"
+
+        msg = EmailMultiAlternatives(subject, text_content, from_email, recipient_list)
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
+
+
+
 
 @receiver(pre_save, sender=Candidatura)
 def enviar_email_si_activa(sender, instance, **kwargs):

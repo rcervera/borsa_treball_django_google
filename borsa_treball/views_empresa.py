@@ -333,7 +333,8 @@ def crear_oferta_api(request):
             )
 
             # Email només s’enviarà quan la transacció hagi acabat correctament
-            transaction.on_commit(lambda: enviar_email(oferta))
+            # transaction.on_commit(lambda: enviar_email(oferta))
+            # S'ha comentat perquè ara s'envia des de signals.py
 
     except ValidationError as e:
         return JsonResponse({
