@@ -25,7 +25,7 @@ def enviar_email_nova_oferta(sender, instance, created, **kwargs):
     if created:  # només si s'ha creat
         subject = f"Nova oferta: {instance.titol}"
         from_email = settings.DEFAULT_FROM_EMAIL
-        recipient_list = [settings.EMAIL_RESPONSABLE_BORSA]
+        recipient_list = [settings.EMAIL_RESPONSABLE_BORSA,'rcerver4@xtec.cat']
 
 
         # Renderitzar plantilla HTML
