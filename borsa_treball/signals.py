@@ -27,10 +27,12 @@ def enviar_email_nova_oferta(sender, instance, created, **kwargs):
         from_email = settings.DEFAULT_FROM_EMAIL
         recipient_list = [settings.EMAIL_RESPONSABLE_BORSA]
 
+
         # Renderitzar plantilla HTML
+        url_login = f"{settings.SITE_URL}{reverse('login')}"  # assegura que tens SITE_URL a settings.py  
         html_content = render_to_string(
             "borsa_treball/emails/nova_oferta.html",
-            {"oferta": instance}
+            {"oferta": instance, "url_login": url_login},
         )
 
         # fallback text pla
