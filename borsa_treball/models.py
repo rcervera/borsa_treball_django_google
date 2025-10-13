@@ -336,8 +336,22 @@ class Oferta(models.Model):
     # tancada = models.BooleanField(default=False, verbose_name="Oferta tancada", help_text="Indica si l'oferta ha estat tancada (ja s'ha cobert la vacant, etc.)")
     
     valoracio_empresa = models.TextField(blank=True, null=True, verbose_name="Valoració de l'Empresa", help_text="La valoració de l'empresa sobre el procés o els candidats.")
+    
+    
     valoracio_responsable = models.TextField(blank=True, null=True, verbose_name="Valoració del Responsable", help_text="La valoració del responsable de la borsa de treball sobre el procés.")
-  
+    # 🔹 Nous atributs per a les enquestes tancament
+    qualitat_candidats = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        help_text="Valoració (1-5) sobre la qualitat dels candidats presentats"
+    )
+    gestio_proces = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        help_text="Valoració (1-5) sobre la gestió del procés de selecció"
+    )
+
+    
     data_tancament = models.DateField(blank=True, null=True)
 
     @property

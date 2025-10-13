@@ -47,8 +47,8 @@ class CandidaturaInline(admin.TabularInline):
         qs = super().get_queryset(request)
         return qs.select_related('oferta', 'oferta__empresa')
 
-class EstudiantAdmin(admin.ModelAdmin):
-    list_display = ('usuari', 'get_nom_complet', 'get_email')
+class EstudiantAdmin(admin.ModelAdmin):    
+    list_display = ('usuari', 'get_nom_complet', 'get_email', 'get_estudis')
     search_fields = ('usuari__email', 'usuari__nom', 'usuari__cognoms')
     raw_id_fields = ('usuari',)
     inlines = [EstudiEstudiantInline, CandidaturaInline]
@@ -60,6 +60,12 @@ class EstudiantAdmin(admin.ModelAdmin):
     def get_email(self, obj):
         return obj.usuari.email
     get_email.short_description = 'Email'
+
+    def get_estudis(self, obj):
+        # Obtenim tots els cicles associats a l'estudiant
+        cicles = [ee.cicle.nom for ee in obj.estudis.select_related('cicle').all()]
+        return ", ".join(cicles) if cicles else "—"
+    get_estudis.short_description = 'Estudis (Cicles)'
 
 class FuncioInline(admin.TabularInline):
     model = Funcio
