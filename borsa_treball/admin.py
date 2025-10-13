@@ -48,6 +48,23 @@ class CandidaturaInline(admin.TabularInline):
         return qs.select_related('oferta', 'oferta__empresa')
 
 
+# --- FILTRE 1: Per família professional ---
+class FamiliaProfessionalFilter(admin.SimpleListFilter):
+    title = 'Família professional'
+    parameter_name = 'familia_professional'
+
+    def lookups(self, request, model_admin):
+        # Mostra totes les famílies com a opcions del filtre
+        return [(f.id, f.nom) for f in FamiliaProfessional.objects.all()]
+
+    def queryset(self, request, queryset):
+        # Filtra estudiants segons la família professional dels seus cicles
+        if self.value():
+            return queryset.filter(estudis__cicle__familia__id=self.value()).distinct()
+        return queryset
+
+
+# --- FILTRE 2: Per cicle concret ---
 class EstudiPerCicleFilter(admin.SimpleListFilter):
     title = 'Cicle (Estudi)'
     parameter_name = 'cicle'
@@ -67,7 +84,7 @@ class EstudiantAdmin(admin.ModelAdmin):
     list_display = ('usuari', 'get_nom_complet', 'get_email', 'get_estudis')
     search_fields = ('usuari__email', 'usuari__nom', 'usuari__cognoms')
     raw_id_fields = ('usuari',)
-    list_filter = (EstudiPerCicleFilter,) # Filtres personalitzats
+    list_filter = (FamiliaProfessionalFilter, EstudiPerCicleFilter,)
     inlines = [EstudiEstudiantInline, CandidaturaInline]
     
     def get_nom_complet(self, obj):
