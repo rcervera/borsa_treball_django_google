@@ -47,10 +47,27 @@ class CandidaturaInline(admin.TabularInline):
         qs = super().get_queryset(request)
         return qs.select_related('oferta', 'oferta__empresa')
 
+
+class EstudiPerCicleFilter(admin.SimpleListFilter):
+    title = 'Cicle (Estudi)'
+    parameter_name = 'cicle'
+
+    def lookups(self, request, model_admin):
+        # Mostra tots els cicles disponibles com a opcions del filtre
+        return [(c.id, c.nom) for c in Cicle.objects.all()]
+
+    def queryset(self, request, queryset):
+        # Filtra els estudiants que tenen relació amb el cicle seleccionat
+        if self.value():
+            return queryset.filter(estudis__cicle__id=self.value()).distinct()
+        return queryset
+
+
 class EstudiantAdmin(admin.ModelAdmin):    
     list_display = ('usuari', 'get_nom_complet', 'get_email', 'get_estudis')
     search_fields = ('usuari__email', 'usuari__nom', 'usuari__cognoms')
     raw_id_fields = ('usuari',)
+    list_filter = (EstudiPerCicleFilter,) # Filtres personalitzats
     inlines = [EstudiEstudiantInline, CandidaturaInline]
     
     def get_nom_complet(self, obj):
