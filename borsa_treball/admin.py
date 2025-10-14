@@ -9,6 +9,8 @@ from .models import (
 )
 
 from django.utils.html import format_html 
+# from .tasks import enviar_notificacio_nova_oferta
+from .tasks import enviar_email_async
 
 class UsuariAdmin(UserAdmin):
     model = Usuari
@@ -214,6 +216,8 @@ class OfertaAdmin(admin.ModelAdmin):
             """
             # Engeguem la tasca de Huey
             # enviar_notificacio_nova_oferta(oferta_id)
+            enviar_email_async("prova","prova", ['rcerver4@xtec.cat'])
+
 
             # Afegim un missatge de confirmació
             self.message_user(request, "La tasca d'enviament de notificacions s'ha engegat correctament.", messages.SUCCESS)
