@@ -376,13 +376,15 @@ def registre_estudiant(request):
 
     # Validacions específiques d'estudiant
     if not dni:
-        errors['dni'] = ['El DNI és obligatori.']
+        errors['dni'] = ['El DNI o NIE és obligatori.']
     else:
-        dni_pattern = r'^\d{8}[A-Z]$' 
+        # Accepta DNI (8 dígits + lletra) o NIE (X/Y/Z + 7 dígits + lletra)
+        dni_pattern = r'^(\d{8}[A-Z]|[XYZ]\d{7}[A-Z])$'
+
         if not re.match(dni_pattern, dni):
-            errors['dni'] = ['Format de DNI no vàlid. Ha de ser 8 dígits seguits d\'una lletra (ex: 12345678A).']
+            errors['dni'] = [ "Format de DNI o NIE no vàlid. Exemples: 12345678A o X1234567B."]
         elif Estudiant.objects.filter(dni=dni).exists():
-            errors['dni'] = ['Aquest DNI ja està registrat.']
+            errors['dni'] = ['Aquest DNI/NIE ja està registrat.']
             
     if not telefon:
         errors['telefon'] = ['El telèfon és obligatori.']
