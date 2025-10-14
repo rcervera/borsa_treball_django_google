@@ -239,7 +239,7 @@ HUEY = {
     'huey_class': 'huey.SqliteHuey',  # Canviem a SQLite
     'name': 'borsa_treball',
     # Indiquem on guardar el fitxer de la cua de tasques
-    'filename': os.path.join(BASE_DIR, 'huey.sqlite3'),
+    'filename': '/var/lib/huey/borsa_treball.sqlite3',
     'immediate': False,
     'consumer': {
         'workers': 4,
