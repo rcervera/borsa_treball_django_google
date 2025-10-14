@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'django_bootstrap5',
     'social_django',
     'django_cleanup.apps.CleanupConfig', 
+    'huey.contrib.djhuey',
     'borsa_treball',
    
 ]
@@ -232,3 +233,15 @@ EMAIL_RESPONSABLE_BORSA = 'borsatreball@vidalibarraquer.net'  # Canvia-ho pel co
 ADMINS = [
     ('rcerver4@xtec.cat'),
 ]
+
+
+HUEY = {
+    'huey_class': 'huey.SqliteHuey',  # Canviem a SQLite
+    'name': 'borsa_treball',
+    # Indiquem on guardar el fitxer de la cua de tasques
+    'filename': os.path.join(BASE_DIR, 'huey.sqlite3'),
+    'consumer': {
+        'workers': 4,
+        'worker_type': 'thread',
+    },
+}

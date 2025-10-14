@@ -1,6 +1,7 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
-from django.urls import reverse
+from django.http import HttpResponseRedirect
+from django.urls import path, reverse
 from .models import (
     CapacitatOferta, Usuari, Sector, Empresa, FamiliaProfessional, Estudiant, Cicle,
     EstudiEstudiant, CapacitatClau, Funcio, Oferta, Candidatura,
@@ -140,6 +141,10 @@ class NivellIdiomaInline(admin.TabularInline):
     extra = 1
 
 class OfertaAdmin(admin.ModelAdmin):
+
+    # Especifiquem la nostra plantilla personalitzada per a la pàgina d'edició.
+    change_form_template = "borsa_treball/admin/oferta/change_form.html"
+
     list_display = (
         'titol', 'empresa', 'estat_colored',
         'data_publicacio', 'data_limit', 'descripcio_curta'
@@ -187,6 +192,37 @@ class OfertaAdmin(admin.ModelAdmin):
         return obj.candidatures.count()
     
     nombre_candidatures.short_description = "Candidatures"
+
+    def get_urls(self):
+        """
+        Afegeix la nostra URL personalitzada per a l'acció del botó.
+        Això es manté igual que a la solució anterior.
+        """
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                '<int:oferta_id>/enviar-notificacio/',
+                self.admin_site.admin_view(self.enviar_notificacio_view),
+                name='enviar_notificacio_oferta',
+            ),
+        ]
+        return custom_urls + urls
+
+    def enviar_notificacio_view(self, request, oferta_id):
+            """
+            Aquesta vista s'executa quan es clica el botó.
+            """
+            # Engeguem la tasca de Huey
+            # enviar_notificacio_nova_oferta(oferta_id)
+
+            # Afegim un missatge de confirmació
+            self.message_user(request, "La tasca d'enviament de notificacions s'ha engegat correctament.", messages.SUCCESS)
+
+            # IMPORTANT: Redirigim de nou a la mateixa pàgina d'edició de l'oferta
+            url = reverse('admin:borsa_treball_oferta_change', args=[oferta_id])
+            return HttpResponseRedirect(url)
+
+
 
 from django.contrib import admin
 from .models import Candidatura

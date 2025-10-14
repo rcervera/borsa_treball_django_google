@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <title>Nova Oferta de Treball</title>
+    <style>
+        body { font-family: sans-serif; color: #333; }
+        .container { padding: 20px; border: 1px solid #ddd; border-radius: 5px; max-width: 600px; margin: auto; }
+        h2 { color: #0056b3; }
+        ul { list-style-type: none; padding: 0; }
+        li { margin-bottom: 10px; }
+        .boton {
+            display: inline-block;
+            padding: 10px 18px;
+            margin-top: 16px;
+            background: #0066cc;
+            color: #fff !important;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            }
+        .boton:hover {
+            background: #004c99;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p>Hola {{ estudiant.usuari.nom }},</p>
+        <p>S'ha publicat una nova oferta a la nostra borsa de treball que podria ser del teu interès:</p>
+        
+        <h2>{{ oferta.titol }}</h2>
+        
+        <ul>
+            <li><strong>Lloc de treball:</strong> {{ oferta.lloc_treball }}</li>
+            <li><strong>Tipus de contracte:</strong> {{ oferta.get_tipus_contracte_display }}</li>
+            <li><strong>Jornada:</strong> {{ oferta.get_jornada_display }}</li>
+            <li><strong>Data límit:</strong> {{ oferta.data_limit|date:"d/m/Y" }}</li>
+        </ul>
+        
+        <h3>Descripció</h3>
+        <div>
+            {{ oferta.descripcio|linebreaksbr }}
+        </div>
+        
+        <p>Pots consultar tots els detalls i inscriure't com a candidat a través de la nostra plataforma.</p>
+        <a href="{{ url_login }}" class="boton">Accedir a la Borsa de Treball</a>
+        
+        <hr>
+        <p style="font-size: 0.9em; color: #777;">
+            Atentament,<br>
+            L'equip de la Borsa de Treball
+        </p>
+    </div>
+</body>
+</html>

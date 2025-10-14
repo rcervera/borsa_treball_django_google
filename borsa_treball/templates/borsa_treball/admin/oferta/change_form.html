@@ -1,0 +1,15 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+
+{# Aquest bloc afegeix botons addicionals a la part superior dreta, 
+   al costat del botó "Historial". #}
+{% block object-tools-items %}
+    {# Primer, incloem els botons per defecte (com "Historial") #}
+    {{ block.super }}
+
+    {# Després, afegim el nostre botó personalitzat #}
+    <li>
+        {% url 'admin:enviar_notificacio_oferta' object_id as enviar_url %}
+        <a href="{{ enviar_url }}" class="button">📧 Enviar Notificacions</a>
+    </li>
+{% endblock %}
