@@ -236,13 +236,14 @@ ADMINS = [
 
 
 HUEY = {
-    'huey_class': 'huey.SqliteHuey',  # Canviem a SQLite
-    'name': 'borsa_treball',
-    # Indiquem on guardar el fitxer de la cua de tasques
-    'filename': '/var/lib/huey/borsa_treball.sqlite3',
-    'immediate': False,
+    'huey_class': 'huey.RedisHuey',  # Canvi a Redis
+    'name': 'borsa_treball',          # Nom de la cua
+    'host': '127.0.0.1',              # Host Redis local
+    'port': 6379,                     # Port Redis
+    'db': 0,                          # Base de dades Redis (0-15)
+    'immediate': False,               # Async
     'consumer': {
         'workers': 4,
-        'worker_type': 'thread',
+        'worker_type': 'thread',      # Podeu posar process si voleu més aïllament
     },
 }
