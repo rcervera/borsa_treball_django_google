@@ -35,6 +35,7 @@ def enviar_notificacio_nova_oferta(oferta_id):
     if not cicles_oferta_ids:
         return
 
+
     estudiants_a_notificar = Estudiant.objects.filter(
         estudis__cicle_id__in=cicles_oferta_ids
     ).select_related('usuari').distinct() # Usem select_related per optimitzar la consulta
