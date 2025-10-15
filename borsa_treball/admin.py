@@ -235,8 +235,13 @@ class OfertaAdmin(admin.ModelAdmin):
                 self.message_user(request, "No hi ha estudiants a notificar.", messages.WARNING)
             else:
                 # Afegim un missatge de confirmació
-                self.message_user(request,   f"La tasca d'enviament s'ha engegat correctament per a {len(destinatari_list)} estudiants.",messages.SUCCESS)
-
+                # self.message_user(request,   f"La tasca d'enviament s'ha engegat correctament per a {len(destinatari_list)} estudiants.",messages.SUCCESS)
+                self.message_user(
+                        request,
+                        f"La tasca d'enviament de notificacions s'ha engegat correctament per a l'oferta {oferta_id}. "
+                        f"Correus enviats a: {', '.join(destinatari_list)}",
+                        messages.SUCCESS
+                    )
             # IMPORTANT: Redirigim de nou a la mateixa pàgina d'edició de l'oferta
             url = reverse('admin:borsa_treball_oferta_change', args=[oferta_id])
             return HttpResponseRedirect(url)
