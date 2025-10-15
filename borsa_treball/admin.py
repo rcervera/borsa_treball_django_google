@@ -221,7 +221,7 @@ class OfertaAdmin(admin.ModelAdmin):
 
 
             # Afegim un missatge de confirmació
-            self.message_user(request, "La tasca d'enviament de notificacions s'ha engegat correctament.", messages.SUCCESS)
+            self.message_user(request, "La tasca d'enviament de notificacions s'ha engegat correctament. {oferta_id}" + oferta_id, messages.SUCCESS)
 
             # IMPORTANT: Redirigim de nou a la mateixa pàgina d'edició de l'oferta
             url = reverse('admin:borsa_treball_oferta_change', args=[oferta_id])
