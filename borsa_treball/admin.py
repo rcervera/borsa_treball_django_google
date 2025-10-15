@@ -10,7 +10,7 @@ from .models import (
 
 from django.utils.html import format_html 
 # from .tasks import enviar_notificacio_nova_oferta
-from .tasks import enviar_email_async
+from .tasks import enviar_email_async, enviar_notificacio_nova_oferta
 
 class UsuariAdmin(UserAdmin):
     model = Usuari
@@ -216,7 +216,8 @@ class OfertaAdmin(admin.ModelAdmin):
             """
             # Engeguem la tasca de Huey
             # enviar_notificacio_nova_oferta(oferta_id)
-            enviar_email_async("prova","prova", ['rcerver4@xtec.cat'])
+            # enviar_email_async("prova","prova", ['rcerver4@xtec.cat'])
+            enviar_notificacio_nova_oferta(oferta_id)
 
 
             # Afegim un missatge de confirmació
