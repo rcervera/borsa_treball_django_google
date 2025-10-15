@@ -9,6 +9,8 @@ from .models import (
 )
 
 from django.utils.html import format_html 
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 # from .tasks import enviar_notificacio_nova_oferta
 # from .tasks import enviar_email_async, enviar_notificacio_nova_oferta
 
@@ -234,12 +236,17 @@ class OfertaAdmin(admin.ModelAdmin):
             if not destinatari_list:
                 self.message_user(request, "No hi ha estudiants a notificar.", messages.WARNING)
             else:
+                # Renderitzem la plantilla HTML un cop
+                context = {'oferta': oferta}
+                html_missatge = render_to_string('borsa_treball/emails/oferta_activada.html', context)
+                missatge_text_pla = strip_tags(html_missatge)
                 # Afegim un missatge de confirmació
                 # self.message_user(request,   f"La tasca d'enviament s'ha engegat correctament per a {len(destinatari_list)} estudiants.",messages.SUCCESS)
                 self.message_user(
                         request,
                         f"La tasca d'enviament de notificacions s'ha engegat correctament per a l'oferta {oferta_id}. "
-                        f"Correus enviats a: {', '.join(destinatari_list)}",
+                        f"Correus enviats a: {', '.join(destinatari_list)}"
+                        f"html_missatge: {html_missatge}",
                         messages.SUCCESS
                     )
             # IMPORTANT: Redirigim de nou a la mateixa pàgina d'edició de l'oferta
