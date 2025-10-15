@@ -225,9 +225,17 @@ class OfertaAdmin(admin.ModelAdmin):
                 self.message_user(request, f"L'oferta {oferta_id} no existeix.", messages.ERROR)
                 url = reverse('admin:borsa_treball_oferta_change', args=[oferta_id])
                 return HttpResponseRedirect(url)
+            
+             # Obtenim els emails dels estudiants que han de ser notificats
+            cicles_oferta_ids = oferta.cicles.values_list('id', flat=True)
+            estudiants_a_notificar = Estudiant.objects.filter(estudis__cicle_id__in=cicles_oferta_ids).select_related('usuari').distinct()
 
-            # Afegim un missatge de confirmació
-            self.message_user(request,  f"La tasca d'enviament de notificacions s'ha engegat correctament. {oferta_id}", messages.SUCCESS)
+            destinatari_list = [estudiant.usuari.email for estudiant in estudiants_a_notificar]
+            if not destinatari_list:
+                self.message_user(request, "No hi ha estudiants a notificar.", messages.WARNING)
+            else:
+                # Afegim un missatge de confirmació
+                self.message_user(request,   f"La tasca d'enviament s'ha engegat correctament per a {len(destinatari_list)} estudiants.",messages.SUCCESS)
 
             # IMPORTANT: Redirigim de nou a la mateixa pàgina d'edició de l'oferta
             url = reverse('admin:borsa_treball_oferta_change', args=[oferta_id])
