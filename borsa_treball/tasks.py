@@ -17,7 +17,19 @@ def enviar_email_async(subject, message, destinatari_list):
         fail_silently=False,
     )
 
-
+@task()
+def enviar_email_async(subject, message, destinatari_list, html_message=None):
+    """
+    Tasca que envia un email a una llista de destinataris.
+    """
+    send_mail(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,  # o 'rcerver4@xtec.cat' per proves
+        destinatari_list,
+        fail_silently=False,
+        html_message=html_message
+    )
 
 @db_task()
 def enviar_notificacio_nova_oferta(oferta_id):
