@@ -11,7 +11,6 @@ from .models import (
 from django.utils.html import format_html 
 # from .tasks import enviar_notificacio_nova_oferta
 from .tasks import enviar_email_async, enviar_notificacio_nova_oferta
-from django.template.loader import render_to_string
 
 class UsuariAdmin(UserAdmin):
     model = Usuari
@@ -212,34 +211,22 @@ class OfertaAdmin(admin.ModelAdmin):
         return custom_urls + urls
 
     def enviar_notificacio_view(self, request, oferta_id):
-        """
-        Aquesta vista s'executa quan es clica el botó a l'admin.
-        """
-        oferta = Oferta.objects.get(id=oferta_id)
-        cicles_ids = oferta.cicles.values_list('id', flat=True)
+            """
+            Aquesta vista s'executa quan es clica el botó.
+            """
+            # Engeguem la tasca de Huey
+            # enviar_notificacio_nova_oferta(oferta_id)
+            # enviar_email_async("prova","prova", ['rcerver4@xtec.cat'])
+            #enviar_notificacio_nova_oferta(oferta_id)
 
-        estudiants = Estudiant.objects.filter(
-            estudis__cicle_id__in=cicles_ids
-        ).select_related('usuari').distinct()
 
-        emails = [e.usuari.email for e in estudiants if e.usuari.email]
+            # Afegim un missatge de confirmació
+            self.message_user(request,  f"La tasca d'enviament de notificacions s'ha engegat correctament. {oferta_id}", messages.SUCCESS)
 
-        # Renderitzem una sola vegada la plantilla HTML (comú per a tots)
-        context = {'oferta': oferta}
-        html_plantilla = render_to_string('borsa_treball/emails/oferta_activada.html', context)
+            # IMPORTANT: Redirigim de nou a la mateixa pàgina d'edició de l'oferta
+            url = reverse('admin:borsa_treball_oferta_change', args=[oferta_id])
+            return HttpResponseRedirect(url)
 
-        # Llença la tasca Huey
-        # enviar_notificacio_emails(oferta.titol, emails, html_plantilla)
-
-        # Missatge de confirmació
-        self.message_user(
-            request,
-            f"La tasca d'enviament s'ha engegat correctament per a {len(emails)} estudiants.",
-            messages.SUCCESS
-        )
-
-        url = reverse('admin:borsa_treball_oferta_change', args=[oferta_id])
-        return HttpResponseRedirect(url)
 
 
 from django.contrib import admin
