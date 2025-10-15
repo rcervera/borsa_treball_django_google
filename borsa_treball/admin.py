@@ -219,6 +219,12 @@ class OfertaAdmin(admin.ModelAdmin):
             # enviar_email_async("prova","prova", ['rcerver4@xtec.cat'])
             #enviar_notificacio_nova_oferta(oferta_id)
 
+            try:
+                oferta = Oferta.objects.get(id=oferta_id)
+            except Oferta.DoesNotExist:
+                self.message_user(request, f"L'oferta {oferta_id} no existeix.", messages.ERROR)
+                url = reverse('admin:borsa_treball_oferta_change', args=[oferta_id])
+                return HttpResponseRedirect(url)
 
             # Afegim un missatge de confirmació
             self.message_user(request,  f"La tasca d'enviament de notificacions s'ha engegat correctament. {oferta_id}", messages.SUCCESS)
