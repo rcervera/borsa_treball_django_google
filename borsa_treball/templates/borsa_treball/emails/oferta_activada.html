@@ -4,11 +4,57 @@
     <meta charset="UTF-8">
     <title>Nova Oferta de Treball</title>
     <style>
-        body { font-family: sans-serif; color: #333; }
-        .container { padding: 20px; border: 1px solid #ddd; border-radius: 5px; max-width: 600px; margin: auto; }
-        h2 { color: #0056b3; }
-        ul { list-style-type: none; padding: 0; }
-        li { margin-bottom: 10px; }
+        body {
+            font-family: sans-serif;
+            color: #333;
+            background-color: #f6f6f6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-width: 600px;
+            margin: 30px auto;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #4B49AC;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .logo-container {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        .institut-text {
+            display: inline-block;
+            vertical-align: middle;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        h2 {
+            color: #0056b3;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
         .boton {
             display: inline-block;
             padding: 10px 18px;
@@ -18,11 +64,13 @@
             text-decoration: none;
             border-radius: 6px;
             font-weight: bold;
-            }
+        }
+
         .boton:hover {
             background: #004c99;
         }
-         .footer {
+
+        .footer {
             margin-top: 24px;
             font-size: 0.85rem;
             color: #666;
@@ -30,11 +78,43 @@
             padding-top: 12px;
             text-align: center;
         }
+
+        /* Animació del logo */
+        circle {
+            opacity: 0;
+            animation: fadeInOut 4s infinite;
+        }
+
+        .circle1 { animation-delay: 0s; }
+        .circle2 { animation-delay: 0.5s; }
+        .circle3 { animation-delay: 1s; }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <p>Hola {{ estudiant.usuari.nom }},</p>
+        <!-- CAPÇALERA AMB LOGO I TEXT -->
+        <div class="header">
+            <div class="logo-container">
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="50" height="20" viewBox="115 105 310 90">
+                    <circle class="circle1" cx="160" cy="150" r="45" fill="#4B49AC"/>
+                    <circle class="circle2" cx="270" cy="150" r="45" fill="#7DA0FA"/>
+                    <circle class="circle3" cx="380" cy="150" r="45" fill="#98BDFF"/>
+                </svg>
+            </div>
+            <div class="institut-text">
+                Institut Vidal i Barraquer de Tarragona
+            </div>
+        </div>
+
+        <!-- CONTINGUT PRINCIPAL -->
+        <p>Hola,</p>
         <p>S'ha publicat una nova oferta a la nostra borsa de treball que podria ser del teu interès:</p>
         
         <h2>{{ oferta.titol }}</h2>
@@ -61,7 +141,7 @@
         </p>
 
         <div class="footer">
-                Missatge automàtic enviat des de l'aplicació de la Borsa de Treball de l'Institut Vidal i Barraquer.
+            Missatge automàtic enviat des de l'aplicació de la Borsa de Treball de l'Institut Vidal i Barraquer.
         </div>
     </div>
 </body>

@@ -2,6 +2,8 @@ from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.http import HttpResponseRedirect
 from django.urls import path, reverse
+
+from config import settings
 from .models import (
     CapacitatOferta, Usuari, Sector, Empresa, FamiliaProfessional, Estudiant, Cicle,
     EstudiEstudiant, CapacitatClau, Funcio, Oferta, Candidatura,
@@ -237,7 +239,9 @@ class OfertaAdmin(admin.ModelAdmin):
                 self.message_user(request, "No hi ha estudiants a notificar.", messages.WARNING)
             else:
                 # Renderitzem la plantilla HTML un cop
-                context = {'oferta': oferta}
+                # Generar URL absoluta del login
+                url_login = f"{settings.SITE_URL}{reverse('login')}"
+                context = {'oferta': oferta, 'url_login': url_login}
                 html_missatge = render_to_string('borsa_treball/emails/oferta_activada.html', context)
                 missatge_text_pla = strip_tags(html_missatge)
                 # Afegim un missatge de confirmació
