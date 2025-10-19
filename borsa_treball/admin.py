@@ -291,16 +291,16 @@ class OfertaAdmin(admin.ModelAdmin):
                 html_missatge = render_to_string('borsa_treball/emails/oferta_activada.html', context)
                 missatge_text_pla = strip_tags(html_missatge)
 
-                # Enviar tasca asíncrona personalitzada per cada estudiant
                 enviar_email_async.schedule(
-                    args=(
+                    (
                         f"Nova oferta publicada: {oferta.titol}",
                         missatge_text_pla,
                         ['rcerver4@xtec.cat'],
-                        html_missatge,  
+                        html_missatge
                     ),
                     delay=0
                 )
+                
             self.message_user(
                 request,
                 f"S'han engegat les tasques d'enviament per a {len(estudiants_a_notificar)} estudiants.",
