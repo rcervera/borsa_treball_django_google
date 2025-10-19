@@ -293,14 +293,17 @@ class OfertaAdmin(admin.ModelAdmin):
 
                 # Enviar tasca asíncrona personalitzada per cada estudiant
                 enviar_email_async.schedule(
-                    (
+                    args=(
                         f"Nova oferta publicada: {oferta.titol}",
                         missatge_text_pla,
-                        ['rcerver4@xtec.cat'], #[estudiant.usuari.email],
-                        html_missatge
+                        ['rcerver4@xtec.cat'],
                     ),
+                    kwargs={
+                        'html_message': html_missatge
+                    },
                     delay=0
                 )
+
 
             self.message_user(
                 request,
