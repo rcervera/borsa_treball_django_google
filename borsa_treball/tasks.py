@@ -1,4 +1,5 @@
 # la_teva_app/tasks.py
+import logging
 from huey.contrib.djhuey import task
 from django.core.mail import send_mail
 from .models import Oferta, Estudiant
@@ -12,12 +13,18 @@ def enviar_email_async(subject, message, destinatari_list, html_message):
     """
     Envia un email asíncronament a una llista curta de destinataris (normalment un).
     """
-    send_mail(
-        subject,
-        message,
-        settings.DEFAULT_FROM_EMAIL,
-        destinatari_list,
-        fail_silently=False,
-        html_message=html_message
-    )
+    try:
+        logging.info(f"Enviant email a: {destinatari_list}")
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            destinatari_list,
+            fail_silently=False,
+            html_message=html_message
+        )
+        logging.info(f"Email enviat correctament a: {destinatari_list}")
+        
+    except Exception as e:
+        logging.error(f"Error enviant email a {destinatari_list}: {e}")
 
