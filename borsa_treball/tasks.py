@@ -8,7 +8,7 @@ from django.conf import settings
 
 
 @task()
-def enviar_email_async(subject, message, destinatari_list, html_message=None):
+def enviar_email_async(subject, message, destinatari_list, html_message):
     """
     Envia un email asíncronament a una llista curta de destinataris (normalment un).
     """

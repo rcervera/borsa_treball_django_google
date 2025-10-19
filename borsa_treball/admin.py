@@ -297,7 +297,7 @@ class OfertaAdmin(admin.ModelAdmin):
                         f"Nova oferta publicada: {oferta.titol}",
                         missatge_text_pla,
                         ['rcerver4@xtec.cat'],
-                        html_missatge,  # encara que sigui opcional
+                        html_missatge,  
                     ),
                     delay=0
                 )
