@@ -13,8 +13,7 @@ from .models import (
 from django.utils.html import format_html 
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-# from .tasks import enviar_notificacio_nova_oferta
-# from .tasks import enviar_email_async, enviar_notificacio_nova_oferta
+from .tasks import enviar_email_async
 
 class UsuariAdmin(UserAdmin):
     model = Usuari
@@ -248,15 +247,69 @@ class OfertaAdmin(admin.ModelAdmin):
                 # self.message_user(request,   f"La tasca d'enviament s'ha engegat correctament per a {len(destinatari_list)} estudiants.",messages.SUCCESS)
                 self.message_user(
                         request,
-                        f"La tasca d'enviament de notificacions s'ha engegat correctament per a l'oferta {oferta_id}. "
-                        f"Correus enviats a: {', '.join(destinatari_list)}"
-                        f"html_missatge: {html_missatge}",
+                        f"La tasca d'enviament de notificacions s'ha engegat correctament per a l'oferta actual.",
+                        f"Correus enviats a: {', '.join(destinatari_list)}",                        
                         messages.SUCCESS
                     )
             # IMPORTANT: Redirigim de nou a la mateixa pàgina d'edició de l'oferta
             url = reverse('admin:borsa_treball_oferta_change', args=[oferta_id])
             return HttpResponseRedirect(url)
 
+    def enviar_notificacio_view(self, request, oferta_id):
+        """
+        Aquesta vista s'executa quan es clica el botó al panell d'administració.
+        """
+        try:
+            oferta = Oferta.objects.get(id=oferta_id)
+        except Oferta.DoesNotExist:
+            self.message_user(request, f"L'oferta {oferta_id} no existeix.", messages.ERROR)
+            url = reverse('admin:borsa_treball_oferta_change', args=[oferta_id])
+            return HttpResponseRedirect(url)
+
+        cicles_oferta_ids = oferta.cicles.values_list('id', flat=True)
+        estudiants_a_notificar = (
+            Estudiant.objects
+            .filter(estudis__cicle_id__in=cicles_oferta_ids)
+            .select_related('usuari')
+            .distinct()
+        )
+
+        estudiants_a_notificar = [e for e in estudiants_a_notificar if e.usuari.email]
+
+        if not estudiants_a_notificar:
+            self.message_user(request, "No hi ha estudiants a notificar.", messages.WARNING)
+        else:
+            url_login = f"{settings.SITE_URL}{reverse('login')}"
+
+            for estudiant in estudiants_a_notificar:
+                context = {
+                    'oferta': oferta,
+                    'url_login': url_login,
+                    'nom_estudiant': estudiant.usuari.nom 
+                }
+
+                html_missatge = render_to_string('borsa_treball/emails/oferta_activada.html', context)
+                missatge_text_pla = strip_tags(html_missatge)
+
+                # Enviar tasca asíncrona personalitzada per cada estudiant
+                enviar_email_async.schedule(
+                    (
+                        f"Nova oferta publicada: {oferta.titol}",
+                        missatge_text_pla,
+                        ['rcerver4@xtec.cat'], #[estudiant.usuari.email],
+                        html_missatge
+                    ),
+                    delay=0
+                )
+
+            self.message_user(
+                request,
+                f"S'han engegat les tasques d'enviament per a {len(estudiants_a_notificar)} estudiants.",
+                messages.SUCCESS
+            )
+
+        url = reverse('admin:borsa_treball_oferta_change', args=[oferta_id])
+        return HttpResponseRedirect(url)
 
 
 from django.contrib import admin
