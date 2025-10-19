@@ -243,7 +243,7 @@ HUEY = {
     'db': 0,                          # Base de dades Redis (0-15)
     'immediate': False,               # Async
     'consumer': {
-        'workers': 4,
+        'workers': 1,
         'worker_type': 'thread',      # Podeu posar process si voleu més aïllament
     },
 }
