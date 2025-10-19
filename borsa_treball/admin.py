@@ -295,15 +295,12 @@ class OfertaAdmin(admin.ModelAdmin):
                 enviar_email_async.schedule(
                     args=(
                         f"Nova oferta publicada: {oferta.titol}",
-                        missatge_text_pla,
+                        "Missatge de prova sense HTML",
                         ['rcerver4@xtec.cat'],
+                        None,  # html_message com None per prova
                     ),
-                    kwargs={
-                        'html_message': html_missatge
-                    },
                     delay=0
                 )
-
 
             self.message_user(
                 request,

@@ -20,3 +20,4 @@ def enviar_email_async(subject, message, destinatari_list, html_message=None):
         fail_silently=False,
         html_message=html_message
     )
+
