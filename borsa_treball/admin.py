@@ -304,7 +304,7 @@ class OfertaAdmin(admin.ModelAdmin):
             self.message_user(
                 request,
                 f"S'han engegat les tasques d'enviament per a {len(estudiants_a_notificar)} estudiants.",
-                f"Destinataris: {', '.join(estudiants_a_notificar)}",
+                f"Destinataris: {', '.join(estudiants_a_notificar[i].usuari.email for i in range(len(estudiants_a_notificar))   )}",
                 messages.SUCCESS
             )
 
