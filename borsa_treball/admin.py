@@ -291,6 +291,7 @@ class OfertaAdmin(admin.ModelAdmin):
                 html_missatge = render_to_string('borsa_treball/emails/oferta_activada.html', context)
                 missatge_text_pla = strip_tags(html_missatge)
 
+                
                 enviar_email_async.schedule(
                     (
                         f"Nova oferta publicada: {oferta.titol}",
@@ -298,7 +299,7 @@ class OfertaAdmin(admin.ModelAdmin):
                         ['rcerver4@xtec.cat'],
                         html_missatge
                     ),
-                    delay=0
+                    delay=2
                  )
                 
             self.message_user(
