@@ -302,11 +302,11 @@ class OfertaAdmin(admin.ModelAdmin):
                 # )
                 
             self.message_user(
-                request,
-                f"S'han engegat les tasques d'enviament per a {len(estudiants_a_notificar)} estudiants.",
-                f"Destinataris: {', '.join(e.usuari.email for e in estudiants_a_notificar)}",
-                messages.SUCCESS
-            )
+                    request,
+                    f"S'han engegat les tasques d'enviament per a {len(estudiants_a_notificar)} estudiants.\n"
+                    f"Destinataris: {', '.join(e.usuari.email for e in estudiants_a_notificar)}",
+                    messages.SUCCESS
+                )
 
         url = reverse('admin:borsa_treball_oferta_change', args=[oferta_id])
         return HttpResponseRedirect(url)
