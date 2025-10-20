@@ -7,6 +7,7 @@ from django.template.loader import render_to_string  # <-- Importa render_to_str
 from django.utils.html import strip_tags  # <-- Per crear la versió de text pla
 from django.conf import settings
 
+logger = logging.getLogger(__name__)
 
 @task()
 def enviar_email_async(subject, message, destinatari_list, html_message):
@@ -14,7 +15,7 @@ def enviar_email_async(subject, message, destinatari_list, html_message):
     Envia un email asíncronament a una llista curta de destinataris (normalment un).
     """
     try:
-        logging.info(f"Enviant email a: {destinatari_list}")
+        logger.info(f"Enviant correu a {destinatari_list}")
         send_mail(
             subject,
             message,
@@ -23,8 +24,8 @@ def enviar_email_async(subject, message, destinatari_list, html_message):
             fail_silently=False,
             html_message=html_message
         )
-        logging.info(f"Email enviat correctament a: {destinatari_list}")
+        logger.info(f"Email enviat correctament a: {destinatari_list}")
         
     except Exception as e:
-        logging.error(f"Error enviant email a {destinatari_list}: {e}")
+        logger.error(f"Error enviant email a {destinatari_list}: {e}")
 
