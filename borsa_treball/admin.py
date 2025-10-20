@@ -14,6 +14,8 @@ from django.utils.html import format_html
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from .tasks import enviar_email_async
+from time import time
+
 
 class UsuariAdmin(UserAdmin):
     model = Usuari
@@ -299,7 +301,8 @@ class OfertaAdmin(admin.ModelAdmin):
                     html_missatge,
                     emails  # llista de BCC
                 ),
-                delay=0
+                delay=2,
+                extra={'uid': time()}  
             )
                 
             self.message_user(
