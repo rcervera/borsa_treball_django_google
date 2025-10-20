@@ -9,28 +9,32 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
+from django.core.mail import EmailMessage
+
 @task()
-def enviar_email_async(subject, message, destinatari_list, html_message, bcc_list=[]):
+def enviar_email_async(subject, message, destinatari_list, html_message, bcc_list=None):
     """
-    Envia un email asíncronament a una llista curta de destinataris (normalment un).
-    Permet opcionalment BCC per enviar a més persones sense que es vegin entre elles.
+    Envia un email asíncronament amb possibilitat de BCC.
     """
     try:
-        destinatari_str = ', '.join(destinatari_list)  # converteix la llista a string llegible
+        if bcc_list is None:
+            bcc_list = []
+
+        destinatari_str = ', '.join(destinatari_list)
         bcc_str = ', '.join(bcc_list)
         logger.info(f"Enviant correu a: {destinatari_str} BCC: {bcc_str}")
-        
-        send_mail(
+
+        email = EmailMessage(
             subject,
             message,
             settings.DEFAULT_FROM_EMAIL,
-            destinatari_list,
-            fail_silently=False,
-            html_message=html_message,
+            to=destinatari_list,
             bcc=bcc_list
         )
-        
+        email.content_subtype = "html"  # perquè s'enviï en HTML
+        email.send(fail_silently=False)
+
         logger.info(f"Email enviat correctament a: {destinatari_str}")
-        
+
     except Exception as e:
         logger.error(f"Error enviant email: {e}")
