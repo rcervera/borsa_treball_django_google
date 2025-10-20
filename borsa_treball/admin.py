@@ -297,7 +297,7 @@ class OfertaAdmin(admin.ModelAdmin):
                     args=(
                         f"Prova: nova oferta",
                         missatge_text_pla,
-                        emails,
+                        emails[i],
                         html_missatge
                     ),
                     delay=2 + i
