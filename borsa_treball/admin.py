@@ -280,29 +280,27 @@ class OfertaAdmin(admin.ModelAdmin):
             self.message_user(request, "No hi ha estudiants a notificar.", messages.WARNING)
         else:
             url_login = f"{settings.SITE_URL}{reverse('login')}"
+            context = {
+                'oferta': oferta,
+                'url_login': url_login,
+            }
+            html_missatge = render_to_string('borsa_treball/emails/oferta_activada.html', context)
+            missatge_text_pla = strip_tags(html_missatge)
 
-            
+            # Llista de tots els emails
+            # emails = [e.usuari.email for e in estudiants_a_notificar]
             emails = ["rcerver4@xtec.cat", "rcerver4@gmail.com"]
-            for i, estudiant in enumerate(estudiants_a_notificar):
-                context = {
-                    'oferta': oferta,
-                    'url_login': url_login,
-                    'nom_estudiant': estudiant.usuari.nom 
-                }
-
-                html_missatge = render_to_string('borsa_treball/emails/oferta_activada.html', context)
-                missatge_text_pla = strip_tags(html_missatge)
-
-                enviar_email_async.schedule(
-                    args=(
-                        f"Prova: nova oferta",
-                        missatge_text_pla,                        
-                        [emails[i]],
-                        html_missatge
-                    ),
-                    delay=2 + i
-                )
-
+            # Envia un únic email amb BCC
+            enviar_email_async.schedule(
+                args=(
+                    f"Nova oferta publicada: {oferta.titol}",  # subject
+                    missatge_text_pla,
+                    [],  # a tu mateix o un correu genèric
+                    html_missatge,
+                    emails  # llista de BCC
+                ),
+                delay=0
+            )
                 
             self.message_user(
                     request,
