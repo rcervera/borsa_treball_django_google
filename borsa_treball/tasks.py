@@ -9,7 +9,7 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMultiAlternatives
 
 @task()
 def enviar_email_async(subject, message, destinatari_list, html_message, bcc_list=None):
@@ -24,14 +24,17 @@ def enviar_email_async(subject, message, destinatari_list, html_message, bcc_lis
         bcc_str = ', '.join(bcc_list)
         logger.info(f"Enviant correu a: {destinatari_str} BCC: {bcc_str}")
 
-        email = EmailMessage(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
+        email = EmailMultiAlternatives(
+            subject=subject,
+            body=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
             to=destinatari_list,
             bcc=bcc_list
         )
-        email.content_subtype = "html"  # perquè s'enviï en HTML
+
+        if html_message:
+            email.attach_alternative(html_message, "text/html")
+
         email.send(fail_silently=False)
 
         logger.info(f"Email enviat correctament a: {destinatari_str}")
