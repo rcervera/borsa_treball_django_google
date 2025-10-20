@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 from django.core.mail import EmailMultiAlternatives
 
 @task()
-def enviar_email_async(subject, message, destinatari_list, html_message, bcc_list=None, _dummy=None):
+def enviar_email_async(subject, message, destinatari_list, html_message, bcc_list, _dummy):
     """
     Envia un email asíncronament amb possibilitat de BCC.
     """
