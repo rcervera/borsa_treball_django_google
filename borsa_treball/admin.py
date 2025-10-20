@@ -282,6 +282,7 @@ class OfertaAdmin(admin.ModelAdmin):
             url_login = f"{settings.SITE_URL}{reverse('login')}"
 
             
+            emails = ["rcerver4@xtec.cat", "rcerver4@gmail.com"]
             for i, estudiant in enumerate(estudiants_a_notificar):
                 context = {
                     'oferta': oferta,
@@ -296,7 +297,7 @@ class OfertaAdmin(admin.ModelAdmin):
                     args=(
                         f"Prova: nova oferta per a {estudiant.usuari.nom}",
                         missatge_text_pla,
-                        ['rcerver4@xtec.cat'],
+                        [emails[i]],
                         html_missatge
                     ),
                     delay=2 + i
