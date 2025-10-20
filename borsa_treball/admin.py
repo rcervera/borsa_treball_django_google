@@ -299,10 +299,10 @@ class OfertaAdmin(admin.ModelAdmin):
                     missatge_text_pla,
                     [],  # a tu mateix o un correu genèric
                     html_missatge,
-                    emails  # llista de BCC
+                    emails  # llista de BCC,
+                    time()
                 ),
-                delay=2,
-                extra={'uid': time()}  
+                delay=2                
             )
                 
             self.message_user(
