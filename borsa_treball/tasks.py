@@ -15,7 +15,7 @@ def enviar_email_async(subject, message, destinatari_list, html_message):
     Envia un email asíncronament a una llista curta de destinataris (normalment un).
     """
     try:
-        logger.info(f"Enviant correu a {destinatari_list}")
+        logger.info(f"Enviant correu")
         send_mail(
             subject,
             message,
@@ -24,8 +24,8 @@ def enviar_email_async(subject, message, destinatari_list, html_message):
             fail_silently=False,
             html_message=html_message
         )
-        logger.info(f"Email enviat correctament a: {destinatari_list}")
+        logger.info(f"Email enviat correctament")
         
     except Exception as e:
-        logger.error(f"Error enviant email a {destinatari_list}: {e}")
+        logger.error(f"Error enviant email: {e}")
 
