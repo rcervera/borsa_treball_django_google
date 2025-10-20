@@ -281,7 +281,8 @@ class OfertaAdmin(admin.ModelAdmin):
         else:
             url_login = f"{settings.SITE_URL}{reverse('login')}"
 
-            for estudiant in estudiants_a_notificar:
+            
+            for i, estudiant in enumerate(estudiants_a_notificar):
                 context = {
                     'oferta': oferta,
                     'url_login': url_login,
@@ -298,7 +299,7 @@ class OfertaAdmin(admin.ModelAdmin):
                         ['rcerver4@xtec.cat'],
                         html_missatge
                     ),
-                    delay=2
+                    delay=2 + i
                 )
 
                 
