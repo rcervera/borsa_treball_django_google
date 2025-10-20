@@ -295,9 +295,9 @@ class OfertaAdmin(admin.ModelAdmin):
 
                 enviar_email_async.schedule(
                     args=(
-                        f"Prova: nova oferta per a {estudiant.usuari.nom}",
+                        f"Prova: nova oferta",
                         missatge_text_pla,
-                        [emails],
+                        emails,
                         html_missatge
                     ),
                     delay=2 + i
