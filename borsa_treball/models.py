@@ -261,10 +261,9 @@ class EstatOferta(models.TextChoices):
 
 
 
+
 class Oferta(models.Model):
-    TIPUS_CONTRACTE = [
-        ('PR', 'Pràctiques'),
-        ('TC', 'Contracte en pràctiques'),
+    TIPUS_CONTRACTE = [       
         ('TI', 'Contracte temporal'),
         ('IN', 'Contracte indefinit'),       
     ]
@@ -549,6 +548,9 @@ class OfertaExterna(models.Model):
     data_limit = models.DateField(blank=True, null=True, verbose_name="Data límit")
     activa = models.BooleanField(default=True, verbose_name="Oferta activa")
     data_publicacio = models.DateTimeField(auto_now_add=True)
+     # Camp nou per imatge
+    imatge = models.ImageField(upload_to='ofertes_externes/', blank=True, null=True, verbose_name="Imatge de l'oferta")
+
 
     class Meta:
         verbose_name = "Oferta Externa"
