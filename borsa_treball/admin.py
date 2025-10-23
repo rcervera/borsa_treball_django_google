@@ -16,6 +16,7 @@ from django.utils.html import strip_tags
 from .tasks import enviar_email_async
 from time import time
 
+from django.core.mail import EmailMultiAlternatives
 
 class UsuariAdmin(UserAdmin):
     model = Usuari
@@ -293,17 +294,26 @@ class OfertaAdmin(admin.ModelAdmin):
             # emails = [e.usuari.email for e in estudiants_a_notificar]
             emails = ["rcerver4@xtec.cat", "rcerver4@gmail.com"]
             # Envia un únic email amb BCC
-            enviar_email_async.schedule(
-                args=(
-                    f"Nova oferta publicada: {oferta.titol}",  # subject
-                    missatge_text_pla,
-                    [],  # a tu mateix o un correu genèric
-                    html_missatge,
-                    emails  # llista de BCC,                    
-                ),
-                delay=2                
-            )
+
+            # enviar_email_async.schedule(
+            #    args=(
+            #        f"Nova oferta publicada: {oferta.titol}",  # subject
+            #        missatge_text_pla,
+            #        [],  # a tu mateix o un correu genèric
+            #        html_missatge,
+            #        emails  # llista de BCC,                    
+            #    ),
+            #    delay=2                
+            # )
                 
+            email = EmailMultiAlternatives(
+                subject=f"Nova oferta publicada: {oferta.titol}",
+                body=missatge_text_pla,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[],
+                bcc=emails
+            )
+
             self.message_user(
                     request,
                     f"S'han engegat les tasques d'enviament per a {len(estudiants_a_notificar)} estudiants.\n"
