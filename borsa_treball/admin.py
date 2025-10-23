@@ -319,13 +319,15 @@ class OfertaAdmin(admin.ModelAdmin):
             # email.send(fail_silently=False)
 
             enqueue(
-                    enviar_email_async,
+                enviar_email_async,
+                args=(
                     f"Nova oferta publicada: {oferta.titol}",  # subject
                     missatge_text_pla,                         # body text
                     [],                                        # destinatari principal
                     html_missatge,                             # body HTML
                     emails                                     # BCC
                 )
+            )
 
             self.message_user(
                     request,
