@@ -17,7 +17,7 @@ from .tasks import enviar_email_async
 from time import time
 
 from django.core.mail import EmailMultiAlternatives
-from huey.contrib.djhuey import enqueue
+from borsa_treball.huey import huey
 
 class UsuariAdmin(UserAdmin):
     model = Usuari
@@ -318,16 +318,14 @@ class OfertaAdmin(admin.ModelAdmin):
             # email.attach_alternative(html_missatge, "text/html")  # per enviar versió HTML
             # email.send(fail_silently=False)
 
-            enqueue(
-                    enviar_email_async,
-                    (
-                        f"Nova oferta publicada: {oferta.titol}",  # subject
-                        missatge_text_pla,                         # body text
-                        [],                                        # destinatari principal
-                        html_missatge,                             # body HTML
-                        emails                                     # BCC
-                    )
-                )
+            huey.enqueue(
+                enviar_email_async,               # el task
+                f"Nova oferta publicada: {oferta.titol}",  # subject
+                missatge_text_pla,                         # body text
+                [],                                        # destinatari principal
+                html_missatge,                             # body HTML
+                emails                                     # BCC
+            )
 
             self.message_user(
                     request,
