@@ -296,16 +296,16 @@ class OfertaAdmin(admin.ModelAdmin):
             emails = ["rcerver4@xtec.cat", "rcerver4@gmail.com"]
             # Envia un únic email amb BCC
 
-            # enviar_email_async.schedule(
-            #    args=(
-            #        f"Nova oferta publicada: {oferta.titol}",  # subject
-            #        missatge_text_pla,
-            #        [],  # a tu mateix o un correu genèric
-            #        html_missatge,
-            #        emails  # llista de BCC,                    
-            #    ),
-            #    delay=2                
-            # )
+            enviar_email_async.schedule(
+                args=(
+                    f"Nova oferta publicada: {oferta.titol}",  # subject
+                    missatge_text_pla,
+                    [],  # a tu mateix o un correu genèric
+                    html_missatge,
+                    emails  # llista de BCC,                    
+                ),
+                delay=0                
+             )
                 
             #email = EmailMultiAlternatives(
             #    subject=f"Nova oferta publicada: {oferta.titol}",
@@ -318,14 +318,14 @@ class OfertaAdmin(admin.ModelAdmin):
             # email.attach_alternative(html_missatge, "text/html")  # per enviar versió HTML
             # email.send(fail_silently=False)
 
-            huey.enqueue(
-                enviar_email_async,               # el task
-                f"Nova oferta publicada: {oferta.titol}",  # subject
-                missatge_text_pla,                         # body text
-                [],                                        # destinatari principal
-                html_missatge,                             # body HTML
-                emails                                     # BCC
-            )
+            # huey.enqueue(
+            #    enviar_email_async,               # el task
+            #    f"Nova oferta publicada: {oferta.titol}",  # subject
+            #    missatge_text_pla,                         # body text
+            #    [],                                        # destinatari principal
+            #    html_missatge,                             # body HTML
+            #    emails                                     # BCC
+            #)
 
             self.message_user(
                     request,
