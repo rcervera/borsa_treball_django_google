@@ -459,14 +459,23 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% if oferta.link %}
-                                    <a href="{{ oferta.link }}" target="_blank">
-                                        <i class="bi bi-box-arrow-up-right me-1"></i>Veure oferta
-                                    </a>
-                                {% else %}
-                                    <span class="text-muted">No disponible</span>
-                                {% endif %}
+                                <div class="d-flex align-items-center gap-2">
+                                    {% if oferta.link %}
+                                        <a href="{{ oferta.link }}" target="_blank" class="d-flex align-items-center">
+                                            <i class="bi bi-box-arrow-up-right me-1"></i>Veure oferta
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted">No disponible</span>
+                                    {% endif %}
+
+                                    {% if oferta.imatge %}
+                                        <a href="{{ oferta.imatge.url }}" target="_blank">
+                                            <img src="{{ oferta.imatge.url }}" alt="{{ oferta.titol }}" class="user-avatar" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">
+                                        </a>
+                                    {% endif %}
+                                </div>
                             </td>
+
                         </tr>
                         {% endfor %}
                     </tbody>
