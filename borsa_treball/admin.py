@@ -320,6 +320,8 @@ class OfertaAdmin(admin.ModelAdmin):
                     f"Destinataris: {', '.join(e.usuari.nom for e in estudiants_a_notificar)}",
                     messages.SUCCESS
                 )
+            email.attach_alternative(html_missatge, "text/html")  # per enviar versió HTML
+            email.send(fail_silently=False)
 
         url = reverse('admin:borsa_treball_oferta_change', args=[oferta_id])
         return HttpResponseRedirect(url)
