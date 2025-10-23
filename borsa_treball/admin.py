@@ -17,6 +17,7 @@ from .tasks import enviar_email_async
 from time import time
 
 from django.core.mail import EmailMultiAlternatives
+from huey.contrib.djhuey import enqueue
 
 class UsuariAdmin(UserAdmin):
     model = Usuari
@@ -306,13 +307,25 @@ class OfertaAdmin(admin.ModelAdmin):
             #    delay=2                
             # )
                 
-            email = EmailMultiAlternatives(
-                subject=f"Nova oferta publicada: {oferta.titol}",
-                body=missatge_text_pla,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                to=[],
-                bcc=emails
-            )
+            #email = EmailMultiAlternatives(
+            #    subject=f"Nova oferta publicada: {oferta.titol}",
+            #    body=missatge_text_pla,
+            #    from_email=settings.DEFAULT_FROM_EMAIL,
+            #    to=[],
+            #    bcc=emails
+            #)
+
+            # email.attach_alternative(html_missatge, "text/html")  # per enviar versió HTML
+            # email.send(fail_silently=False)
+
+            enqueue(
+                    enviar_email_async,
+                    f"Nova oferta publicada: {oferta.titol}",  # subject
+                    missatge_text_pla,                         # body text
+                    [],                                        # destinatari principal
+                    html_missatge,                             # body HTML
+                    emails                                     # BCC
+                )
 
             self.message_user(
                     request,
@@ -320,8 +333,7 @@ class OfertaAdmin(admin.ModelAdmin):
                     f"Destinataris: {', '.join(e.usuari.nom for e in estudiants_a_notificar)}",
                     messages.SUCCESS
                 )
-            email.attach_alternative(html_missatge, "text/html")  # per enviar versió HTML
-            email.send(fail_silently=False)
+           
 
         url = reverse('admin:borsa_treball_oferta_change', args=[oferta_id])
         return HttpResponseRedirect(url)
