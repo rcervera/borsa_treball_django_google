@@ -85,6 +85,9 @@
                     <div class="mb-4">
                         <label for="password" class="form-label">
                             <i class="bi bi-lock me-2"></i>Contrasenya
+                             <a href="{% url 'password_reset' %}" class="forgot-password-link">
+                                He oblidat la contrasenya
+                            </a>
                         </label>
                         <div class="input-group">                          
                             <input type="password" 
@@ -99,7 +102,7 @@
                     <!-- Remember Me & Forgot Password -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div class="form-check">
-                            <a href="/password-reset/">He oblidat la mevacontrasenya</a>
+                           
                         </div>
                         
                     </div>
