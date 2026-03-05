@@ -526,3 +526,16 @@ body {
 .funcio-item:hover {
     background: linear-gradient(135deg, #c0c0c0 0%, #a9a9a9 100%);
 }
+
+
+.forgot-password-link {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.forgot-password-link:hover {
+    color: #0d6efd;
+    text-decoration: underline;
+}
