@@ -296,16 +296,7 @@ class OfertaAdmin(admin.ModelAdmin):
             emails = ["rcerver4@xtec.cat", "rcerver4@gmail.com"]
             # Envia un únic email amb BCC
 
-            enviar_email_async.schedule(
-                args=(
-                    f"Nova oferta publicada: {oferta.titol}",  # subject
-                    missatge_text_pla,
-                    [],  # a tu mateix o un correu genèric
-                    html_missatge,
-                    emails  # llista de BCC,                    
-                ),
-                delay=0                
-             )
+
                 
             #email = EmailMultiAlternatives(
             #    subject=f"Nova oferta publicada: {oferta.titol}",
