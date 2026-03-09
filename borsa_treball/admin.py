@@ -156,7 +156,7 @@ class OfertaAdmin(admin.ModelAdmin):
 
     list_display = (
         'titol', 'empresa', 'estat_colored',
-        'data_publicacio', 'data_limit', 'descripcio_curta'
+        'data_publicacio', 'data_limit', 'descripcio_curta', 'numero_vacants'
     )
     search_fields = ('titol', 'empresa__nom_comercial', 'descripcio')
     list_filter = ('tipus_contracte', 'jornada', 'estat', 'data_publicacio')
