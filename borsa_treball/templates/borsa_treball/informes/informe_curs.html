@@ -285,47 +285,30 @@
     </div>
 
 
-    <h2 class="d-flex align-items-center">
-        
-        <span>Resum general</span>
-    </h2> 
-    <div class="row">
-        <div class="col-md-4 mb-3">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <h3 class="card-title">{{ num_ofertes }}</h3>
-                    <p class="card-text">Noves Ofertes Publicades</p>
-                </div>
-            </div>            
-        </div>
-
-         <div class="col-md-4 mb-3">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <h3 class="card-title">{{ num_vacants }}</h3>
-                    <p class="card-text">Total de vacants</p>
-                </div>
-            </div>            
-        </div>
-       
-        <div class="col-md-4 mb-3">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <h3 class="card-title">{{ num_alumnes_nous }}</h3>
-                    <p class="card-text">Nous Estudiants Inscrits</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-3">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <h3 class="card-title">{{ num_empreses_noves }}</h3>
-                    <p class="card-text">Noves Empreses Registrades</p>
-                </div>
-            </div>
-        </div>
+    <!-- RESUM GENERAL -->
+  <div class="seccio-bloc">
+    <p class="seccio-titol">Resum general</p>
+    <div class="kpi-grid kpi-grid-4">
+      <div class="kpi-card">
+        <div class="kpi-num">{{ num_ofertes }}</div>
+        <div class="kpi-label">Noves ofertes publicades</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num">{{ num_vacants }}</div>
+        <div class="kpi-label">Total de vacants</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num">{{ num_alumnes_nous }}</div>
+        <div class="kpi-label">Nous estudiants inscrits</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num">{{ num_empreses_noves }}</div>
+        <div class="kpi-label">Noves empreses registrades</div>
+      </div>
     </div>
-    
+  </div>
+
+  <hr class="divisor">
     <h2 class="d-flex align-items-center">
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-bar-chart me-3" viewBox="0 0 16 16">
             <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002-.014.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7 7 0 0 0 5 9c-4 0-5 3-5 4q0 1 1 1h4.216A2.24 2.24 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816M4.92 10A5.5 5.5 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4"/>
