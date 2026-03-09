@@ -3,7 +3,7 @@
 from django.shortcuts import render
 from django.utils import timezone
 from datetime import date
-from django.db.models import Count
+from django.db.models import Count, Sum
 from .models import Oferta, Estudiant, Empresa, Candidatura, EstatCandidatura
 import json # Importem json per si calgués, encara que el tag 'json_script' ho gestiona internament
 from django.contrib.auth.decorators import login_required
@@ -38,7 +38,8 @@ def informe_curs_view(request):
     # --- Càlculs per a l'informe principal (període actual) ---
       
     ofertes_period = Oferta.objects.filter(data_publicacio__range=[start_date, end_date])
-    num_ofertes = ofertes_period.count()
+    num_ofertes = ofertes_period.count()   
+    num_vacants = ofertes_period.aggregate(total=Sum('numero_vacants'))['total'] or 0
     num_alumnes_nous = Estudiant.objects.filter(usuari__data_registre__date__range=[start_date, end_date]).count()
     num_empreses_noves = Empresa.objects.filter(usuari__data_registre__date__range=[start_date, end_date]).count()
     num_candidatures = Candidatura.objects.filter(data_candidatura__date__range=[start_date, end_date]).count()
@@ -98,6 +99,7 @@ def informe_curs_view(request):
         'start_date': start_date,
         'end_date': end_date,
         'num_ofertes': num_ofertes,
+        'num_vacants': num_vacants,
         'num_alumnes_nous': num_alumnes_nous,
         'num_empreses_noves': num_empreses_noves,
         'num_candidatures': num_candidatures,
