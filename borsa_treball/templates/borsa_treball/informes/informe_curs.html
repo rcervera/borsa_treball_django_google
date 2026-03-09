@@ -342,60 +342,65 @@
         </div>
     </div>
     
-    <hr class="my-4">
-    <h2 class="d-flex align-items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-graph-up me-3" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M0 0h1v15h15v1H0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5"/>
-        </svg>
-        <span>Anàlisis Addicionals del Període Actual</span>
-    </h2>
-    <div class="row">
-        <div class="col-lg-4 mb-4">
-            <h5>Ofertes per Tipus de Contracte</h5>
-            {% if ofertes_per_tipus_contracte %}
-                <ul class="list-group">
-                    {% for item in ofertes_per_tipus_contracte %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            {{ item.nom_llegible }}
-                            <span class="badge bg-primary rounded-pill">{{ item.count }}</span>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="text-muted">No hi ha dades disponibles.</p>
-            {% endif %}
-        </div>
-        <div class="col-lg-4 mb-4">
-            <h5>Top 5 Empreses amb Més Ofertes</h5>
-            {% if top_empreses %}
-                 <ul class="list-group">
-                    {% for item in top_empreses %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            {{ item.empresa__nom_comercial }}
-                            <span class="badge bg-primary rounded-pill">{{ item.count }}</span>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="text-muted">No hi ha dades disponibles.</p>
-            {% endif %}
-        </div>
-        <div class="col-lg-4 mb-4">
-            <h5>Ofertes per Família Professional</h5>
-            {% if ofertes_per_familia %}
-                 <ul class="list-group">
-                    {% for item in ofertes_per_familia %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            {{ item.cicles__familia__nom }}
-                            <span class="badge bg-primary rounded-pill">{{ item.count }}</span>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="text-muted">No hi ha dades disponibles.</p>
-            {% endif %}
-        </div>
+    
+    <hr class="divisor">
+
+  <!-- ANÀLISI ADDICIONAL -->
+  <div class="seccio-bloc">
+    <p class="seccio-titol">Anàlisi addicional del període actual</p>
+    <div class="analisi-grid">
+
+      <div class="analisi-bloc">
+        <h5>Per tipus de contracte</h5>
+        {% if ofertes_per_tipus_contracte %}
+          <ul class="analisi-list">
+            {% for item in ofertes_per_tipus_contracte %}
+              <li>
+                <span>{{ item.nom_llegible }}</span>
+                <span class="analisi-badge">{{ item.count }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-buit">Sense dades disponibles.</p>
+        {% endif %}
+      </div>
+
+      <div class="analisi-bloc">
+        <h5>Top 5 empreses</h5>
+        {% if top_empreses %}
+          <ul class="analisi-list">
+            {% for item in top_empreses %}
+              <li>
+                <span>{{ item.empresa__nom_comercial }}</span>
+                <span class="analisi-badge">{{ item.count }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-buit">Sense dades disponibles.</p>
+        {% endif %}
+      </div>
+
+      <div class="analisi-bloc">
+        <h5>Per família professional</h5>
+        {% if ofertes_per_familia %}
+          <ul class="analisi-list">
+            {% for item in ofertes_per_familia %}
+              <li>
+                <span>{{ item.cicles__familia__nom }}</span>
+                <span class="analisi-badge">{{ item.count }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-buit">Sense dades disponibles.</p>
+        {% endif %}
+      </div>
+
     </div>
+  </div>
+
 
 </div> {{ chart_data|json_script:"chartData" }}
 
