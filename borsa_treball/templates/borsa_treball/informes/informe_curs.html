@@ -1,11 +1,269 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1>Informe d'Activitat del Curs Escolar</h1>
-    <p class="text-muted">Informe generat pel període del {{ start_date|date:"d/m/Y" }} al {{ end_date|date:"d/m/Y" }}</p>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
 
-    <div class="card my-4">
+  .informe-wrapper {
+    font-family: 'DM Sans', sans-serif;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+    color: #1a1a2e;
+  }
+
+  /* HEADER */
+  .informe-header {
+    border-bottom: 2px solid #1a1a2e;
+    padding-bottom: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .informe-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.4rem;
+    font-weight: 400;
+    margin: 0 0 0.25rem;
+    letter-spacing: -0.02em;
+    color: #1a1a2e;
+  }
+
+  .informe-header .periode {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: #6b7280;
+    letter-spacing: 0.02em;
+  }
+
+  /* FILTRE DE DATES */
+  .filtre-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .filtre-card label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6b7280;
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  .filtre-card input[type="date"] {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 0.55rem 0.85rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: #1a1a2e;
+    background: #fff;
+    width: 100%;
+    transition: border-color 0.2s;
+  }
+
+  .filtre-card input[type="date"]:focus {
+    outline: none;
+    border-color: #1a1a2e;
+  }
+
+  .btn-generar {
+    background: #1a1a2e;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.5rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s, transform 0.1s;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-generar:hover {
+    background: #2d2d4e;
+    transform: translateY(-1px);
+  }
+
+  /* SECCIONS */
+  .seccio-titol {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #9ca3af;
+    margin: 0 0 1.2rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .seccio-bloc {
+    margin-bottom: 3rem;
+  }
+
+  /* MÈTRIQUES — KPI CARDS */
+  .kpi-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .kpi-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .kpi-grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+  .kpi-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem 1.75rem;
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+
+  .kpi-card:hover {
+    box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+  }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: #1a1a2e;
+    opacity: 0.12;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .kpi-card.accent::before {
+    opacity: 1;
+    background: #059669;
+  }
+
+  .kpi-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.6rem;
+    font-weight: 400;
+    color: #1a1a2e;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .kpi-card.accent .kpi-num {
+    color: #059669;
+  }
+
+  .kpi-label {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #6b7280;
+    line-height: 1.3;
+  }
+
+  /* DIVISOR */
+  .divisor {
+    border: none;
+    border-top: 1px solid #f3f4f6;
+    margin: 2.5rem 0;
+  }
+
+  /* GRÀFIC */
+  .chart-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 2rem;
+  }
+
+  /* TAULES ANÀLISI */
+  .analisi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .analisi-bloc h5 {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #374151;
+    margin-bottom: 0.85rem;
+  }
+
+  .analisi-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .analisi-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 0.88rem;
+    color: #374151;
+  }
+
+  .analisi-list li:last-child {
+    border-bottom: none;
+  }
+
+  .analisi-badge {
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    min-width: 28px;
+    text-align: center;
+  }
+
+  .text-buit {
+    font-size: 0.88rem;
+    color: #9ca3af;
+    font-style: italic;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .kpi-grid-3,
+    .kpi-grid-4,
+    .analisi-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .informe-header h1 { font-size: 1.8rem; }
+  }
+
+  @media (max-width: 480px) {
+    .kpi-grid-3,
+    .kpi-grid-4,
+    .analisi-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+
+<div class="informe-wrapper">
+
+  <!-- CAPÇALERA -->
+  <div class="informe-header">
+    <h1>Informe d'Activitat del Curs Escolar</h1>
+    <p class="periode">Període: {{ start_date|date:"d/m/Y" }} — {{ end_date|date:"d/m/Y" }}</p>
+  </div>
+
+
+  <div class="card my-4">
         <div class="card-body">
             <h5 class="card-title">Seleccionar Període</h5>
             <form method="get" action="{% url 'informe_curs' %}">
