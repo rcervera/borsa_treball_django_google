@@ -295,6 +295,8 @@
 const ofertaId = {{ oferta.id }};
 let ofertaEstat = "{{ oferta.estat }}"; // 'AC' (Activa) o 'TC' (Tancada)
 let ofertaValoracio = "{{ oferta.valoracio_empresa|default:'' }}"; // Valoració actual de l'oferta
+let ofertaQualitat = "{{ oferta.qualitat_candidats|default:'' }}";
+let ofertaGestio = "{{ oferta.gestio_proces|default:'' }}";
 
 let currentPage = 1;
 let currentSearch = "{{ cerca }}";
@@ -399,6 +401,14 @@ function updateOfferToggleButton() {
         if (ofertaValoracio && valoracioTextarea.value === '') {
             valoracioTextarea.value = ofertaValoracio;
         }
+        if (ofertaQualitat && qualitatSelect.value === "") {
+            qualitatSelect.value = ofertaQualitat;
+        }
+        if (ofertaGestio && gestioSelect.value === "") {
+            gestioSelect.value = ofertaGestio;
+        }
+
+
     } else { // 'AC' = Activa
         // valoracioTextarea.value = ofertaValoracio;
         toggleOfferStatusBtn.textContent = 'Tancar Oferta';
@@ -906,6 +916,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 // Actualitzar la valoració de l'oferta si s'ha tancat
                 ofertaValoracio = data.valoracio || ''; // Assegurar que s'actualitza amb el valor retornat
+                ofertaQualitat = data.qualitat_candidats || '';
+                ofertaGestio = data.gestio_proces || '';
+                
             } else {
                 if (typeof window.showErrorToast === 'function') {
                         showErrorToast(data.error || 'Error en canviar l\'estat de l\'oferta');

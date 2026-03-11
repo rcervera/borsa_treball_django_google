@@ -599,6 +599,7 @@ def toggle_tancament_oferta(request, oferta_id):
         new_estat = data.get('estat')
         valoracio = data.get('valoracio', '').strip() # Get valoracio, default to empty string and strip whitespace
 
+
         # Calculate current stats for validation
         stats = oferta.candidatures.filter(activa=True).aggregate(
                 total=Count('id'),
@@ -648,6 +649,8 @@ def toggle_tancament_oferta(request, oferta_id):
             'estat': oferta.estat,
             'oferta_id': oferta.id,
             'valoracio': oferta.valoracio_empresa,  # Return the updated valoracio
+            "qualitat_candidats": oferta.qualitat_candidats,
+            "gestio_proces": oferta.gestio_proces,
             'stats': stats
         })
             
@@ -1253,6 +1256,8 @@ def api_candidatures_oferta(request, oferta_id):
             'data_limit': oferta.data_limit.isoformat() if oferta.data_limit else None,
             'estat': oferta.estat,
             'valoracio': oferta.valoracio_empresa,
+            'qualitat_candidats': oferta.qualitat_candidats,
+            'gestio_proces': oferta.gestio_proces,
         },
         'candidatures': candidatures_data,
         'stats': stats,
