@@ -198,10 +198,49 @@
         <div class="card shadow-lg border-0 mt-4 mb-4">
             <div class="card-body p-4">
                 <h5 class="text-secondary mb-3">Tancament de l'Oferta</h5>
+
+                
                 <div class="mb-3">
                     <label for="valoracioEmpresa" class="form-label">
                         <i class="bi bi-chat me-2"></i>Valoració de l'Empresa *
                     </label>
+                    <div class="row mb-3">
+
+                        <div class="col-md-6">
+                            <label for="qualitatCandidats" class="form-label">
+                                <i class="bi bi-people me-2"></i>Qualitat dels candidats *
+                            </label>
+                            <select class="form-select" id="qualitatCandidats">
+                                <option value="">Selecciona valoració</option>
+                                <option value="1">1 - Molt baixa</option>
+                                <option value="2">2</option>
+                                <option value="3">3 - Correcta</option>
+                                <option value="4">4</option>
+                                <option value="5">5 - Excel·lent</option>
+                            </select>
+                            <div id="qualitatError" class="text-danger mt-1" style="display:none;">
+                                Aquesta valoració és obligatòria.
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="gestioProces" class="form-label">
+                                <i class="bi bi-gear me-2"></i>Gestió del procés *
+                            </label>
+                            <select class="form-select" id="gestioProces">
+                                <option value="">Selecciona valoració</option>
+                                <option value="1">1 - Molt dolenta</option>
+                                <option value="2">2</option>
+                                <option value="3">3 - Correcta</option>
+                                <option value="4">4</option>
+                                <option value="5">5 - Excel·lent</option>
+                            </select>
+                            <div id="gestioError" class="text-danger mt-1" style="display:none;">
+                                Aquesta valoració és obligatòria.
+                            </div>
+                        </div>
+
+                    </div>
                     <textarea class="form-control" id="valoracioEmpresa" rows="4" placeholder="Escriu aquí la teva valoració sobre el procés de selecció i els candidats..."></textarea>
                     <div id="valoracioError" class="text-danger mt-1" style="display: none;">La valoració és obligatòria per tancar l'oferta.</div>
                 </div>

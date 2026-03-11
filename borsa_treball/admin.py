@@ -97,6 +97,7 @@ class EstudiantAdmin(admin.ModelAdmin):
     list_filter = (FamiliaProfessionalFilter, EstudiPerCicleFilter,)
     inlines = [EstudiEstudiantInline, CandidaturaInline]
     
+    
     def get_nom_complet(self, obj):
         return obj.usuari.get_full_name()
     get_nom_complet.short_description = 'Nom complet'
