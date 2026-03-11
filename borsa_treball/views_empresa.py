@@ -598,7 +598,8 @@ def toggle_tancament_oferta(request, oferta_id):
         data = json.loads(request.body)
         new_estat = data.get('estat')
         valoracio = data.get('valoracio', '').strip() # Get valoracio, default to empty string and strip whitespace
-
+        qualitat_candidats = data.get('qualitat_candidats', '').strip()
+        gestio_proces = data.get('gestio_proces', '').strip()
 
         # Calculate current stats for validation
         stats = oferta.candidatures.filter(activa=True).aggregate(
@@ -612,13 +613,24 @@ def toggle_tancament_oferta(request, oferta_id):
         )
 
         if new_estat == 'TC': # If the new state is 'Tancada'
-            if not valoracio:
+            if not valoracio :
                 return JsonResponse({
                     'success': False,
                     'error': 'La valoració és obligatòria per tancar l\'oferta.'
                 }, status=400) # Bad Request
             
+            if not qualitat_candidats:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'La valoració de la qualitat dels candidats és obligatòria per tancar l\'oferta.'
+                }, status=400) # Bad Request
             
+            if not gestio_proces:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'La valoració de la gestió del procés és obligatòria per tancar l\'oferta.'
+                }, status=400) # Bad Request
+
 
             # Check if all active candidatures are either 'Contractada' or 'Rebutjada'
             if stats['total'] != (stats['rebutjades'] + stats['contratades']):
@@ -630,6 +642,9 @@ def toggle_tancament_oferta(request, oferta_id):
             # If all checks pass, update the oferta
             oferta.estat = 'TC'
             oferta.valoracio_empresa = valoracio # Save the valoracio
+            oferta.qualitat_candidats = qualitat_candidats
+            oferta.gestio_proces = gestio_proces
+            
             status_text = "tancada"
         elif new_estat == 'AC': # If the new state is 'Activa' (re-opening)
             oferta.estat = 'AC'
