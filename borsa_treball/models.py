@@ -108,6 +108,7 @@ class Estudiant(models.Model):
     usuari = models.OneToOneField(Usuari, on_delete=models.CASCADE, primary_key=True)
     dni = models.CharField(max_length=9, unique=True)  
     carnet_conduir = models.BooleanField(default=False)
+    valoracio_responsable = models.TextField(blank=True, null=True)
            
     def clean(self):
         if self.usuari.tipus != 'EST':
