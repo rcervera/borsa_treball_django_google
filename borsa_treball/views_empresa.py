@@ -644,7 +644,7 @@ def toggle_tancament_oferta(request, oferta_id):
             oferta.valoracio_empresa = valoracio # Save the valoracio
             oferta.qualitat_candidats = qualitat_candidats
             oferta.gestio_proces = gestio_proces
-            
+
             status_text = "tancada"
         elif new_estat == 'AC': # If the new state is 'Activa' (re-opening)
             oferta.estat = 'AC'

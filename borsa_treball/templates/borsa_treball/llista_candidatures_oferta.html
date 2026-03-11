@@ -897,8 +897,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({
                     estat: newOfferStatus,
                     valoracio: newOfferStatus === 'TC' ? valoracio : '',
-                    qualitat_candidats: newOfferStatus === 'TC' ? qualitatSelect.value : null,
-                    gestio_proces: newOfferStatus === 'TC' ? gestioSelect.value : null
+                    qualitat_candidats: newOfferStatus === 'TC' ? qualitatSelect.value : '',
+                    gestio_proces: newOfferStatus === 'TC' ? gestioSelect.value : ''
                 })
             });
             const data = await response.json();
@@ -918,7 +918,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 ofertaValoracio = data.valoracio || ''; // Assegurar que s'actualitza amb el valor retornat
                 ofertaQualitat = data.qualitat_candidats || '';
                 ofertaGestio = data.gestio_proces || '';
-                
+
             } else {
                 if (typeof window.showErrorToast === 'function') {
                         showErrorToast(data.error || 'Error en canviar l\'estat de l\'oferta');
