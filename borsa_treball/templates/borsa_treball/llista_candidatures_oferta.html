@@ -201,14 +201,12 @@
 
                 
                 <div class="mb-3">
-                    <label for="valoracioEmpresa" class="form-label">
-                        <i class="bi bi-chat me-2"></i>Valoració de l'Empresa *
-                    </label>
+                   
                     <div class="row mb-3">
 
                         <div class="col-md-6">
                             <label for="qualitatCandidats" class="form-label">
-                                <i class="bi bi-people me-2"></i>Qualitat dels candidats *
+                                <i class="bi bi-people me-2"></i>Valoració de la Qualitat dels candidats *
                             </label>
                             <select class="form-select" id="qualitatCandidats">
                                 <option value="">Selecciona valoració</option>
@@ -225,7 +223,7 @@
 
                         <div class="col-md-6">
                             <label for="gestioProces" class="form-label">
-                                <i class="bi bi-gear me-2"></i>Gestió del procés *
+                                <i class="bi bi-gear me-2"></i>Valoració de la Gestió del procés *
                             </label>
                             <select class="form-select" id="gestioProces">
                                 <option value="">Selecciona valoració</option>
@@ -241,6 +239,9 @@
                         </div>
 
                     </div>
+                     <label for="valoracioEmpresa" class="form-label">
+                        <i class="bi bi-chat me-2"></i>Altres comentaris i valoració general de l'oferta (obligatori per tancar) *
+                    </label>
                     <textarea class="form-control" id="valoracioEmpresa" rows="4" placeholder="Escriu aquí la teva valoració sobre el procés de selecció i els candidats..."></textarea>
                     <div id="valoracioError" class="text-danger mt-1" style="display: none;">La valoració és obligatòria per tancar l'oferta.</div>
                 </div>
@@ -312,6 +313,13 @@ let currentStats = { // Variable per emmagatzemar les estadístiques del servido
 // --- Elements del DOM per a la gestió de l'oferta ---
 const valoracioTextarea = document.getElementById('valoracioEmpresa');
 const valoracioError = document.getElementById('valoracioError');
+
+const qualitatSelect = document.getElementById('qualitatCandidats');
+const gestioSelect = document.getElementById('gestioProces');
+
+const qualitatError = document.getElementById('qualitatError');
+const gestioError = document.getElementById('gestioError');
+
 const toggleOfferStatusBtn = document.getElementById('toggleOfferStatusBtn');
 const offerStatusHint = document.getElementById('offerStatusHint');
 
@@ -372,6 +380,10 @@ function areAllCandidaturesFinal() {
 // Funció per actualitzar l'estat i el text del botó de l'oferta
 function updateOfferToggleButton() {
     const valoracionFilled = valoracioTextarea.value.trim().length > 0;
+    const qualitatFilled = qualitatSelect.value !== "";
+    const gestioFilled = gestioSelect.value !== "";
+
+
     const allCandidaturesFinal = areAllCandidaturesFinal();
 
     if (ofertaEstat === 'TC') { // 'TC' = Tancada
@@ -380,6 +392,8 @@ function updateOfferToggleButton() {
         toggleOfferStatusBtn.classList.add('btn-warning');
         toggleOfferStatusBtn.disabled = false; // Sempre es pot re-obrir
         valoracioTextarea.disabled = true; // Deshabilitar textarea quan l'oferta està tancada
+        qualitatSelect.disabled = true;
+        gestioSelect.disabled = true;
         valoracioError.style.display = 'none';
         offerStatusHint.textContent = 'L\'oferta està tancada. Pots re-obrir-la en qualsevol moment.';
         if (ofertaValoracio && valoracioTextarea.value === '') {
@@ -391,8 +405,11 @@ function updateOfferToggleButton() {
         toggleOfferStatusBtn.classList.remove('btn-warning');
         toggleOfferStatusBtn.classList.add('btn-primary');
         valoracioTextarea.disabled = false; // Habilitar textarea quan l'oferta està oberta
+      
+        qualitatSelect.disabled = false;
+        gestioSelect.disabled = false;
         
-        if (valoracionFilled && allCandidaturesFinal) {
+        if (valoracionFilled && qualitatFilled && gestioFilled && allCandidaturesFinal) {
             toggleOfferStatusBtn.disabled = false;
             valoracioError.style.display = 'none';
             offerStatusHint.textContent = 'Totes les condicions per tancar l\'oferta es compleixen.';
@@ -405,6 +422,8 @@ function updateOfferToggleButton() {
                 valoracioError.style.display = 'none';
                 offerStatusHint.textContent = 'Per tancar l\'oferta, totes les candidatures han d\'estar en estat "Contractada" o "Rebutjada".';
             }
+            qualitatError.style.display = qualitatFilled ? 'none' : 'block';
+            gestioError.style.display = gestioFilled ? 'none' : 'block';
         }
     }
 }
@@ -867,7 +886,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({
                     estat: newOfferStatus,
-                    valoracio: newOfferStatus === 'TC' ? valoracio : ''
+                    valoracio: newOfferStatus === 'TC' ? valoracio : '',
+                    qualitat_candidats: newOfferStatus === 'TC' ? qualitatSelect.value : null,
+                    gestio_proces: newOfferStatus === 'TC' ? gestioSelect.value : null
                 })
             });
             const data = await response.json();
