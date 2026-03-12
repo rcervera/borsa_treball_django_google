@@ -613,11 +613,7 @@ def toggle_tancament_oferta(request, oferta_id):
         )
 
         if new_estat == 'TC': # If the new state is 'Tancada'
-            if not valoracio :
-                return JsonResponse({
-                    'success': False,
-                    'error': 'La valoració és obligatòria per tancar l\'oferta.'
-                }, status=400) # Bad Request
+           
             
             if not qualitat_candidats:
                 return JsonResponse({
