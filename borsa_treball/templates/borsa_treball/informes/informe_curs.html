@@ -309,7 +309,7 @@
  <!-- ACTIVITAT DE CANDIDATURES -->
   <div class="seccio-bloc">
     <p class="seccio-titol">Activitat de candidatures</p>
-    <div class="kpi-grid kpi-grid-3">
+    <div class="kpi-grid kpi-grid-4">
       <div class="kpi-card">
         <div class="kpi-num">{{ num_candidatures }}</div>
         <div class="kpi-label">Total de candidatures</div>
@@ -321,6 +321,15 @@
       <div class="kpi-card accent">
         <div class="kpi-num">{{ num_contractats }}</div>
         <div class="kpi-label">Estudiants contractats</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num">{{ mitjana_qualitat_candidats }}</div>
+        <div class="kpi-label">Qualitat mitjana dels candidats (1-5)</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-num">{{ mitjana_gestio_proces }}</div>
+        <div class="kpi-label">Gestió mitjana del procés (1-5)</div>
       </div>
     </div>
   </div>

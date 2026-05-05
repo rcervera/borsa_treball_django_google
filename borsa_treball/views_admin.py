@@ -3,7 +3,7 @@
 from django.shortcuts import render
 from django.utils import timezone
 from datetime import date
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Avg
 from .models import Oferta, Estudiant, Empresa, Candidatura, EstatCandidatura
 import json # Importem json per si calgués, encara que el tag 'json_script' ho gestiona internament
 from django.contrib.auth.decorators import login_required
@@ -47,6 +47,15 @@ def informe_curs_view(request):
         estat=EstatCandidatura.CONTRATADA,
         data_canvi_estat__date__range=[start_date, end_date]
     ).count()
+
+    # --- NOVES MITJANES DE VALORACIÓ D'EMPRESA ---
+    valoracions = ofertes_period.aggregate(
+        mitjana_qualitat=Avg('qualitat_candidats'),
+        mitjana_gestio=Avg('gestio_proces')
+    )
+
+    mitjana_qualitat_candidats = round(valoracions['mitjana_qualitat'], 2) if valoracions['mitjana_qualitat'] else 0
+    mitjana_gestio_proces = round(valoracions['mitjana_gestio'], 2) if valoracions['mitjana_gestio'] else 0
     
     if num_ofertes > 0:
         mitjana_candidatures_per_oferta = round(num_candidatures / num_ofertes, 2)
@@ -109,6 +118,8 @@ def informe_curs_view(request):
         'top_empreses': top_empreses,
         'ofertes_per_familia': ofertes_per_familia,
         'chart_data': chart_data,  # Afegim les dades del gràfic al context
+        'mitjana_qualitat_candidats': mitjana_qualitat_candidats,
+        'mitjana_gestio_proces': mitjana_gestio_proces,
     }
 
     return render(request, 'borsa_treball/informes/informe_curs.html', context)
