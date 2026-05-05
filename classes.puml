@@ -1,0 +1,179 @@
+@startuml
+hide circle
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+' =======================
+' COLORS PER DOMINI
+' =======================
+skinparam package {
+  BackgroundColor<<Usuari>> #E3F2FD
+  BackgroundColor<<Academic>> #E8F5E9
+  BackgroundColor<<Ofertes>> #FFF3E0
+  BackgroundColor<<Sistema>> #F3E5F5
+}
+
+' =======================
+' ENUMS
+' =======================
+enum EstatOferta {
+  OCULT
+  REVISIO
+  ACTIU
+  TANCAT
+}
+
+enum EstatCandidatura {
+  REBUTJADA
+  EN_PROCES
+  PRESELECCIONADA
+  ENTREVISTA
+  CONTRATADA
+}
+
+' =======================
+' PAQUET USUARI
+' =======================
+package "Usuari" <<Usuari>> {
+
+class Usuari {
+  email: string
+  nom: string
+  cognoms: string
+  tipus: string
+  telefon: string
+  data_naixement: date
+  adreca: text
+  is_active: bool
+  is_staff: bool
+}
+
+class Empresa {
+  cif: string
+  nom_comercial: string
+  rao_social: string
+  web: string
+}
+
+class Estudiant {
+  dni: string
+  carnet_conduir: bool
+}
+
+Usuari "1" -- "1" Empresa
+Usuari "1" -- "1" Estudiant
+}
+
+' =======================
+' PAQUET ACADÈMIC
+' =======================
+package "Acadèmic" <<Academic>> {
+
+class Sector {
+  nom: string
+}
+
+class FamiliaProfessional {
+  codi: string
+  nom: string
+}
+
+class Cicle {
+  codi: string
+  nom: string
+  grau: string
+  durada: int
+}
+
+class EstudiEstudiant {
+  any_inici: int
+  any_fi: int
+  centre_estudis: string
+}
+
+Empresa "*" -- "1" Sector
+Cicle "*" -- "1" FamiliaProfessional
+EstudiEstudiant "*" -- "1" Estudiant
+EstudiEstudiant "*" -- "1" Cicle
+
+}
+
+' =======================
+' PAQUET OFERTES
+' =======================
+package "Ofertes" <<Ofertes>> {
+
+class Oferta {
+  titol: string
+  descripcio: text
+  estat: EstatOferta
+  data_limit: date
+  lloc_treball: string
+}
+
+class Funcio {
+  descripcio: text
+  ordre: int
+}
+
+class CapacitatOferta {
+  nom: string
+}
+
+class NivellIdioma {
+  idioma: string
+  nivell: string
+}
+
+class Candidatura {
+  estat: EstatCandidatura
+  data_candidatura: datetime
+  puntuacio: int
+}
+
+Empresa "1" -- "*" Oferta
+Oferta "*" -- "*" Cicle
+Oferta "1" -- "*" Funcio
+Oferta "1" -- "*" CapacitatOferta
+Oferta "1" -- "*" NivellIdioma
+
+Estudiant "1" -- "*" Candidatura
+Oferta "1" -- "*" Candidatura
+
+}
+
+' =======================
+' PAQUET SISTEMA
+' =======================
+package "Sistema" <<Sistema>> {
+
+class Noticia {
+  titol: string
+  destinatari: string
+  visible: bool
+}
+
+class RegistreAuditoria {
+  accio: string
+  model_afectat: string
+  data: datetime
+}
+
+class Missatge {
+  assumpte: string
+  llegit: bool
+}
+
+class OfertaExterna {
+  titol: string
+  link: string
+  activa: bool
+}
+
+Usuari "1" -- "*" RegistreAuditoria
+Usuari "1" -- "*" Missatge : remitent
+Usuari "1" -- "*" Missatge : destinatari
+
+}
+
+@enduml
