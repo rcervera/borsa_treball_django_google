@@ -75,9 +75,13 @@ def informe_curs_view(request):
         'labels': [],
         'num_ofertes': [],
         'num_candidatures': [],
-        'num_contractats': [],
-        'mitjana_qualitat': [],      
-        'mitjana_gestio': [],        
+        'num_contractats': [],            
+    }
+
+    satisfaction_chart_data = {
+        'labels': [],
+        'mitjana_qualitat': [],
+        'mitjana_gestio': [],
     }
 
     for i in range(4):  # Bucle per als últims 4 anys (0, 1, 2, 3)
@@ -115,12 +119,17 @@ def informe_curs_view(request):
         chart_data['num_ofertes'].append(p_ofertes)
         chart_data['num_candidatures'].append(p_candidatures)
         chart_data['num_contractats'].append(p_contractats)
-        chart_data['mitjana_qualitat'].append(p_mitjana_qualitat)
-        chart_data['mitjana_gestio'].append(p_mitjana_gestio)
+       
+        satisfaction_chart_data['labels'].append(label)
+        satisfaction_chart_data['mitjana_qualitat'].append(p_mitjana_qualitat)
+        satisfaction_chart_data['mitjana_gestio'].append(p_mitjana_gestio)
 
     # Invertim les llistes per tenir un ordre cronològic al gràfic (del més antic al més nou)
     for key in chart_data:
         chart_data[key].reverse()
+
+    for key in satisfaction_chart_data:
+        satisfaction_chart_data[key].reverse()
 
     context = {
         'start_date': start_date,
@@ -136,6 +145,7 @@ def informe_curs_view(request):
         'top_empreses': top_empreses,
         'ofertes_per_familia': ofertes_per_familia,
         'chart_data': chart_data,  # Afegim les dades del gràfic al context
+        'satisfaction_chart_data': satisfaction_chart_data,
         'mitjana_qualitat_candidats': mitjana_qualitat_candidats,
         'mitjana_gestio_proces': mitjana_gestio_proces,
     }

@@ -344,6 +344,20 @@
         </div>
     </div>
 
+    <hr class="divisor">
+
+    <div class="seccio-bloc">
+        <p class="seccio-titol">
+            Evolució de satisfacció empresarial — Últims 4 cursos
+        </p>
+
+        <div class="chart-card">
+            <canvas id="satisfactionChart"
+                    style="min-height: 360px; width: 100%;">
+            </canvas>
+        </div>
+    </div>
+
    
     
     
@@ -406,7 +420,10 @@
   </div>
 
 
-</div> {{ chart_data|json_script:"chartData" }}
+</div> 
+{{ chart_data|json_script:"chartData" }}
+
+{{ satisfaction_chart_data|json_script:"satisfactionChartData" }}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -441,21 +458,7 @@
                             backgroundColor: 'rgba(75, 192, 192, 0.6)',
                             borderColor: 'rgba(75, 192, 192, 1)',
                             borderWidth: 1
-                        },
-                        {
-                            label: 'Qualitat candidats (1-5)',
-                            data: chartData.mitjana_qualitat,
-                            type: 'line',
-                            yAxisID: 'y1',
-                            tension: 0.3
-                        },
-                        {
-                            label: 'Gestió procés (1-5)',
-                            data: chartData.mitjana_gestio,
-                            type: 'line',
-                            yAxisID: 'y1',
-                            tension: 0.3
-                        }
+                        },                        
                     ]
                 },
                 options: {
@@ -468,20 +471,7 @@
                                 display: true,
                                 text: 'Quantitat'
                             }
-                        },
-                        y1: {
-                            beginAtZero: true,
-                            position: 'right',
-                            min: 0,
-                            max: 5,
-                            grid: {
-                                drawOnChartArea: false
-                            },
-                            title: {
-                                display: true,
-                                text: 'Valoració (1-5)'
-                            }
-                        },
+                        },                        
                     },
                     plugins: {
                         legend: {
@@ -495,6 +485,93 @@
                 }
             });
         }
-    });
+
+        const satisfactionData = JSON.parse(
+            document.getElementById('satisfactionChartData').textContent
+        );
+
+        const satisfactionCtx = document
+            .getElementById('satisfactionChart')
+            .getContext('2d');
+
+        new Chart(satisfactionCtx, {
+            type: 'line',
+
+            data: {
+                labels: satisfactionData.labels,
+
+                datasets: [
+                    {
+                        label: 'Qualitat candidats',
+                        data: satisfactionData.mitjana_qualitat,
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                        borderWidth: 3,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        tension: 0.35,
+                        fill: true
+                    },
+                    {
+                        label: 'Gestió del procés',
+                        data: satisfactionData.mitjana_gestio,
+                        borderColor: 'rgba(16, 185, 129, 1)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                        borderWidth: 3,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        tension: 0.35,
+                        fill: true
+                    }
+                ]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+
+                    title: {
+                        display: true,
+                        text: 'Tendència de satisfacció empresarial'
+                    },
+
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.parsed.y}/5`;
+                            }
+                        }
+                    }
+                },
+
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 5,
+
+                        ticks: {
+                            stepSize: 1
+                        },
+
+                        title: {
+                            display: true,
+                            text: 'Valoració mitjana'
+                        }
+                    }
+                }
+            }
+        });
+
+            });
 </script>
 {% endblock %}
