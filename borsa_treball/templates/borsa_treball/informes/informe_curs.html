@@ -441,6 +441,20 @@
                             backgroundColor: 'rgba(75, 192, 192, 0.6)',
                             borderColor: 'rgba(75, 192, 192, 1)',
                             borderWidth: 1
+                        },
+                        {
+                            label: 'Qualitat candidats (1-5)',
+                            data: chartData.mitjana_qualitat,
+                            type: 'line',
+                            yAxisID: 'y1',
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Gestió procés (1-5)',
+                            data: chartData.mitjana_gestio,
+                            type: 'line',
+                            yAxisID: 'y1',
+                            tension: 0.3
                         }
                     ]
                 },
@@ -454,7 +468,20 @@
                                 display: true,
                                 text: 'Quantitat'
                             }
-                        }
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            position: 'right',
+                            min: 0,
+                            max: 5,
+                            grid: {
+                                drawOnChartArea: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Valoració (1-5)'
+                            }
+                        },
                     },
                     plugins: {
                         legend: {

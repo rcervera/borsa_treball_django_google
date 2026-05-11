@@ -76,6 +76,8 @@ def informe_curs_view(request):
         'num_ofertes': [],
         'num_candidatures': [],
         'num_contractats': [],
+        'mitjana_qualitat': [],      
+        'mitjana_gestio': [],        
     }
 
     for i in range(4):  # Bucle per als últims 4 anys (0, 1, 2, 3)
@@ -93,12 +95,28 @@ def informe_curs_view(request):
             estat=EstatCandidatura.CONTRATADA,
             data_canvi_estat__date__range=[period_start, period_end]
         ).count()
+
+        # Ofertes del període (només tancades millor)
+        p_ofertes_qs = Oferta.objects.filter(
+            data_publicacio__range=[period_start, period_end],
+            estat='TC'  # recomanat!
+        )
+
+        valoracions = p_ofertes_qs.aggregate(
+            mitjana_qualitat=Avg('qualitat_candidats'),
+            mitjana_gestio=Avg('gestio_proces')
+        )
+
+        p_mitjana_qualitat = round(valoracions['mitjana_qualitat'], 2) if valoracions['mitjana_qualitat'] else 0
+        p_mitjana_gestio = round(valoracions['mitjana_gestio'], 2) if valoracions['mitjana_gestio'] else 0
         
         # Afegim les dades a les llistes
         chart_data['labels'].append(label)
         chart_data['num_ofertes'].append(p_ofertes)
         chart_data['num_candidatures'].append(p_candidatures)
         chart_data['num_contractats'].append(p_contractats)
+        chart_data['mitjana_qualitat'].append(p_mitjana_qualitat)
+        chart_data['mitjana_gestio'].append(p_mitjana_gestio)
 
     # Invertim les llistes per tenir un ordre cronològic al gràfic (del més antic al més nou)
     for key in chart_data:
