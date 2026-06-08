@@ -416,6 +416,78 @@
         {% endif %}
       </div>
 
+      <div class="seccio-bloc">
+        <p class="seccio-titol">Inserció per família professional</p>
+    
+        {% if estadistiques_familia %}
+    
+        <div class="chart-card">
+    
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Família</th>
+                        <th class="text-center">Ofertes</th>
+                        <th class="text-center">Vacants</th>
+                        <th class="text-center">Contractats</th>
+                        <th class="text-center">% Inserció</th>
+                    </tr>
+                </thead>
+    
+                <tbody>
+    
+                {% for item in estadistiques_familia %}
+                    <tr>
+                        <td>{{ item.familia }}</td>
+    
+                        <td class="text-center">
+                            {{ item.ofertes }}
+                        </td>
+    
+                        <td class="text-center">
+                            {{ item.vacants }}
+                        </td>
+    
+                        <td class="text-center">
+                            {{ item.contractats }}
+                        </td>
+    
+                        <td class="text-center">
+    
+                            {% if item.percentatge_insercio >= 80 %}
+                                <span class="badge bg-success">
+                                    {{ item.percentatge_insercio }}%
+                                </span>
+    
+                            {% elif item.percentatge_insercio >= 50 %}
+                                <span class="badge bg-warning text-dark">
+                                    {{ item.percentatge_insercio }}%
+                                </span>
+    
+                            {% else %}
+                                <span class="badge bg-danger">
+                                    {{ item.percentatge_insercio }}%
+                                </span>
+    
+                            {% endif %}
+    
+                        </td>
+                    </tr>
+                {% endfor %}
+    
+                </tbody>
+    
+            </table>
+    
+        </div>
+    
+        {% else %}
+            <p class="text-buit">
+                Sense dades disponibles.
+            </p>
+        {% endif %}
+    </div>
+
     </div>
   </div>
 

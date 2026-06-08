@@ -69,6 +69,70 @@ def informe_curs_view(request):
     top_empreses = list(ofertes_period.values('empresa__nom_comercial').annotate(count=Count('id')).order_by('-count')[:5])
     ofertes_per_familia = list(ofertes_period.filter(cicles__familia__nom__isnull=False).values('cicles__familia__nom').annotate(count=Count('id', distinct=True)).order_by('-count'))
 
+    
+    # Estadístiques completes per família professional
+
+    estadistiques_familia = []
+
+    families = (
+        ofertes_period
+        .filter(cicles__familia__isnull=False)
+        .values(
+            'cicles__familia__id',
+            'cicles__familia__nom'
+        )
+        .distinct()
+    )
+
+    for familia in families:
+
+        familia_id = familia['cicles__familia__id']
+
+        ofertes_familia = ofertes_period.filter(
+            cicles__familia_id=familia_id
+        ).distinct()
+
+        num_ofertes_familia = ofertes_familia.count()
+
+        num_vacants_familia = (
+            ofertes_familia.aggregate(
+                total=Sum('numero_vacants')
+            )['total']
+            or 0
+        )
+
+        num_contractats_familia = (
+            Candidatura.objects.filter(
+                estat=EstatCandidatura.CONTRATADA,
+                data_canvi_estat__date__range=[start_date, end_date],
+                oferta__in=ofertes_familia
+            )
+            .distinct()
+            .count()
+        )
+
+        percentatge_insercio = 0
+
+        if num_vacants_familia > 0:
+            percentatge_insercio = round(
+                (num_contractats_familia / num_vacants_familia) * 100,
+                2
+            )
+
+        estadistiques_familia.append({
+            'familia': familia['cicles__familia__nom'],
+            'ofertes': num_ofertes_familia,
+            'vacants': num_vacants_familia,
+            'contractats': num_contractats_familia,
+            'percentatge_insercio': percentatge_insercio,
+        })
+
+    estadistiques_familia.sort(
+        key=lambda x: x['percentatge_insercio'],
+        reverse=True
+    )
+        
+    
     # --- NOU: Càlcul de dades per a la gràfica històrica ---
     
     chart_data = {
@@ -148,6 +212,7 @@ def informe_curs_view(request):
         'satisfaction_chart_data': satisfaction_chart_data,
         'mitjana_qualitat_candidats': mitjana_qualitat_candidats,
         'mitjana_gestio_proces': mitjana_gestio_proces,
+        'estadistiques_familia': estadistiques_familia,
     }
 
     return render(request, 'borsa_treball/informes/informe_curs.html', context)
