@@ -5,6 +5,7 @@ from django.utils import timezone
 from datetime import date
 from django.db.models import Count, Sum, Avg
 from .models import Oferta, Estudiant, Empresa, Candidatura, EstatCandidatura
+from .models import FamiliaProfessional
 import json # Importem json per si calgués, encara que el tag 'json_script' ho gestiona internament
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
@@ -74,19 +75,13 @@ def informe_curs_view(request):
 
     estadistiques_familia = []
 
-    families = (
-        ofertes_period
-        .filter(cicles__familia__isnull=False)
-        .values(
-            'cicles__familia__id',
-            'cicles__familia__nom'
-        )
-        .distinct()
-    )
+    families = FamiliaProfessional.objects.filter(
+            cicle__ofertes__in=ofertes_period
+    ).distinct()
 
     for familia in families:
 
-        familia_id = familia['cicles__familia__id']
+        familia_id = familia.id
 
         ofertes_familia = ofertes_period.filter(
             cicles__familia_id=familia_id
@@ -120,7 +115,7 @@ def informe_curs_view(request):
             )
 
         estadistiques_familia.append({
-            'familia': familia['cicles__familia__nom'],
+            'familia': familia.nom,
             'ofertes': num_ofertes_familia,
             'vacants': num_vacants_familia,
             'contractats': num_contractats_familia,
