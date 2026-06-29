@@ -237,6 +237,106 @@
             margin-right: 0.35rem;
         }
 
+        .noticia-llegir-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            color: #3b82f6;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .noticia-llegir-btn:hover {
+            color: #1d4ed8;
+        }
+
+        .noticia-llegir-btn i {
+            margin-right: 0.35rem;
+        }
+
+        /* Modal cos de la notícia */
+        .noticia-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            z-index: 1050;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .noticia-modal-overlay.open {
+            display: flex;
+        }
+
+        .noticia-modal {
+            background: #ffffff;
+            border-radius: 16px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .noticia-modal-img {
+            width: 100%;
+            max-height: 280px;
+            object-fit: cover;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .noticia-modal-content {
+            padding: 1.75rem 2rem 2rem 2rem;
+        }
+
+        .noticia-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .noticia-modal-titol {
+            color: #1e293b;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 0 0 0.4rem 0;
+        }
+
+        .noticia-modal-data {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        .noticia-modal-cos {
+            color: #334155;
+            font-size: 1rem;
+            line-height: 1.7;
+            white-space: pre-line;
+            margin-bottom: 1.25rem;
+        }
+
+        .noticia-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            line-height: 1;
+            color: #64748b;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .noticia-modal-close:hover {
+            color: #1e293b;
+        }
+
         /* Fletxes de navegació */
         .noticies-nav {
             position: absolute;
@@ -615,6 +715,13 @@
                             <h3 class="noticia-titol">{{ noticia.titol }}</h3>
                             <p class="noticia-descripcio">{{ noticia.descripcio }}</p>
                             <div class="noticia-links">
+                                <button type="button" class="noticia-llegir-btn"
+                                        data-titol="{{ noticia.titol|escape }}"
+                                        data-data="{{ noticia.data_publicacio|date:'d/m/Y' }}"
+                                        data-cos="{{ noticia.cos|escape }}"
+                                        {% if noticia.imatge %}data-imatge="{{ noticia.imatge.url }}"{% endif %}>
+                                    <i class="bi bi-book"></i> Llegir més
+                                </button>
                                 {% if noticia.url %}
                                     <a href="{{ noticia.url }}" class="noticia-link" target="_blank" rel="noopener">
                                         <i class="bi bi-box-arrow-up-right"></i> Més informació
@@ -702,6 +809,21 @@
         </div>
     </div>
 
+    <!-- MODAL cos de la notícia -->
+    <div class="noticia-modal-overlay" id="noticiaModal">
+        <div class="noticia-modal">
+            <img src="" alt="" class="noticia-modal-img" id="noticiaModalImg" style="display:none;">
+            <div class="noticia-modal-content">
+                <div class="noticia-modal-header">
+                    <h2 class="noticia-modal-titol" id="noticiaModalTitol"></h2>
+                    <button type="button" class="noticia-modal-close" id="noticiaModalClose" aria-label="Tancar">&times;</button>
+                </div>
+                <div class="noticia-modal-data" id="noticiaModalData"></div>
+                <div class="noticia-modal-cos" id="noticiaModalCos"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- FOOTER -->
     <footer class="footer-section">
         <div class="container">
@@ -765,6 +887,49 @@
             scroller.addEventListener('scroll', update);
             window.addEventListener('resize', update);
             update();
+        })();
+
+        (function () {
+            var modal = document.getElementById('noticiaModal');
+            if (!modal) return;
+            var img = document.getElementById('noticiaModalImg');
+            var titol = document.getElementById('noticiaModalTitol');
+            var data = document.getElementById('noticiaModalData');
+            var cos = document.getElementById('noticiaModalCos');
+            var closeBtn = document.getElementById('noticiaModalClose');
+
+            function open() {
+                modal.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+            function close() {
+                modal.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+
+            document.querySelectorAll('.noticia-llegir-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    titol.textContent = btn.dataset.titol || '';
+                    data.textContent = btn.dataset.data || '';
+                    cos.textContent = btn.dataset.cos || '';
+                    if (btn.dataset.imatge) {
+                        img.src = btn.dataset.imatge;
+                        img.alt = btn.dataset.titol || '';
+                        img.style.display = 'block';
+                    } else {
+                        img.style.display = 'none';
+                    }
+                    open();
+                });
+            });
+
+            closeBtn.addEventListener('click', close);
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) close();
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') close();
+            });
         })();
     </script>
 
