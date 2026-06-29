@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Borsa de Treball - Institut Vidal i Barraquer</title>  
+    <title>Borsa de Treball - Institut Vidal i Barraquer</title>
     {% bootstrap_css %}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-     
+
         body {
             background-color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -82,7 +82,7 @@
         /* Botó login millorat */
         .header-login-btn {
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            border: none;        
+            border: none;
             border-radius: 25px;
             padding: 0.8rem 1.5rem;
             font-weight: 600;
@@ -106,13 +106,183 @@
             margin-right: 0.5rem;
         }
 
+        /* ===== SECCIÓ NOTÍCIES ===== */
+        .noticies-section {
+            background: #ffffff;
+            padding: 2.5rem 0 1rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .noticies-title {
+            color: #1e293b;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .noticies-title i {
+            color: #3b82f6;
+            margin-right: 0.6rem;
+        }
+
+        .noticies-wrapper {
+            position: relative;
+        }
+
+        .noticies-scroll {
+            display: flex;
+            gap: 1.5rem;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 0.5rem 0.25rem 1.5rem 0.25rem;
+            scrollbar-width: thin;
+        }
+
+        .noticies-scroll::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .noticies-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .noticia-card {
+            flex: 0 0 320px;
+            max-width: 320px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .noticia-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .noticia-img {
+            width: 100%;
+            height: 170px;
+            object-fit: cover;
+        }
+
+        .noticia-img-placeholder {
+            width: 100%;
+            height: 170px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 2.5rem;
+        }
+
+        .noticia-body {
+            padding: 1.25rem 1.25rem 1.5rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .noticia-data {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .noticia-titol {
+            color: #1e293b;
+            font-weight: 700;
+            font-size: 1.15rem;
+            margin-bottom: 0.6rem;
+            line-height: 1.3;
+        }
+
+        .noticia-descripcio {
+            color: #64748b;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+
+        .noticia-links {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .noticia-link {
+            display: inline-flex;
+            align-items: center;
+            color: #3b82f6;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .noticia-link:hover {
+            color: #1d4ed8;
+        }
+
+        .noticia-link i {
+            margin-right: 0.35rem;
+        }
+
+        /* Fletxes de navegació */
+        .noticies-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: #ffffff;
+            color: #1e293b;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            cursor: pointer;
+            z-index: 5;
+            transition: all 0.3s ease;
+        }
+
+        .noticies-nav:hover {
+            background: #3b82f6;
+            color: #ffffff;
+        }
+
+        .noticies-nav.prev {
+            left: -10px;
+        }
+
+        .noticies-nav.next {
+            right: -10px;
+        }
+
+        .noticies-empty {
+            color: #94a3b8;
+            font-size: 1rem;
+        }
+
         /* Layout principal */
         .main-container {
             min-height: calc(100vh - 200px);
             padding: 4rem 0;
         }
 
-       
+
         .user-section {
             position: relative;
             z-index: 2;
@@ -218,7 +388,7 @@
             margin-right: 0.5rem;
         }
 
-       
+
         .info-section {
             background: #ffffff;
             padding: 2rem 0;
@@ -361,6 +531,14 @@
             .footer-section {
                 padding: 2rem 0 1rem 0;
             }
+
+            .noticia-card {
+                flex: 0 0 260px;
+                max-width: 260px;
+            }
+
+            .noticies-nav.prev { left: 0; }
+            .noticies-nav.next { right: 0; }
         }
 
         /* Ajustos per pantalles mitjanes */
@@ -384,7 +562,7 @@
     </style>
 </head>
 <body>
-   
+
     <!-- HEADER amb estil similar al footer -->
     <header class="header-section">
         <div class="container">
@@ -400,7 +578,7 @@
                     </a>
                     <p class="header-subtitle">Institut Vidal i Barraquer de Tarragona</p>
                 </div>
-                
+
                 <a href="{% url 'login' %}" class="header-login-btn">
                     <i class="bi bi-box-arrow-in-right"></i>
                     Iniciar sessió
@@ -408,6 +586,58 @@
             </div>
         </div>
     </header>
+
+    <!-- SECCIÓ NOTÍCIES (TOTHOM, visibles) -->
+    {% if noticies %}
+    <section class="noticies-section">
+        <div class="container">
+            <h2 class="noticies-title">
+                <i class="bi bi-newspaper"></i>
+                Notícies
+            </h2>
+            <div class="noticies-wrapper">
+                <button type="button" class="noticies-nav prev" id="noticiesPrev" aria-label="Anterior">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+
+                <div class="noticies-scroll" id="noticiesScroll">
+                    {% for noticia in noticies %}
+                    <article class="noticia-card">
+                        {% if noticia.imatge %}
+                            <img src="{{ noticia.imatge.url }}" alt="{{ noticia.titol }}" class="noticia-img">
+                        {% else %}
+                            <div class="noticia-img-placeholder">
+                                <i class="bi bi-newspaper"></i>
+                            </div>
+                        {% endif %}
+                        <div class="noticia-body">
+                            <span class="noticia-data">{{ noticia.data_publicacio|date:"d/m/Y" }}</span>
+                            <h3 class="noticia-titol">{{ noticia.titol }}</h3>
+                            <p class="noticia-descripcio">{{ noticia.descripcio }}</p>
+                            <div class="noticia-links">
+                                {% if noticia.url %}
+                                    <a href="{{ noticia.url }}" class="noticia-link" target="_blank" rel="noopener">
+                                        <i class="bi bi-box-arrow-up-right"></i> Més informació
+                                    </a>
+                                {% endif %}
+                                {% if noticia.document %}
+                                    <a href="{{ noticia.document.url }}" class="noticia-link" target="_blank" rel="noopener">
+                                        <i class="bi bi-file-earmark-text"></i> Document
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+
+                <button type="button" class="noticies-nav next" id="noticiesNext" aria-label="Següent">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+    {% endif %}
 
     <!-- Contingut principal -->
     <div class="main-container">
@@ -417,8 +647,8 @@
                 <div class="col-lg-4 mb-4">
                     <div class="user-section">
                         <div class="user-card">
-                            <img src="{% static 'imgs/estudiants.png' %}" 
-                                 alt="Estudiant" 
+                            <img src="{% static 'imgs/estudiants.png' %}"
+                                 alt="Estudiant"
                                  class="user-avatar">
                             <h3 class="user-title">Soc del Vidal</h3>
                             <p class="user-description">
@@ -454,8 +684,8 @@
                 <div class="col-lg-4 mb-4">
                     <div class="user-section">
                         <div class="user-card">
-                            <img src="{% static 'imgs/empreses.png' %}" 
-                                 alt="Empresa" 
+                            <img src="{% static 'imgs/empreses.png' %}"
+                                 alt="Empresa"
                                  class="user-avatar">
                             <h3 class="user-title">Soc empresa</h3>
                             <p class="user-description">
@@ -480,18 +710,18 @@
                     <i class="bi bi-telephone me-2"></i>
                     Contacta amb nosaltres
                 </h5>
-                
+
                 <div class="contact-info">
                     <a href="mailto:borsatreball@vidalibarraquer.net" class="contact-item">
                         <i class="bi bi-envelope-fill"></i>
                         borsatreball@vidalibarraquer.net
                     </a>
-                    
+
                     <a href="tel:977212836" class="contact-item">
                         <i class="bi bi-telephone-fill"></i>
                         977 212 836 / 977 214 132
                     </a>
-                    
+
                     <div class="contact-item">
                         <i class="bi bi-clock-fill"></i>
                         Dijous de 10:00 a 11:00 i de 17:00 a 18:00h
@@ -499,16 +729,44 @@
                 </div>
 
                 <div class="footer-divider"></div>
-                
+
                 <div class="footer-bottom">
                     <p class="mb-0">
-                        © 2024 Institut Vidal i Barraquer - Tarragona. 
+                        © 2024 Institut Vidal i Barraquer - Tarragona.
                         Sistema de gestió d'ocupació per estudiants i empreses col·laboradores.
                     </p>
                 </div>
             </div>
         </div>
     </footer>
+
+    <script>
+        (function () {
+            var scroller = document.getElementById('noticiesScroll');
+            var prev = document.getElementById('noticiesPrev');
+            var next = document.getElementById('noticiesNext');
+            if (!scroller || !prev || !next) return;
+
+            var STEP = 340; // amplada de la targeta + gap
+
+            function update() {
+                var maxScroll = scroller.scrollWidth - scroller.clientWidth - 1;
+                prev.style.display = scroller.scrollLeft <= 0 ? 'none' : 'flex';
+                next.style.display = scroller.scrollLeft >= maxScroll ? 'none' : 'flex';
+            }
+
+            prev.addEventListener('click', function () {
+                scroller.scrollBy({ left: -STEP, behavior: 'smooth' });
+            });
+            next.addEventListener('click', function () {
+                scroller.scrollBy({ left: STEP, behavior: 'smooth' });
+            });
+
+            scroller.addEventListener('scroll', update);
+            window.addEventListener('resize', update);
+            update();
+        })();
+    </script>
 
 </body>
 </html>

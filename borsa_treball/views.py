@@ -62,7 +62,8 @@ def login_view(request):
 def index(request):
 
     if not request.user.is_authenticated:
-        return render(request, 'landing.html')
+        noticies = Noticia.objects.filter(visible=True, destinatari='TOTHOM')
+        return render(request, 'landing.html', {'noticies': noticies})        
     
     user = request.user
     context = {}
